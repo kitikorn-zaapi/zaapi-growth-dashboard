@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zaapi · Meta Asset Dashboard</title>
+  <title>Zaapi · Meta Asset</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet" />
@@ -20,7 +20,6 @@
       --text-muted: #7a786f;
       --text-faint: #b0ada5;
       --accent: #0f9e75;
-      --accent-bg: #e6f7f1;
       --up: #1a7a4a;
       --up-bg: #e8f7ee;
       --down: #c0392b;
@@ -72,6 +71,31 @@
       font-family: var(--font-mono);
     }
 
+    .forex-ctrl {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .forex-ctrl input {
+      width: 52px;
+      padding: 4px 8px;
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+      border: 1px solid var(--border-strong);
+      border-radius: 5px;
+      background: var(--bg-subtle);
+      color: var(--text);
+      text-align: center;
+    }
+
+    .forex-ctrl input:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+
     .nav-btn {
       font-family: var(--font-mono);
       font-size: 0.72rem;
@@ -86,28 +110,37 @@
     .nav-btn:hover { color: var(--text); border-color: var(--border-strong); background: var(--bg); }
     .nav-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
 
+    .section { margin-top: 2.2rem; }
+
+    .section-title {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-faint);
+      margin-bottom: 0.85rem;
+    }
+
     .controls {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
       flex-wrap: wrap;
-      margin-bottom: 1.5rem;
-      padding: 1rem;
+      align-items: center;
+      gap: 0.8rem 1rem;
+      margin-bottom: 1rem;
       border: 1px solid var(--border);
       border-radius: 8px;
       background: var(--bg-subtle);
+      padding: 0.8rem 1rem;
     }
 
     .control-group {
       display: flex;
+      gap: 0.5rem;
       align-items: center;
-      gap: 0.6rem;
-      flex-wrap: wrap;
     }
 
     .label {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-family: var(--font-mono);
       text-transform: uppercase;
       letter-spacing: 0.08em;
@@ -119,19 +152,9 @@
       border-radius: 6px;
       background: var(--bg);
       color: var(--text);
-      padding: 0.4rem 0.55rem;
+      padding: 0.35rem 0.5rem;
       font-size: 0.86rem;
       font-family: var(--font-sans);
-    }
-
-    .section { margin-top: 2rem; }
-    .section-title {
-      font-family: var(--font-mono);
-      font-size: 0.74rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-faint);
-      margin-bottom: 0.8rem;
     }
 
     .leaderboard {
@@ -157,12 +180,7 @@
       margin-bottom: 0.7rem;
     }
 
-    .thumb-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+    .thumb-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     .img-placeholder {
       width: 100%;
@@ -173,9 +191,10 @@
       background: #d9d9d9;
       color: #555;
       font-family: var(--font-mono);
-      font-size: 0.8rem;
-      text-transform: uppercase;
+      font-size: 0.82rem;
+      font-weight: 500;
       letter-spacing: 0.04em;
+      text-transform: uppercase;
       text-align: center;
       padding: 0.4rem;
     }
@@ -190,15 +209,15 @@
 
     .ad-code {
       font-family: var(--font-mono);
-      font-size: 0.84rem;
-      font-weight: 500;
-      letter-spacing: 0.04em;
+      font-size: 0.86rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
     }
 
-    .pills { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.45rem; }
+    .pills { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.5rem; }
 
     .pill {
-      font-size: 0.68rem;
+      font-size: 0.67rem;
       padding: 0.12rem 0.45rem;
       border-radius: 999px;
       border: 1px solid var(--border-strong);
@@ -220,104 +239,89 @@
     .metric-value { font-size: 0.9rem; font-weight: 500; }
 
     .status {
-      font-size: 0.67rem;
+      font-size: 0.68rem;
       font-family: var(--font-mono);
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.04em;
       border-radius: 999px;
-      padding: 0.15rem 0.5rem;
-      border: 1px solid var(--border);
+      padding: 0.12rem 0.5rem;
+      border: 1px solid var(--border-strong);
       color: var(--text-muted);
       background: var(--bg-subtle);
     }
 
-    .status-kill { color: var(--down); background: var(--down-bg); border-color: #f1c3bc; }
-    .status-scale { color: var(--up); background: var(--up-bg); border-color: #bbe4c8; }
-    .status-watch { color: #8a6200; background: #fff8e7; border-color: #f1deaa; }
-    .status-pending { color: #4e63a6; background: #eef2ff; border-color: #ccd5f7; }
+    .status-kill { color: var(--down); background: var(--down-bg); border-color: #f0b2ab; }
+    .status-scale { color: var(--up); background: var(--up-bg); border-color: #b6e4c8; }
 
     .assessment {
-      margin-top: 0.4rem;
-      font-size: 0.83rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
-      cursor: pointer;
-      user-select: none;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      cursor: pointer;
+      user-select: none;
     }
 
     .assessment.expanded {
+      display: block;
       -webkit-line-clamp: unset;
       overflow: visible;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    .table-wrap {
       border: 1px solid var(--border);
       border-radius: 8px;
       overflow: hidden;
-      font-size: 0.88rem;
     }
 
-    th, td {
-      text-align: left;
-      padding: 0.52rem 0.6rem;
-      border-bottom: 1px solid var(--border);
-    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    thead { background: var(--bg-subtle); }
+    th, td { padding: 0.6rem 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); }
+    tbody tr:last-child td { border-bottom: none; }
 
-    th {
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: var(--text-faint);
-      background: var(--bg-subtle);
-    }
-
-    tr:last-child td { border-bottom: none; }
-
-    .next-test {
+    .next-box {
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 0.9rem;
       background: var(--bg-subtle);
+      padding: 1rem;
       font-size: 0.95rem;
     }
 
     .empty {
-      padding: 1rem;
       border: 1px dashed var(--border-strong);
       border-radius: 8px;
-      color: var(--text-faint);
-      font-family: var(--font-mono);
-      font-size: 0.82rem;
+      padding: 0.9rem;
+      color: var(--text-muted);
+      background: #fcfcfb;
     }
 
-    @media (max-width: 760px) {
-      .page { padding: 1.5rem 1rem 3rem; }
-      .header { flex-direction: column; align-items: flex-start; margin-bottom: 1.2rem; }
-      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    @media (max-width: 920px) {
+      .header { flex-direction: column; }
     }
   </style>
 </head>
 <body>
-  <div class="page">
+  <main class="page">
     <header class="header">
       <div>
         <div class="logo">Zaapi · Growth Dashboard</div>
-        <div id="week-label">Meta Asset Performance</div>
+        <div id="week-label">—</div>
       </div>
-      <nav style="display:flex;align-items:center;gap:0.4rem;">
-        <a href="index.html" class="nav-btn">Overview</a>
-        <a href="search.html" class="nav-btn">Search</a>
-        <a href="meta-asset.html" class="nav-btn active">Meta Asset</a>
-      </nav>
+      <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+        <div class="forex-ctrl">
+          <span>Forex</span>
+          <input id="forex-rate" type="number" step="0.01" min="0" aria-label="Forex rate" />
+        </div>
+        <a class="nav-btn" href="index.html">Overview</a>
+        <a class="nav-btn" href="search.html">Search</a>
+        <a class="nav-btn active" href="meta-asset.html" aria-current="page">Meta Asset</a>
+      </div>
     </header>
 
-    <section class="controls">
+    <section class="controls" aria-label="Meta asset controls">
       <div class="control-group">
         <label class="label" for="region-filter">Region</label>
         <select id="region-filter">
@@ -330,10 +334,10 @@
       <div class="control-group">
         <label class="label" for="sort-by">Sort</label>
         <select id="sort-by">
-          <option value="fti_desc">FTI (desc)</option>
-          <option value="hook_rate_desc">Hook Rate (desc)</option>
-          <option value="spend_desc">Spend (desc)</option>
-          <option value="cpa_asc">CPA (asc)</option>
+          <option value="fti_desc">FTI (descending)</option>
+          <option value="hook_rate_desc">Hook Rate (descending)</option>
+          <option value="spend_desc">Spend (descending)</option>
+          <option value="cpa_asc">CPA (ascending)</option>
         </select>
       </div>
     </section>
@@ -344,16 +348,17 @@
     </section>
 
     <section class="section">
-      <h2 class="section-title">Section 2 — Fatigue</h2>
+      <h2 class="section-title">Section 2 — Fatigue Watch</h2>
       <div id="fatigue"></div>
     </section>
 
     <section class="section">
-      <h2 class="section-title">Section 3 — Next Test</h2>
-      <div id="next-test" class="next-test"></div>
+      <h2 class="section-title">Section 3 — Next Test Suggestion</h2>
+      <div id="next-test" class="next-box"></div>
     </section>
-  </div>
+  </main>
 
+  <script src="shared-nav.js"></script>
   <script src="meta-asset.js"></script>
 </body>
 </html>
