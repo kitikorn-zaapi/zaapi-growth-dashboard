@@ -1,7 +1,8 @@
-const SHEETS_CSV_URL = "PASTE_URL";
-const API_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(SHEETS_CSV_URL)}`;
+const SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSVufnWJeLLw5gPzY35xMd4M3-NPdeEIgnHQHJ5PjuESKootN4ZpuNanI-KMcdphPnqRI6iu80wynFR/pub?gid=526174207&single=true&output=csv";
+const PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(SHEETS_CSV_URL)}`;
 
 const NUMERIC_FIELDS = ["spend", "hook_rate", "thumb_stop", "frequency", "ctr", "fti", "cpa"];
+const EXPECTED_COLUMNS = ["ad_code", "status", "region", "prod", "angle", "feature1", "stage", "spend", "hook_rate", "thumb_stop", "frequency", "ctr", "fti", "cpa", "assessment"];
 
 const state = {
   rows: [],
@@ -27,105 +28,101 @@ sortByEl.addEventListener("change", (event) => {
 
 async function init() {
   try {
-    const response = await fetch(API_URL);
+    const response = await fetch(PROXY_URL);
     const csvText = await response.text();
     state.rows = parseCsv(csvText);
     render();
   } catch (error) {
-    leaderboardEl.innerHTML = `<div class="empty">Failed to load CSV data.</div>`;
-    fatigueEl.innerHTML = `<div class="empty">Failed to load CSV data.</div>`;
-    nextTestEl.textContent = "No test suggestion available.";
+    const errorHtml = '<div class="empty">Failed to load Meta Asset CSV data.</div>';
+    leaderboardEl.innerHTML = errorHtml;
+    fatigueEl.innerHTML = errorHtml;
+    nextTestEl.innerHTML = "No test suggestion available.";
     console.error(error);
   }
 }
 
 function parseCsv(csvText) {
-  const lines = csvText
+  const rows = csvText
     .split("\n")
     .map((line) => line.trim())
-    .filter((line) => line.length > 0);
+    .filter((line) => line.length > 0)
+    .map((line) => line.split(",").map((cell) => cell.trim()));
 
-  if (lines.length < 2) {
-    return [];
-  }
+  if (rows.length < 2) return [];
 
-  const headers = lines[0].split(",").map((h) => h.trim().toLowerCase());
+  const rawHeaders = rows[0].map((header) => normalizeKey(header));
+  const headerMap = EXPECTED_COLUMNS.map((column) => {
+    const idx = rawHeaders.indexOf(column);
+    return { column, idx };
+  });
 
-  return lines.slice(1).map((line) => {
-    const parts = line.split(",").map((part) => part.trim());
+  return rows.slice(1).map((cells) => {
     const row = {};
 
-    headers.forEach((header, index) => {
-      row[header] = parts[index] ?? "";
+    headerMap.forEach(({ column, idx }) => {
+      row[column] = idx >= 0 ? (cells[idx] || "") : "";
     });
 
     NUMERIC_FIELDS.forEach((field) => {
-      row[field] = Number(row[field]) || 0;
+      row[field] = toNumber(row[field]);
     });
 
-    row.status = getStatus(row);
-    row.assessment = row.assessment || row.note || row.notes || "No assessment available.";
-
+    row.status = classifyStatus(row);
     return row;
   });
 }
 
-function getStatus(row) {
-  if (row.hook_rate < 15 || row.ctr < 0.8 || (row.fti === 0 && row.spend > 15)) {
-    return "Kill";
-  }
-  if (row.hook_rate > 35 && row.fti >= 2) {
-    return "Scale";
-  }
-  if (row.fti > 0 && row.fti < 2) {
-    return "Watch";
-  }
-  if (row.spend === 0) {
-    return "Pending";
-  }
+function toNumber(value) {
+  const cleaned = String(value).replace(/[^0-9.-]/g, "");
+  const parsed = Number(cleaned);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function normalizeKey(value) {
+  return String(value).trim().toLowerCase().replace(/\s+/g, "_");
+}
+
+function classifyStatus(row) {
+  if (row.hook_rate < 15 || row.ctr < 0.8 || (row.fti === 0 && row.spend > 15)) return "Kill";
+  if (row.hook_rate > 35 && row.fti >= 2) return "Scale";
+  if (row.fti > 0 && row.fti < 2) return "Watch";
+  if (row.spend === 0) return "Pending";
   return "Live";
 }
 
-function filteredRows() {
-  const region = state.region;
-  const rows = region === "All"
+function getFilteredAndSortedRows() {
+  const filtered = state.region === "All"
     ? [...state.rows]
-    : state.rows.filter((row) => (row.region || "").toUpperCase() === region);
+    : state.rows.filter((row) => String(row.region).toUpperCase() === state.region);
 
-  return rows.sort((a, b) => {
-    switch (state.sortBy) {
-      case "hook_rate_desc":
-        return b.hook_rate - a.hook_rate;
-      case "spend_desc":
-        return b.spend - a.spend;
-      case "cpa_asc":
-        return a.cpa - b.cpa;
-      case "fti_desc":
-      default:
-        return b.fti - a.fti;
-    }
+  return filtered.sort((a, b) => {
+    if (state.sortBy === "hook_rate_desc") return b.hook_rate - a.hook_rate;
+    if (state.sortBy === "spend_desc") return b.spend - a.spend;
+    if (state.sortBy === "cpa_asc") return a.cpa - b.cpa;
+    return b.fti - a.fti;
   });
 }
 
 function render() {
-  const rows = filteredRows();
+  const rows = getFilteredAndSortedRows();
   renderLeaderboard(rows);
   renderFatigue(rows);
   renderNextTest(rows);
 }
 
 function renderLeaderboard(rows) {
-  if (rows.length === 0) {
-    leaderboardEl.innerHTML = `<div class="empty">No assets found for this region.</div>`;
+  if (!rows.length) {
+    leaderboardEl.innerHTML = '<div class="empty">No assets found for this region.</div>';
     return;
   }
 
   leaderboardEl.innerHTML = rows.map((row) => {
-    const adCode = row.ad_code || row.adcode || "UNKNOWN";
+    const adCode = row.ad_code || "UNKNOWN";
+
     return `
       <article class="asset-card">
-        <div class="thumb-wrap" data-code="${escapeHtml(adCode)}">
-          <img src="assets/${encodeURIComponent(adCode)}.jpg" alt="${escapeHtml(adCode)}" data-ad-code="${escapeHtml(adCode)}" />
+        <div class="thumb-wrap" data-ad-code="${escapeHtml(adCode)}">
+          <img src="assets/${encodeURIComponent(adCode)}.jpg" alt="${escapeHtml(adCode)}" loading="lazy" />
         </div>
         <div class="row-top">
           <div class="ad-code">${escapeHtml(adCode)}</div>
@@ -143,21 +140,22 @@ function renderLeaderboard(rows) {
           ${metricCell("CPA", `$${row.cpa.toFixed(2)}`)}
           ${metricCell("Frequency", row.frequency.toFixed(2))}
         </div>
-        <p class="assessment" title="Click to expand/collapse">${escapeHtml(row.assessment)}</p>
+        <p class="assessment" title="Click to expand/collapse">${escapeHtml(row.assessment || "No assessment")}</p>
       </article>
     `;
   }).join("");
 
-  leaderboardEl.querySelectorAll("img[data-ad-code]").forEach((imgEl) => {
-    imgEl.addEventListener("error", () => {
-      const code = imgEl.dataset.adCode || "UNKNOWN";
-      imgEl.parentElement.innerHTML = `<div class="img-placeholder">${escapeHtml(code)}</div>`;
+  leaderboardEl.querySelectorAll(".thumb-wrap img").forEach((img) => {
+    img.addEventListener("error", () => {
+      const wrapper = img.parentElement;
+      const adCode = wrapper.dataset.adCode || "UNKNOWN";
+      wrapper.innerHTML = `<div class="img-placeholder">${escapeHtml(adCode)}</div>`;
     }, { once: true });
   });
 
-  leaderboardEl.querySelectorAll(".assessment").forEach((assessmentEl) => {
-    assessmentEl.addEventListener("click", () => {
-      assessmentEl.classList.toggle("expanded");
+  leaderboardEl.querySelectorAll(".assessment").forEach((assessment) => {
+    assessment.addEventListener("click", () => {
+      assessment.classList.toggle("expanded");
     });
   });
 }
@@ -165,54 +163,56 @@ function renderLeaderboard(rows) {
 function renderFatigue(rows) {
   const fatigueRows = rows.filter((row) => row.frequency > 2.5 || (row.hook_rate < 15 && row.spend > 0));
 
-  if (fatigueRows.length === 0) {
-    fatigueEl.innerHTML = `<div class="empty">No fatigue risks detected.</div>`;
+  if (!fatigueRows.length) {
+    fatigueEl.innerHTML = '<div class="empty">All clear — no fatigue signals this week.</div>';
     return;
   }
 
   fatigueEl.innerHTML = `
-    <table>
-      <thead>
-        <tr>
-          <th>Ad Code</th>
-          <th>Region</th>
-          <th>Hook Rate</th>
-          <th>Frequency</th>
-          <th>Issue</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${fatigueRows.map((row) => {
-          const issue = row.frequency > 2.5
-            ? "High frequency"
-            : "Low hook rate with spend";
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Ad Code</th>
+            <th>Region</th>
+            <th>Hook Rate</th>
+            <th>Frequency</th>
+            <th>Issue</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${fatigueRows.map((row) => {
+            const issue = row.frequency > 2.5
+              ? "High frequency"
+              : "Low hook rate with spend";
 
-          return `
-            <tr>
-              <td>${escapeHtml(row.ad_code || row.adcode || "-")}</td>
-              <td>${escapeHtml(row.region || "-")}</td>
-              <td>${row.hook_rate.toFixed(1)}%</td>
-              <td>${row.frequency.toFixed(2)}</td>
-              <td>${issue}</td>
-            </tr>
-          `;
-        }).join("")}
-      </tbody>
-    </table>
+            return `
+              <tr>
+                <td>${escapeHtml(row.ad_code || "-")}</td>
+                <td>${escapeHtml(row.region || "-")}</td>
+                <td>${row.hook_rate.toFixed(1)}%</td>
+                <td>${row.frequency.toFixed(2)}</td>
+                <td>${issue}</td>
+              </tr>
+            `;
+          }).join("")}
+        </tbody>
+      </table>
+    </div>
   `;
 }
 
 function renderNextTest(rows) {
-  const spentRows = rows.filter((row) => row.spend > 0);
-  if (spentRows.length === 0) {
-    nextTestEl.textContent = "No spend yet. Launch first batch before suggesting next test.";
+  const candidates = rows.filter((row) => row.spend > 0);
+  if (!candidates.length) {
+    nextTestEl.textContent = "No spend yet. Launch a live test to generate a next suggestion.";
     return;
   }
 
-  const winner = [...spentRows].sort((a, b) => b.fti - a.fti)[0];
-  const adCode = winner.ad_code || winner.adcode || "-";
+  const winner = [...candidates].sort((a, b) => b.fti - a.fti)[0];
+  const adCode = winner.ad_code || "-";
 
-  nextTestEl.innerHTML = `Winner: <strong>${escapeHtml(adCode)}</strong> (${winner.fti.toFixed(2)} FTI, $${winner.cpa.toFixed(2)} CPA)<br>→ Suggested next: test new angle in <strong>${escapeHtml(winner.region || "same")}</strong>.`;
+  nextTestEl.innerHTML = `Winner: <strong>${escapeHtml(adCode)}</strong> (${winner.fti.toFixed(2)} FTI, $${winner.cpa.toFixed(2)} CPA)<br>→ Suggested next: test new angle`;
 }
 
 function metricCell(label, value) {
