@@ -56,10 +56,12 @@ async function init() {
 }
 
 function parseCsv(csvText) {
-  const rows = csvText
+  const lines = csvText
     .split("\n")
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0)
+    .map((line) => line.replace(/\r$/, "").trim())
+    .filter((line) => line.length > 0);
+
+  const rows = lines
     .map((line) => splitCsvRow(line).map((cell) => cell.replace(/^"|"$/g, "").trim()));
 
   console.log("ROWS:", rows.length);
@@ -78,7 +80,7 @@ function parseCsv(csvText) {
     const row = {};
 
     headerMap.forEach(({ column, idx }) => {
-      row[column] = idx >= 0 ? (cells[idx] || "") : "";
+      row[column] = idx >= 0 ? (cells[idx] || "").trim() : "";
     });
 
     NUMERIC_FIELDS.forEach((field) => {
@@ -145,7 +147,7 @@ function splitCsvRow(line) {
 function getFilteredAndSortedRows() {
   const filtered = state.region === "All"
     ? [...state.rows]
-    : state.rows.filter((row) => String(row.region).toUpperCase() === state.region);
+    : state.rows.filter((row) => row.region === state.region);
 
   return filtered.sort((a, b) => {
     if (state.sortBy === "hook_rate_desc") return b.hook_rate - a.hook_rate;
@@ -158,6 +160,7 @@ function getFilteredAndSortedRows() {
 function render() {
   const rows = getFilteredAndSortedRows();
   console.log("DATA TO RENDER:", rows.length);
+  console.log("REGIONS:", state.rows.slice(0, 10).map((r) => `"${r.region}"`));
   renderLeaderboard(rows);
   renderFatigue(rows);
   renderNextTest(rows);
