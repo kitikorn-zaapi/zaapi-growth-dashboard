@@ -1075,6 +1075,11 @@
       "cost_per_hq": 14245
     }
   ],
+  "history_by_region": {
+    "TH": [],
+    "SEA": [],
+    "ROW": []
+  },
   "region_spend": [
     {
       "region": "TH",
