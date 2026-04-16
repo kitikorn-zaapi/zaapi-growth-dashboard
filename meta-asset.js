@@ -115,8 +115,31 @@ function classifyStatus(row) {
   return "Live";
 }
 
-function splitCsvRow(row) {
-  return row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
+function splitCsvRow(line) {
+  const result = [];
+  let cur = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        cur += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (ch === "," && !inQuotes) {
+      result.push(cur.trim());
+      cur = "";
+    } else {
+      cur += ch;
+    }
+  }
+
+  result.push(cur.trim());
+  return result;
 }
 
 function getFilteredAndSortedRows() {
