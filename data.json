@@ -1,0 +1,30 @@
+{
+  "week": "CW 12 Apr 2026",
+  "week_prev": "CW 05 Apr 2026",
+  "forex_rate": 34,
+  "state": "Improving",
+  "snapshot": {
+    "spend_thb": 284903,
+    "spend_prev_thb": 208625,
+    "fti": 22,
+    "fti_prev": 9,
+    "qualified": null,
+    "qualified_prev": null,
+    "hq": null,
+    "hq_prev": null
+  },
+  "region_spend": [
+    { "region": "TH",  "google": 87750, "meta": 77477, "fti": 20.3, "lost_is_rank": 58.3 },
+    { "region": "SEA", "google": 35031, "meta": 40677, "fti": 2.0,  "lost_is_rank": 34.1 },
+    { "region": "ROW", "google": 28719, "meta": 15249, "fti": 0.0,  "lost_is_rank": 74.7 }
+  ],
+  "insights": [
+    "FTI up +144% WoW — TH driving 20 of 22 conversions this week.",
+    "HQ+ not entered — add from Pipedrive to assess quality vs volume.",
+    "ROW Lost IS rank 74.7% — high headroom, but zero FTI for 5+ weeks."
+  ],
+  "next_step": {
+    "type": "pipedrive",
+    "label": "Enter HQ+ from Pipedrive to complete the funnel picture."
+  }
+}
