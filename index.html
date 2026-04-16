@@ -198,41 +198,70 @@
     .wow.down { background: var(--down-bg); color: var(--down); }
     .wow.neutral { background: var(--bg-subtle); color: var(--text-muted); }
 
-    .graph-toggle-wrap {
-      display: flex;
-      justify-content: flex-start;
+    .graph-row {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.1rem 1.15rem;
+      background: #fcfcfb;
       margin-bottom: 1rem;
     }
 
-    #graph-toggle {
+    .graph-row:last-child { margin-bottom: 0; }
+
+    .graph-row-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .graph-row-title {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .graph-controls-right {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .graph-toggle {
       border: 1px solid var(--border-strong);
       background: var(--bg-subtle);
       color: var(--text);
       border-radius: 6px;
-      padding: 0.45rem 0.8rem;
+      padding: 0.4rem 0.8rem;
       font-family: var(--font-mono);
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       letter-spacing: 0.05em;
       text-transform: uppercase;
       cursor: pointer;
     }
 
-    #graph-toggle:hover { background: #f1f1ef; }
+    .graph-toggle:hover { background: #f1f1ef; }
 
-    #graph-content {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.2rem;
-      background: #fcfcfb;
+    .graph-range {
+      border: 1px solid var(--border-strong);
+      border-radius: 6px;
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 0.74rem;
+      font-family: var(--font-mono);
+      padding: 0.35rem 0.5rem;
     }
-
-    #graph-content[hidden] { display: none; }
 
     .graph-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 1.2rem;
     }
+
+    .graph-grid[hidden] { display: none; }
 
     .chart-card {
       background: var(--bg-card);
@@ -403,19 +432,57 @@
 
     <section class="section">
       <div class="section-title">Performance graphs</div>
-      <div class="graph-toggle-wrap">
-        <button id="graph-toggle" type="button" aria-expanded="false" aria-controls="graph-content">Show Graph</button>
-      </div>
-      <div id="graph-content" hidden>
-        <div class="graph-grid">
+      <div class="graph-row">
+        <div class="graph-row-controls">
+          <div class="graph-row-title">Row 1 · Ads Layer</div>
+          <div class="graph-controls-right">
+            <select id="ads-range" class="graph-range" aria-label="Ads layer range">
+              <option value="L4W">L4W</option>
+              <option value="L8W">L8W</option>
+              <option value="L12W">L12W</option>
+              <option value="MAX">MAX</option>
+            </select>
+            <button id="ads-toggle" class="graph-toggle" type="button" aria-expanded="false" aria-controls="ads-graphs">Show</button>
+          </div>
+        </div>
+        <div id="ads-graphs" class="graph-grid" hidden>
           <div class="chart-card">
-            <div class="chart-title">Graph A · Volume</div>
+            <div class="chart-title">Graph A · Spend (Budget View)</div>
             <div class="chart-canvas-wrap">
-              <canvas id="volume-chart"></canvas>
+              <canvas id="spend-chart"></canvas>
             </div>
           </div>
           <div class="chart-card">
-            <div class="chart-title">Graph B · Efficiency</div>
+            <div class="chart-title">Graph B · FTI (Ads Effectiveness)</div>
+            <div class="chart-canvas-wrap">
+              <canvas id="fti-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="graph-row">
+        <div class="graph-row-controls">
+          <div class="graph-row-title">Row 2 · Business Layer</div>
+          <div class="graph-controls-right">
+            <select id="business-range" class="graph-range" aria-label="Business layer range">
+              <option value="L4W">L4W</option>
+              <option value="L8W">L8W</option>
+              <option value="L12W">L12W</option>
+              <option value="MAX">MAX</option>
+            </select>
+            <button id="business-toggle" class="graph-toggle" type="button" aria-expanded="false" aria-controls="business-graphs">Show</button>
+          </div>
+        </div>
+        <div id="business-graphs" class="graph-grid" hidden>
+          <div class="chart-card">
+            <div class="chart-title">Graph C · Outcome</div>
+            <div class="chart-canvas-wrap">
+              <canvas id="outcome-chart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Graph D · Efficiency</div>
             <div class="chart-canvas-wrap">
               <canvas id="efficiency-chart"></canvas>
             </div>

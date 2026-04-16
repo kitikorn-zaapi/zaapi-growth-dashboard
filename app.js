@@ -3,7 +3,9 @@
 // ─────────────────────────────────────────────
 
 const FOREX_DEFAULT = 34;
-let volumeChart = null;
+let spendChart = null;
+let ftiChart = null;
+let outcomeChart = null;
 let efficiencyChart = null;
 
 function toUSD(thb, rate) {
@@ -215,54 +217,102 @@ function buildChart(ctx, labels, datasets, yAsCurrency = false) {
   });
 }
 
+function getFilteredHistory(history, range) {
+  const ranges = { L4W: 4, L8W: 8, L12W: 12 };
+  const windowSize = ranges[range];
+  if (!windowSize || range === "MAX") return history;
+  return history.slice(-windowSize);
+}
+
 function renderGraphs(data) {
   const history = Array.isArray(data.history) ? data.history : [];
   if (!history.length || typeof Chart === "undefined") return;
   const rate = data.forex_rate || FOREX_DEFAULT;
 
-  const labels = history.map(h => h.week);
+  const buildDatasets = {
+    ads: rows => ({
+      spend: [
+        { label: "Spend", data: rows.map(h => typeof h.spend === "number" ? h.spend / rate : null), borderColor: "#2d7ff9", backgroundColor: "#2d7ff9", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 },
+        { label: "Spend Target", data: rows.map(h => typeof h.spend_target === "number" ? h.spend_target / rate : null), borderColor: "#5aa1ff", backgroundColor: "#5aa1ff", borderWidth: 2, borderDash: [5, 4], pointRadius: 1.5, pointHoverRadius: 3, tension: 0.15 },
+        { label: "Spend L4W Avg", data: rows.map(h => typeof h.spend_l4w_avg === "number" ? h.spend_l4w_avg / rate : null), borderColor: "#9cbce8", backgroundColor: "#9cbce8", borderWidth: 2, borderDash: [3, 3], pointRadius: 1.5, pointHoverRadius: 3, tension: 0.15 }
+      ],
+      fti: [
+        { label: "FTI", data: rows.map(h => h.fti), borderColor: "#0f9e75", backgroundColor: "#0f9e75", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 },
+        { label: "FTI Google", data: rows.map(h => h.fti_google), borderColor: "#4ac39e", backgroundColor: "#4ac39e", borderWidth: 2, pointRadius: 1.5, pointHoverRadius: 3, tension: 0.15 },
+        { label: "FTI Meta", data: rows.map(h => h.fti_meta), borderColor: "#79d6bb", backgroundColor: "#79d6bb", borderWidth: 2, pointRadius: 1.5, pointHoverRadius: 3, tension: 0.15 }
+      ]
+    }),
+    business: rows => ({
+      outcome: [
+        { label: "Qualified", data: rows.map(h => h.qualified), borderColor: "#ff8a00", backgroundColor: "#ff8a00", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 },
+        { label: "HQ+", data: rows.map(h => h.hq), borderColor: "#8d5cf6", backgroundColor: "#8d5cf6", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 }
+      ],
+      efficiency: [
+        { label: "Cost per FTI", data: rows.map(h => typeof h.cost_per_fti === "number" ? h.cost_per_fti / rate : null), borderColor: "#2d7ff9", backgroundColor: "#2d7ff9", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 },
+        { label: "Cost per Qualified", data: rows.map(h => typeof h.cost_per_qualified === "number" ? h.cost_per_qualified / rate : null), borderColor: "#ff8a00", backgroundColor: "#ff8a00", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 },
+        { label: "Cost per HQ+", data: rows.map(h => typeof h.cost_per_hq === "number" ? h.cost_per_hq / rate : null), borderColor: "#8d5cf6", backgroundColor: "#8d5cf6", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 }
+      ]
+    })
+  };
 
-  if (volumeChart) volumeChart.destroy();
-  if (efficiencyChart) efficiencyChart.destroy();
-
-  volumeChart = buildChart(
-    document.getElementById("volume-chart"),
-    labels,
-    [
-      { label: "Spend", data: history.map(h => h.spend / rate), borderColor: "#2d7ff9", backgroundColor: "#2d7ff9", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 },
-      { label: "FTI", data: history.map(h => h.fti), borderColor: "#0f9e75", backgroundColor: "#0f9e75", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 },
-      { label: "Qualified", data: history.map(h => h.qualified), borderColor: "#ff8a00", backgroundColor: "#ff8a00", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 },
-      { label: "HQ+", data: history.map(h => h.hq), borderColor: "#8d5cf6", backgroundColor: "#8d5cf6", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 }
-    ]
-  );
-
-  efficiencyChart = buildChart(
-    document.getElementById("efficiency-chart"),
-    labels,
-    [
-      { label: "Cost per FTI", data: history.map(h => h.cost_per_fti / rate), borderColor: "#2d7ff9", backgroundColor: "#2d7ff9", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 },
-      { label: "Cost per Qualified", data: history.map(h => h.cost_per_qualified / rate), borderColor: "#ff8a00", backgroundColor: "#ff8a00", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 },
-      { label: "Cost per HQ+", data: history.map(h => h.cost_per_hq / rate), borderColor: "#8d5cf6", backgroundColor: "#8d5cf6", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 }
-    ],
-    true
-  );
-}
-
-function setupGraphToggle() {
-  const btn = document.getElementById("graph-toggle");
-  const content = document.getElementById("graph-content");
-
-  btn.addEventListener("click", () => {
-    const hidden = content.hasAttribute("hidden");
-    if (hidden) {
-      content.removeAttribute("hidden");
-      btn.textContent = "Hide Graph";
-      btn.setAttribute("aria-expanded", "true");
-    } else {
-      content.setAttribute("hidden", "hidden");
-      btn.textContent = "Show Graph";
-      btn.setAttribute("aria-expanded", "false");
+  const rows = [
+    {
+      toggleId: "ads-toggle",
+      rangeId: "ads-range",
+      contentId: "ads-graphs",
+      render: filteredHistory => {
+        const labels = filteredHistory.map(h => h.week);
+        const datasets = buildDatasets.ads(filteredHistory);
+        if (spendChart) spendChart.destroy();
+        if (ftiChart) ftiChart.destroy();
+        spendChart = buildChart(document.getElementById("spend-chart"), labels, datasets.spend, true);
+        ftiChart = buildChart(document.getElementById("fti-chart"), labels, datasets.fti, false);
+      }
+    },
+    {
+      toggleId: "business-toggle",
+      rangeId: "business-range",
+      contentId: "business-graphs",
+      render: filteredHistory => {
+        const labels = filteredHistory.map(h => h.week);
+        const datasets = buildDatasets.business(filteredHistory);
+        if (outcomeChart) outcomeChart.destroy();
+        if (efficiencyChart) efficiencyChart.destroy();
+        outcomeChart = buildChart(document.getElementById("outcome-chart"), labels, datasets.outcome, false);
+        efficiencyChart = buildChart(document.getElementById("efficiency-chart"), labels, datasets.efficiency, true);
+      }
     }
+  ];
+
+  rows.forEach(row => {
+    const toggle = document.getElementById(row.toggleId);
+    const range = document.getElementById(row.rangeId);
+    const content = document.getElementById(row.contentId);
+
+    const rerender = () => row.render(getFilteredHistory(history, range.value));
+    if (toggle.dataset.bound === "true") {
+      if (!content.hasAttribute("hidden")) rerender();
+      return;
+    }
+
+    toggle.dataset.bound = "true";
+    toggle.addEventListener("click", () => {
+      const hidden = content.hasAttribute("hidden");
+      if (hidden) {
+        content.removeAttribute("hidden");
+        toggle.textContent = "Hide";
+        toggle.setAttribute("aria-expanded", "true");
+        rerender();
+      } else {
+        content.setAttribute("hidden", "hidden");
+        toggle.textContent = "Show";
+        toggle.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    range.addEventListener("change", () => {
+      if (!content.hasAttribute("hidden")) rerender();
+    });
   });
 }
 
@@ -285,7 +335,6 @@ async function init() {
   renderInsights(data);
   renderNextStep(data);
   renderGraphs(data);
-  setupGraphToggle();
 
   document.getElementById("forex-rate").value = data.forex_rate || FOREX_DEFAULT;
   document.getElementById("forex-rate").addEventListener("input", () => {
@@ -293,6 +342,7 @@ async function init() {
     renderSnapshot(data);
     renderTable(data);
     renderRegions(data);
+    renderGraphs(data);
   });
 }
 

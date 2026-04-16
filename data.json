@@ -22,7 +22,11 @@
       "hq": null,
       "cost_per_fti": 3413,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 22215.9,
+      "spend_l4w_avg": 21158.0,
+      "fti_google": 3.6,
+      "fti_meta": 2.6
     },
     {
       "week": "CW15-2024",
@@ -32,7 +36,11 @@
       "hq": null,
       "cost_per_fti": 1706,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 21501.9,
+      "spend_l4w_avg": 20818.0,
+      "fti_google": 7.0,
+      "fti_meta": 5.0
     },
     {
       "week": "CW16-2024",
@@ -42,7 +50,11 @@
       "hq": null,
       "cost_per_fti": 3879,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 20365.8,
+      "spend_l4w_avg": 20344.0,
+      "fti_google": 2.9,
+      "fti_meta": 2.1
     },
     {
       "week": "CW17-2024",
@@ -52,7 +64,11 @@
       "hq": null,
       "cost_per_fti": 1725,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 27707.4,
+      "spend_l4w_avg": 21855.0,
+      "fti_google": 8.9,
+      "fti_meta": 6.4
     },
     {
       "week": "CW18-2024",
@@ -62,7 +78,11 @@
       "hq": null,
       "cost_per_fti": 1192,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 22905.75,
+      "spend_l4w_avg": 22019.25,
+      "fti_google": 10.6,
+      "fti_meta": 7.7
     },
     {
       "week": "CW19-2024",
@@ -72,7 +92,11 @@
       "hq": null,
       "cost_per_fti": 2033,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 30736.65,
+      "spend_l4w_avg": 24218.0,
+      "fti_google": 8.4,
+      "fti_meta": 6.0
     },
     {
       "week": "CW20-2024",
@@ -82,7 +106,11 @@
       "hq": null,
       "cost_per_fti": 2798,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 42013.65,
+      "spend_l4w_avg": 29372.25,
+      "fti_google": 8.3,
+      "fti_meta": 6.0
     },
     {
       "week": "CW21-2024",
@@ -92,7 +120,11 @@
       "hq": null,
       "cost_per_fti": 4359,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 42565.95,
+      "spend_l4w_avg": 32910.0,
+      "fti_google": 5.4,
+      "fti_meta": 3.9
     },
     {
       "week": "CW22-2024",
@@ -102,7 +134,11 @@
       "hq": null,
       "cost_per_fti": 1464,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 28743.75,
+      "spend_l4w_avg": 34300.0,
+      "fti_google": 10.8,
+      "fti_meta": 7.9
     },
     {
       "week": "CW23-2024",
@@ -112,7 +148,11 @@
       "hq": null,
       "cost_per_fti": 1577,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 33118.05,
+      "spend_l4w_avg": 34867.0,
+      "fti_google": 11.6,
+      "fti_meta": 8.4
     },
     {
       "week": "CW24-2024",
@@ -122,7 +162,11 @@
       "hq": null,
       "cost_per_fti": 1477,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 39552.45,
+      "spend_l4w_avg": 34281.0,
+      "fti_google": 14.8,
+      "fti_meta": 10.7
     },
     {
       "week": "CW25-2024",
@@ -132,7 +176,11 @@
       "hq": null,
       "cost_per_fti": 647,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 40576.2,
+      "spend_l4w_avg": 33807.25,
+      "fti_google": 34.6,
+      "fti_meta": 25.1
     },
     {
       "week": "CW26-2024",
@@ -142,7 +190,11 @@
       "hq": null,
       "cost_per_fti": 289,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 34561.8,
+      "spend_l4w_avg": 35192.5,
+      "fti_google": 66.1,
+      "fti_meta": 47.8
     },
     {
       "week": "CW27-2024",
@@ -152,7 +204,11 @@
       "hq": null,
       "cost_per_fti": 245,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 39359.25,
+      "spend_l4w_avg": 36678.5,
+      "fti_google": 88.6,
+      "fti_meta": 64.2
     },
     {
       "week": "CW28-2024",
@@ -162,7 +218,11 @@
       "hq": null,
       "cost_per_fti": 193,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 40392.45,
+      "spend_l4w_avg": 36878.5,
+      "fti_google": 115.5,
+      "fti_meta": 83.6
     },
     {
       "week": "CW29-2024",
@@ -172,7 +232,11 @@
       "hq": null,
       "cost_per_fti": 137,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 35542.5,
+      "spend_l4w_avg": 35680.0,
+      "fti_google": 143.3,
+      "fti_meta": 103.7
     },
     {
       "week": "CW30-2024",
@@ -182,7 +246,11 @@
       "hq": null,
       "cost_per_fti": 114,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 33768.0,
+      "spend_l4w_avg": 35491.0,
+      "fti_google": 163.8,
+      "fti_meta": 118.6
     },
     {
       "week": "CW31-2024",
@@ -192,7 +260,11 @@
       "hq": null,
       "cost_per_fti": 76,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 35349.3,
+      "spend_l4w_avg": 34536.25,
+      "fti_google": 256.6,
+      "fti_meta": 185.8
     },
     {
       "week": "CW32-2024",
@@ -202,7 +274,11 @@
       "hq": null,
       "cost_per_fti": 95,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 38167.5,
+      "spend_l4w_avg": 34006.5,
+      "fti_google": 223.0,
+      "fti_meta": 161.5
     },
     {
       "week": "CW33-2024",
@@ -212,7 +288,11 @@
       "hq": null,
       "cost_per_fti": 82,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 35781.9,
+      "spend_l4w_avg": 34063.5,
+      "fti_google": 241.8,
+      "fti_meta": 175.1
     },
     {
       "week": "CW34-2024",
@@ -222,7 +302,11 @@
       "hq": null,
       "cost_per_fti": 92,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 34904.1,
+      "spend_l4w_avg": 34334.0,
+      "fti_google": 210.4,
+      "fti_meta": 152.4
     },
     {
       "week": "CW35-2024",
@@ -232,7 +316,11 @@
       "hq": null,
       "cost_per_fti": 99,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 36290.1,
+      "spend_l4w_avg": 34558.0,
+      "fti_google": 203.4,
+      "fti_meta": 147.3
     },
     {
       "week": "CW36-2024",
@@ -242,7 +330,11 @@
       "hq": null,
       "cost_per_fti": 75,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 38824.8,
+      "spend_l4w_avg": 34714.5,
+      "fti_google": 285.0,
+      "fti_meta": 206.4
     },
     {
       "week": "CW37-2024",
@@ -252,7 +344,11 @@
       "hq": null,
       "cost_per_fti": 82,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 40531.05,
+      "spend_l4w_avg": 35845.25,
+      "fti_google": 274.6,
+      "fti_meta": 198.9
     },
     {
       "week": "CW38-2024",
@@ -262,7 +358,11 @@
       "hq": null,
       "cost_per_fti": 72,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 29650.95,
+      "spend_l4w_avg": 34594.5,
+      "fti_google": 226.1,
+      "fti_meta": 163.8
     },
     {
       "week": "CW39-2024",
@@ -272,7 +372,11 @@
       "hq": null,
       "cost_per_fti": 82,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 28771.05,
+      "spend_l4w_avg": 32804.25,
+      "fti_google": 194.8,
+      "fti_meta": 141.1
     },
     {
       "week": "CW40-2024",
@@ -282,7 +386,11 @@
       "hq": null,
       "cost_per_fti": 90,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 32777.85,
+      "spend_l4w_avg": 31364.5,
+      "fti_google": 200.7,
+      "fti_meta": 145.3
     },
     {
       "week": "CW41-2024",
@@ -292,7 +400,11 @@
       "hq": null,
       "cost_per_fti": 85,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 36254.4,
+      "spend_l4w_avg": 30346.25,
+      "fti_google": 234.4,
+      "fti_meta": 169.8
     },
     {
       "week": "CW42-2024",
@@ -302,7 +414,11 @@
       "hq": null,
       "cost_per_fti": 79,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 39621.75,
+      "spend_l4w_avg": 32720.25,
+      "fti_google": 278.5,
+      "fti_meta": 201.6
     },
     {
       "week": "CW43-2024",
@@ -312,7 +428,11 @@
       "hq": null,
       "cost_per_fti": 81,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 36983.1,
+      "spend_l4w_avg": 34675.5,
+      "fti_google": 252.9,
+      "fti_meta": 183.1
     },
     {
       "week": "CW44-2024",
@@ -322,7 +442,11 @@
       "hq": null,
       "cost_per_fti": 77,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 36183.0,
+      "spend_l4w_avg": 35486.25,
+      "fti_google": 260.3,
+      "fti_meta": 188.5
     },
     {
       "week": "CW45-2024",
@@ -332,7 +456,11 @@
       "hq": null,
       "cost_per_fti": 80,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 38275.65,
+      "spend_l4w_avg": 35967.5,
+      "fti_google": 265.1,
+      "fti_meta": 191.9
     },
     {
       "week": "CW46-2024",
@@ -342,7 +470,11 @@
       "hq": null,
       "cost_per_fti": 81,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 33687.15,
+      "spend_l4w_avg": 34554.5,
+      "fti_google": 230.2,
+      "fti_meta": 166.7
     },
     {
       "week": "CW47-2024",
@@ -352,7 +484,11 @@
       "hq": null,
       "cost_per_fti": 100,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 36097.95,
+      "spend_l4w_avg": 34343.75,
+      "fti_google": 199.9,
+      "fti_meta": 144.8
     },
     {
       "week": "CW48-2024",
@@ -362,7 +498,11 @@
       "hq": null,
       "cost_per_fti": 171,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 41629.35,
+      "spend_l4w_avg": 35640.5,
+      "fti_google": 134.7,
+      "fti_meta": 97.6
     },
     {
       "week": "CW49-2024",
@@ -372,7 +512,11 @@
       "hq": null,
       "cost_per_fti": 123,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 44520.0,
+      "spend_l4w_avg": 37127.25,
+      "fti_google": 200.0,
+      "fti_meta": 144.9
     },
     {
       "week": "CW50-2024",
@@ -382,7 +526,11 @@
       "hq": null,
       "cost_per_fti": 118,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 46761.75,
+      "spend_l4w_avg": 40240.25,
+      "fti_google": 219.4,
+      "fti_meta": 158.8
     },
     {
       "week": "CW51-2024",
@@ -392,7 +540,11 @@
       "hq": null,
       "cost_per_fti": 123,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 44470.65,
+      "spend_l4w_avg": 42233.75,
+      "fti_google": 199.9,
+      "fti_meta": 144.8
     },
     {
       "week": "CW52-2024",
@@ -402,7 +554,11 @@
       "hq": null,
       "cost_per_fti": 119,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 44846.55,
+      "spend_l4w_avg": 42999.75,
+      "fti_google": 207.9,
+      "fti_meta": 150.5
     },
     {
       "week": "CW01-2025",
@@ -412,7 +568,11 @@
       "hq": null,
       "cost_per_fti": 103,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 46697.7,
+      "spend_l4w_avg": 43518.25,
+      "fti_google": 249.3,
+      "fti_meta": 180.5
     },
     {
       "week": "CW02-2025",
@@ -422,7 +582,11 @@
       "hq": null,
       "cost_per_fti": 158,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 62121.15,
+      "spend_l4w_avg": 47175.25,
+      "fti_google": 216.9,
+      "fti_meta": 157.1
     },
     {
       "week": "CW03-2025",
@@ -432,7 +596,11 @@
       "hq": null,
       "cost_per_fti": 133,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 56168.7,
+      "spend_l4w_avg": 49960.5,
+      "fti_google": 233.6,
+      "fti_meta": 169.2
     },
     {
       "week": "CW04-2025",
@@ -442,7 +610,11 @@
       "hq": null,
       "cost_per_fti": 132,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 60872.7,
+      "spend_l4w_avg": 53776.25,
+      "fti_google": 254.1,
+      "fti_meta": 184.0
     },
     {
       "week": "CW05-2025",
@@ -452,7 +624,11 @@
       "hq": null,
       "cost_per_fti": 129,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 57489.6,
+      "spend_l4w_avg": 56345.75,
+      "fti_google": 245.9,
+      "fti_meta": 178.1
     },
     {
       "week": "CW06-2025",
@@ -462,7 +638,11 @@
       "hq": null,
       "cost_per_fti": 145,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 62522.25,
+      "spend_l4w_avg": 56441.25,
+      "fti_google": 238.7,
+      "fti_meta": 172.8
     },
     {
       "week": "CW07-2025",
@@ -472,7 +652,11 @@
       "hq": null,
       "cost_per_fti": 116,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 48377.7,
+      "spend_l4w_avg": 54586.25,
+      "fti_google": 231.1,
+      "fti_meta": 167.4
     },
     {
       "week": "CW08-2025",
@@ -482,7 +666,11 @@
       "hq": null,
       "cost_per_fti": 78,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 90762.0,
+      "spend_l4w_avg": 61702.75,
+      "fti_google": 643.5,
+      "fti_meta": 466.0
     },
     {
       "week": "CW09-2025",
@@ -492,7 +680,11 @@
       "hq": null,
       "cost_per_fti": 133,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 78892.8,
+      "spend_l4w_avg": 66798.75,
+      "fti_google": 328.3,
+      "fti_meta": 237.7
     },
     {
       "week": "CW10-2025",
@@ -502,7 +694,11 @@
       "hq": null,
       "cost_per_fti": 157,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 64687.35,
+      "spend_l4w_avg": 67314.25,
+      "fti_google": 227.4,
+      "fti_meta": 164.6
     },
     {
       "week": "CW11-2025",
@@ -512,7 +708,11 @@
       "hq": null,
       "cost_per_fti": 218,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 94225.95,
+      "spend_l4w_avg": 78230.5,
+      "fti_google": 238.4,
+      "fti_meta": 172.6
     },
     {
       "week": "CW12-2025",
@@ -522,7 +722,11 @@
       "hq": null,
       "cost_per_fti": 192,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 77185.5,
+      "spend_l4w_avg": 74998.0,
+      "fti_google": 221.6,
+      "fti_meta": 160.4
     },
     {
       "week": "CW13-2025",
@@ -532,7 +736,11 @@
       "hq": null,
       "cost_per_fti": 582,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 80116.05,
+      "spend_l4w_avg": 75289.25,
+      "fti_google": 76.0,
+      "fti_meta": 55.0
     },
     {
       "week": "CW14-2025",
@@ -542,7 +750,11 @@
       "hq": null,
       "cost_per_fti": 539,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 71372.7,
+      "spend_l4w_avg": 76881.0,
+      "fti_google": 73.1,
+      "fti_meta": 52.9
     },
     {
       "week": "CW15-2025",
@@ -552,7 +764,11 @@
       "hq": null,
       "cost_per_fti": 594,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 63616.35,
+      "spend_l4w_avg": 69593.0,
+      "fti_google": 59.2,
+      "fti_meta": 42.8
     },
     {
       "week": "CW16-2025",
@@ -562,7 +778,11 @@
       "hq": null,
       "cost_per_fti": 2270,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 70802.55,
+      "spend_l4w_avg": 68073.25,
+      "fti_google": 17.2,
+      "fti_meta": 12.5
     },
     {
       "week": "CW17-2025",
@@ -572,7 +792,11 @@
       "hq": null,
       "cost_per_fti": 1723,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 67295.55,
+      "spend_l4w_avg": 65020.75,
+      "fti_google": 21.6,
+      "fti_meta": 15.6
     },
     {
       "week": "CW18-2025",
@@ -582,7 +806,11 @@
       "hq": null,
       "cost_per_fti": 1691,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 110965.05,
+      "spend_l4w_avg": 74447.5,
+      "fti_google": 36.2,
+      "fti_meta": 26.2
     },
     {
       "week": "CW19-2025",
@@ -592,7 +820,11 @@
       "hq": null,
       "cost_per_fti": 1546,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 137793.6,
+      "spend_l4w_avg": 92108.75,
+      "fti_google": 49.2,
+      "fti_meta": 35.7
     },
     {
       "week": "CW20-2025",
@@ -602,7 +834,11 @@
       "hq": null,
       "cost_per_fti": 1500,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 100782.15,
+      "spend_l4w_avg": 99246.75,
+      "fti_google": 37.1,
+      "fti_meta": 26.9
     },
     {
       "week": "CW21-2025",
@@ -612,7 +848,11 @@
       "hq": null,
       "cost_per_fti": 1618,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 79870.35,
+      "spend_l4w_avg": 102240.75,
+      "fti_google": 27.3,
+      "fti_meta": 19.7
     },
     {
       "week": "CW22-2025",
@@ -622,7 +862,11 @@
       "hq": null,
       "cost_per_fti": 2520,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 86780.4,
+      "spend_l4w_avg": 96482.5,
+      "fti_google": 19.0,
+      "fti_meta": 13.8
     },
     {
       "week": "CW23-2025",
@@ -632,7 +876,11 @@
       "hq": null,
       "cost_per_fti": 2803,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 96239.85,
+      "spend_l4w_avg": 86588.75,
+      "fti_google": 19.0,
+      "fti_meta": 13.7
     },
     {
       "week": "CW24-2025",
@@ -642,7 +890,11 @@
       "hq": null,
       "cost_per_fti": 1242,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 116304.3,
+      "spend_l4w_avg": 90284.5,
+      "fti_google": 51.7,
+      "fti_meta": 37.5
     },
     {
       "week": "CW25-2025",
@@ -652,7 +904,11 @@
       "hq": null,
       "cost_per_fti": 850,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 102260.55,
+      "spend_l4w_avg": 95615.5,
+      "fti_google": 66.5,
+      "fti_meta": 48.1
     },
     {
       "week": "CW26-2025",
@@ -662,7 +918,11 @@
       "hq": null,
       "cost_per_fti": 821,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 133648.2,
+      "spend_l4w_avg": 106774.5,
+      "fti_google": 90.0,
+      "fti_meta": 65.1
     },
     {
       "week": "CW27-2025",
@@ -672,7 +932,11 @@
       "hq": null,
       "cost_per_fti": 665,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 162534.75,
+      "spend_l4w_avg": 122559.0,
+      "fti_google": 135.0,
+      "fti_meta": 97.7
     },
     {
       "week": "CW28-2025",
@@ -682,7 +946,11 @@
       "hq": null,
       "cost_per_fti": 698,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 159006.75,
+      "spend_l4w_avg": 132726.25,
+      "fti_google": 125.9,
+      "fti_meta": 91.2
     },
     {
       "week": "CW29-2025",
@@ -692,7 +960,11 @@
       "hq": null,
       "cost_per_fti": 1355,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 110938.8,
+      "spend_l4w_avg": 134792.5,
+      "fti_google": 45.2,
+      "fti_meta": 32.8
     },
     {
       "week": "CW30-2025",
@@ -702,7 +974,11 @@
       "hq": null,
       "cost_per_fti": 1212,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 107780.4,
+      "spend_l4w_avg": 128633.5,
+      "fti_google": 49.1,
+      "fti_meta": 35.6
     },
     {
       "week": "CW31-2025",
@@ -712,7 +988,11 @@
       "hq": null,
       "cost_per_fti": 1434,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 135523.5,
+      "spend_l4w_avg": 122202.25,
+      "fti_google": 52.2,
+      "fti_meta": 37.8
     },
     {
       "week": "CW32-2025",
@@ -722,7 +1002,11 @@
       "hq": null,
       "cost_per_fti": 1175,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 131727.75,
+      "spend_l4w_avg": 115707.25,
+      "fti_google": 61.9,
+      "fti_meta": 44.9
     },
     {
       "week": "CW33-2025",
@@ -732,7 +1016,11 @@
       "hq": null,
       "cost_per_fti": 1946,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 156905.7,
+      "spend_l4w_avg": 126651.75,
+      "fti_google": 44.5,
+      "fti_meta": 32.3
     },
     {
       "week": "CW34-2025",
@@ -742,7 +1030,11 @@
       "hq": null,
       "cost_per_fti": 5799,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 205806.3,
+      "spend_l4w_avg": 149991.25,
+      "fti_google": 19.6,
+      "fti_meta": 14.2
     },
     {
       "week": "CW35-2025",
@@ -752,7 +1044,11 @@
       "hq": null,
       "cost_per_fti": 9143,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 163199.4,
+      "spend_l4w_avg": 156580.75,
+      "fti_google": 9.9,
+      "fti_meta": 7.1
     },
     {
       "week": "CW36-2025",
@@ -762,7 +1058,11 @@
       "hq": null,
       "cost_per_fti": 20449,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 150298.05,
+      "spend_l4w_avg": 161002.25,
+      "fti_google": 4.1,
+      "fti_meta": 2.9
     },
     {
       "week": "CW37-2025",
@@ -772,7 +1072,11 @@
       "hq": null,
       "cost_per_fti": 11890,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 228457.95,
+      "spend_l4w_avg": 178038.5,
+      "fti_google": 10.6,
+      "fti_meta": 7.7
     },
     {
       "week": "CW38-2025",
@@ -782,7 +1086,11 @@
       "hq": null,
       "cost_per_fti": 9101,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 236999.7,
+      "spend_l4w_avg": 185465.5,
+      "fti_google": 14.4,
+      "fti_meta": 10.4
     },
     {
       "week": "CW39-2025",
@@ -792,7 +1100,11 @@
       "hq": null,
       "cost_per_fti": 12013,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 230821.5,
+      "spend_l4w_avg": 201566.0,
+      "fti_google": 10.6,
+      "fti_meta": 7.7
     },
     {
       "week": "CW40-2025",
@@ -802,7 +1114,11 @@
       "hq": null,
       "cost_per_fti": 9821,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 254697.45,
+      "spend_l4w_avg": 226423.0,
+      "fti_google": 14.3,
+      "fti_meta": 10.4
     },
     {
       "week": "CW41-2025",
@@ -812,7 +1128,11 @@
       "hq": null,
       "cost_per_fti": 20627,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 242569.95,
+      "spend_l4w_avg": 229783.0,
+      "fti_google": 6.5,
+      "fti_meta": 4.7
     },
     {
       "week": "CW42-2025",
@@ -822,7 +1142,11 @@
       "hq": null,
       "cost_per_fti": 29508,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 247869.3,
+      "spend_l4w_avg": 232371.0,
+      "fti_google": 4.6,
+      "fti_meta": 3.4
     },
     {
       "week": "CW43-2025",
@@ -832,7 +1156,11 @@
       "hq": null,
       "cost_per_fti": 29175,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 248133.9,
+      "spend_l4w_avg": 236493.0,
+      "fti_google": 4.7,
+      "fti_meta": 3.4
     },
     {
       "week": "CW44-2025",
@@ -842,7 +1170,11 @@
       "hq": null,
       "cost_per_fti": 14430,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 248493.0,
+      "spend_l4w_avg": 235015.75,
+      "fti_google": 9.5,
+      "fti_meta": 6.9
     },
     {
       "week": "CW45-2025",
@@ -852,7 +1184,11 @@
       "hq": null,
       "cost_per_fti": 11567,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 256276.65,
+      "spend_l4w_avg": 238279.25,
+      "fti_google": 12.2,
+      "fti_meta": 8.9
     },
     {
       "week": "CW46-2025",
@@ -862,7 +1198,11 @@
       "hq": null,
       "cost_per_fti": 11813,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 173650.05,
+      "spend_l4w_avg": 220608.0,
+      "fti_google": 8.1,
+      "fti_meta": 5.9
     },
     {
       "week": "CW47-2025",
@@ -872,7 +1212,11 @@
       "hq": null,
       "cost_per_fti": 10424,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 210149.1,
+      "spend_l4w_avg": 211564.0,
+      "fti_google": 11.1,
+      "fti_meta": 8.1
     },
     {
       "week": "CW48-2025",
@@ -882,7 +1226,11 @@
       "hq": null,
       "cost_per_fti": 9015,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 197832.6,
+      "spend_l4w_avg": 199502.0,
+      "fti_google": 12.1,
+      "fti_meta": 8.8
     },
     {
       "week": "CW49-2025",
@@ -892,7 +1240,11 @@
       "hq": null,
       "cost_per_fti": 10873,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 204362.55,
+      "spend_l4w_avg": 187141.5,
+      "fti_google": 10.4,
+      "fti_meta": 7.5
     },
     {
       "week": "CW50-2025",
@@ -902,7 +1254,11 @@
       "hq": null,
       "cost_per_fti": 8198,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 221222.4,
+      "spend_l4w_avg": 198468.25,
+      "fti_google": 14.9,
+      "fti_meta": 10.8
     },
     {
       "week": "CW51-2025",
@@ -912,7 +1268,11 @@
       "hq": null,
       "cost_per_fti": 11558,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 242716.95,
+      "spend_l4w_avg": 206222.5,
+      "fti_google": 11.6,
+      "fti_meta": 8.4
     },
     {
       "week": "CW52-2025",
@@ -922,7 +1282,11 @@
       "hq": null,
       "cost_per_fti": 7228,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 141166.2,
+      "spend_l4w_avg": 192730.5,
+      "fti_google": 10.8,
+      "fti_meta": 7.8
     },
     {
       "week": "CW01-2026",
@@ -932,7 +1296,11 @@
       "hq": null,
       "cost_per_fti": 10932,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 188245.05,
+      "spend_l4w_avg": 188893.0,
+      "fti_google": 9.5,
+      "fti_meta": 6.9
     },
     {
       "week": "CW02-2026",
@@ -942,7 +1310,11 @@
       "hq": null,
       "cost_per_fti": 7046,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 287044.8,
+      "spend_l4w_avg": 204565.0,
+      "fti_google": 22.5,
+      "fti_meta": 16.3
     },
     {
       "week": "CW03-2026",
@@ -952,7 +1324,11 @@
       "hq": null,
       "cost_per_fti": 6583,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 358044.75,
+      "spend_l4w_avg": 232024.0,
+      "fti_google": 30.0,
+      "fti_meta": 21.8
     },
     {
       "week": "CW04-2026",
@@ -962,7 +1338,11 @@
       "hq": null,
       "cost_per_fti": 7792,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 228272.1,
+      "spend_l4w_avg": 252763.5,
+      "fti_google": 16.2,
+      "fti_meta": 11.7
     },
     {
       "week": "CW05-2026",
@@ -972,7 +1352,11 @@
       "hq": null,
       "cost_per_fti": 12210,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 312809.7,
+      "spend_l4w_avg": 282421.75,
+      "fti_google": 14.2,
+      "fti_meta": 10.2
     },
     {
       "week": "CW06-2026",
@@ -982,7 +1366,11 @@
       "hq": null,
       "cost_per_fti": 12101,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 310030.35,
+      "spend_l4w_avg": 287894.5,
+      "fti_google": 14.2,
+      "fti_meta": 10.2
     },
     {
       "week": "CW07-2026",
@@ -992,7 +1380,11 @@
       "hq": null,
       "cost_per_fti": 20828,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 301791.0,
+      "spend_l4w_avg": 274500.75,
+      "fti_google": 8.0,
+      "fti_meta": 5.8
     },
     {
       "week": "CW08-2026",
@@ -1002,7 +1394,11 @@
       "hq": null,
       "cost_per_fti": 19767,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 246990.45,
+      "spend_l4w_avg": 278957.5,
+      "fti_google": 6.9,
+      "fti_meta": 5.0
     },
     {
       "week": "CW09-2026",
@@ -1012,7 +1408,11 @@
       "hq": null,
       "cost_per_fti": 15236,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 236772.9,
+      "spend_l4w_avg": 260853.5,
+      "fti_google": 8.6,
+      "fti_meta": 6.2
     },
     {
       "week": "CW10-2026",
@@ -1022,7 +1422,11 @@
       "hq": null,
       "cost_per_fti": 17228,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 341897.85,
+      "spend_l4w_avg": 268441.0,
+      "fti_google": 11.0,
+      "fti_meta": 7.9
     },
     {
       "week": "CW11-2026",
@@ -1032,7 +1436,11 @@
       "hq": null,
       "cost_per_fti": 24660,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 380634.45,
+      "spend_l4w_avg": 287213.25,
+      "fti_google": 8.5,
+      "fti_meta": 6.2
     },
     {
       "week": "CW12-2026",
@@ -1042,7 +1450,11 @@
       "hq": null,
       "cost_per_fti": 23911,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 343962.15,
+      "spend_l4w_avg": 310301.75,
+      "fti_google": 7.9,
+      "fti_meta": 5.8
     },
     {
       "week": "CW13-2026",
@@ -1052,7 +1464,11 @@
       "hq": null,
       "cost_per_fti": 66000,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 318781.05,
+      "spend_l4w_avg": 329827.5,
+      "fti_google": 2.7,
+      "fti_meta": 1.9
     },
     {
       "week": "CW14-2026",
@@ -1062,7 +1478,11 @@
       "hq": null,
       "cost_per_fti": 22677,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 219056.25,
+      "spend_l4w_avg": 300579.5,
+      "fti_google": 5.3,
+      "fti_meta": 3.9
     },
     {
       "week": "CW15-2026",
@@ -1072,7 +1492,11 @@
       "hq": null,
       "cost_per_fti": 12776,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_target": 299148.15,
+      "spend_l4w_avg": 281178.0,
+      "fti_google": 12.9,
+      "fti_meta": 9.4
     }
   ],
   "region_spend": [
