@@ -1,6 +1,6 @@
 const SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSVufnWJeLLw5gPzY35xMd4M3-NPdeEIgnHQHJ5PjuESKootN4ZpuNanI-KMcdphPnqRI6iu80wynFR/pub?gid=526174207&single=true&output=csv";
-const PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(SHEETS_CSV_URL)}`;
-const FALLBACK_PROXY_URL = `https://allorigins.win/raw?url=${encodeURIComponent(SHEETS_CSV_URL)}`;
+const PROXY_URL = `https://corsproxy.io/?${encodeURIComponent(SHEETS_CSV_URL)}`;
+const FALLBACK_PROXY_URL = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(SHEETS_CSV_URL)}`;
 
 const NUMERIC_FIELDS = ["spend", "hook_rate", "thumb_stop", "frequency", "ctr", "fti", "cpa"];
 const EXPECTED_COLUMNS = ["ad_code", "status", "region", "prod", "angle", "feature1", "stage", "spend", "hook_rate", "thumb_stop", "frequency", "ctr", "fti", "cpa", "assessment"];
@@ -28,30 +28,30 @@ sortByEl.addEventListener("change", (event) => {
 });
 
 async function init() {
-  try {
-    let response = await fetch(PROXY_URL);
-    let csvText = await response.text();
-    console.log("FETCH RESPONSE:", csvText.slice(0, 200));
+  let csvText = "";
 
-    if (!response.ok || !csvText.includes(",")) {
-      const fallbackResponse = await fetch(FALLBACK_PROXY_URL);
-      response = fallbackResponse;
-      csvText = await fallbackResponse.text();
-      console.log("FETCH RESPONSE:", csvText.slice(0, 200));
+  try {
+    let res = await fetch(PROXY_URL);
+    csvText = await res.text();
+
+    if (!res.ok || csvText.trim().startsWith("<")) {
+      res = await fetch(FALLBACK_PROXY_URL);
+      csvText = await res.text();
     }
 
-    if (!response.ok || !csvText.includes(",")) {
-      throw new Error("Invalid CSV response from proxy");
+    if (csvText.trim().startsWith("<") || !csvText.includes(",")) {
+      throw new Error("Both proxies failed — invalid CSV response");
     }
 
     state.rows = parseCsv(csvText);
+    console.log("ROWS LOADED:", state.rows.length);
     render();
   } catch (error) {
-    const errorHtml = '<div class="empty">Failed to load Meta Asset CSV data.</div>';
-    leaderboardEl.innerHTML = errorHtml;
-    fatigueEl.innerHTML = errorHtml;
-    nextTestEl.innerHTML = "No test suggestion available.";
-    console.error(error);
+    console.error("FETCH ERROR:", error);
+
+    leaderboardEl.innerHTML = '<div class="empty">Failed to load data</div>';
+    fatigueEl.innerHTML = '<div class="empty">—</div>';
+    nextTestEl.innerHTML = "No suggestion available.";
   }
 }
 
