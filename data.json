@@ -22,7 +22,8 @@
       "hq": null,
       "cost_per_fti": 3413,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 21158
     },
     {
       "week": "CW15-2024",
@@ -32,7 +33,8 @@
       "hq": null,
       "cost_per_fti": 1706,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 20478
     },
     {
       "week": "CW16-2024",
@@ -42,7 +44,8 @@
       "hq": null,
       "cost_per_fti": 3879,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 19396
     },
     {
       "week": "CW17-2024",
@@ -52,7 +55,8 @@
       "hq": null,
       "cost_per_fti": 1725,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 26388
     },
     {
       "week": "CW18-2024",
@@ -62,7 +66,8 @@
       "hq": null,
       "cost_per_fti": 1192,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 21815
     },
     {
       "week": "CW19-2024",
@@ -72,7 +77,8 @@
       "hq": null,
       "cost_per_fti": 2033,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 29273
     },
     {
       "week": "CW20-2024",
@@ -82,7 +88,8 @@
       "hq": null,
       "cost_per_fti": 2798,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 40013
     },
     {
       "week": "CW21-2024",
@@ -92,7 +99,8 @@
       "hq": null,
       "cost_per_fti": 4359,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 40539
     },
     {
       "week": "CW22-2024",
@@ -102,7 +110,8 @@
       "hq": null,
       "cost_per_fti": 1464,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 27375
     },
     {
       "week": "CW23-2024",
@@ -112,7 +121,8 @@
       "hq": null,
       "cost_per_fti": 1577,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 31541
     },
     {
       "week": "CW24-2024",
@@ -122,7 +132,8 @@
       "hq": null,
       "cost_per_fti": 1477,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 37669
     },
     {
       "week": "CW25-2024",
@@ -132,7 +143,8 @@
       "hq": null,
       "cost_per_fti": 647,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 38644
     },
     {
       "week": "CW26-2024",
@@ -142,7 +154,8 @@
       "hq": null,
       "cost_per_fti": 289,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 32916
     },
     {
       "week": "CW27-2024",
@@ -152,7 +165,8 @@
       "hq": null,
       "cost_per_fti": 245,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 37485
     },
     {
       "week": "CW28-2024",
@@ -162,7 +176,8 @@
       "hq": null,
       "cost_per_fti": 193,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 38469
     },
     {
       "week": "CW29-2024",
@@ -172,7 +187,8 @@
       "hq": null,
       "cost_per_fti": 137,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 33850
     },
     {
       "week": "CW30-2024",
@@ -182,7 +198,8 @@
       "hq": null,
       "cost_per_fti": 114,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 32160
     },
     {
       "week": "CW31-2024",
@@ -192,7 +209,8 @@
       "hq": null,
       "cost_per_fti": 76,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 33666
     },
     {
       "week": "CW32-2024",
@@ -202,7 +220,8 @@
       "hq": null,
       "cost_per_fti": 95,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 36350
     },
     {
       "week": "CW33-2024",
@@ -212,7 +231,8 @@
       "hq": null,
       "cost_per_fti": 82,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 34078
     },
     {
       "week": "CW34-2024",
@@ -222,7 +242,8 @@
       "hq": null,
       "cost_per_fti": 92,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 33242
     },
     {
       "week": "CW35-2024",
@@ -232,7 +253,8 @@
       "hq": null,
       "cost_per_fti": 99,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 34562
     },
     {
       "week": "CW36-2024",
@@ -242,7 +264,8 @@
       "hq": null,
       "cost_per_fti": 75,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 36976
     },
     {
       "week": "CW37-2024",
@@ -252,7 +275,8 @@
       "hq": null,
       "cost_per_fti": 82,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 38601
     },
     {
       "week": "CW38-2024",
@@ -262,7 +286,8 @@
       "hq": null,
       "cost_per_fti": 72,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 28239
     },
     {
       "week": "CW39-2024",
@@ -272,7 +297,8 @@
       "hq": null,
       "cost_per_fti": 82,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 27401
     },
     {
       "week": "CW40-2024",
@@ -282,7 +308,8 @@
       "hq": null,
       "cost_per_fti": 90,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 31217
     },
     {
       "week": "CW41-2024",
@@ -292,7 +319,8 @@
       "hq": null,
       "cost_per_fti": 85,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 34528
     },
     {
       "week": "CW42-2024",
@@ -302,7 +330,8 @@
       "hq": null,
       "cost_per_fti": 79,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 37735
     },
     {
       "week": "CW43-2024",
@@ -312,7 +341,8 @@
       "hq": null,
       "cost_per_fti": 81,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 35222
     },
     {
       "week": "CW44-2024",
@@ -322,7 +352,8 @@
       "hq": null,
       "cost_per_fti": 77,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 34460
     },
     {
       "week": "CW45-2024",
@@ -332,7 +363,8 @@
       "hq": null,
       "cost_per_fti": 80,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 36453
     },
     {
       "week": "CW46-2024",
@@ -342,7 +374,8 @@
       "hq": null,
       "cost_per_fti": 81,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 32083
     },
     {
       "week": "CW47-2024",
@@ -352,7 +385,8 @@
       "hq": null,
       "cost_per_fti": 100,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 34379
     },
     {
       "week": "CW48-2024",
@@ -362,7 +396,8 @@
       "hq": null,
       "cost_per_fti": 171,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 39647
     },
     {
       "week": "CW49-2024",
@@ -372,7 +407,8 @@
       "hq": null,
       "cost_per_fti": 123,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 42400
     },
     {
       "week": "CW50-2024",
@@ -382,7 +418,8 @@
       "hq": null,
       "cost_per_fti": 118,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 44535
     },
     {
       "week": "CW51-2024",
@@ -392,7 +429,8 @@
       "hq": null,
       "cost_per_fti": 123,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 42353
     },
     {
       "week": "CW52-2024",
@@ -402,7 +440,8 @@
       "hq": null,
       "cost_per_fti": 119,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 42711
     },
     {
       "week": "CW01-2025",
@@ -412,7 +451,8 @@
       "hq": null,
       "cost_per_fti": 103,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 39460
     },
     {
       "week": "CW02-2025",
@@ -422,7 +462,8 @@
       "hq": null,
       "cost_per_fti": 158,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 46511
     },
     {
       "week": "CW03-2025",
@@ -432,7 +473,8 @@
       "hq": null,
       "cost_per_fti": 133,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 43564
     },
     {
       "week": "CW04-2025",
@@ -442,7 +484,8 @@
       "hq": null,
       "cost_per_fti": 132,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 51749
     },
     {
       "week": "CW05-2025",
@@ -452,7 +495,8 @@
       "hq": null,
       "cost_per_fti": 129,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 49293
     },
     {
       "week": "CW06-2025",
@@ -462,7 +506,8 @@
       "hq": null,
       "cost_per_fti": 145,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 52714
     },
     {
       "week": "CW07-2025",
@@ -472,7 +517,8 @@
       "hq": null,
       "cost_per_fti": 116,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 41113
     },
     {
       "week": "CW08-2025",
@@ -482,7 +528,8 @@
       "hq": null,
       "cost_per_fti": 78,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 83202
     },
     {
       "week": "CW09-2025",
@@ -492,7 +539,8 @@
       "hq": null,
       "cost_per_fti": 133,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 74494
     },
     {
       "week": "CW10-2025",
@@ -502,7 +550,8 @@
       "hq": null,
       "cost_per_fti": 157,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 61607
     },
     {
       "week": "CW11-2025",
@@ -512,7 +561,8 @@
       "hq": null,
       "cost_per_fti": 218,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 89739
     },
     {
       "week": "CW12-2025",
@@ -522,7 +572,8 @@
       "hq": null,
       "cost_per_fti": 192,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 73510
     },
     {
       "week": "CW13-2025",
@@ -532,7 +583,8 @@
       "hq": null,
       "cost_per_fti": 582,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 67494
     },
     {
       "week": "CW14-2025",
@@ -542,7 +594,8 @@
       "hq": null,
       "cost_per_fti": 539,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 53827
     },
     {
       "week": "CW15-2025",
@@ -552,7 +605,8 @@
       "hq": null,
       "cost_per_fti": 594,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 29514
     },
     {
       "week": "CW16-2025",
@@ -562,7 +616,8 @@
       "hq": null,
       "cost_per_fti": 2270,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 30454
     },
     {
       "week": "CW17-2025",
@@ -572,7 +627,8 @@
       "hq": null,
       "cost_per_fti": 1723,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 48272
     },
     {
       "week": "CW18-2025",
@@ -582,7 +638,8 @@
       "hq": null,
       "cost_per_fti": 1691,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 82026
     },
     {
       "week": "CW19-2025",
@@ -592,7 +649,8 @@
       "hq": null,
       "cost_per_fti": 1546,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 101310
     },
     {
       "week": "CW20-2025",
@@ -602,7 +660,8 @@
       "hq": null,
       "cost_per_fti": 1500,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 72096
     },
     {
       "week": "CW21-2025",
@@ -612,7 +671,8 @@
       "hq": null,
       "cost_per_fti": 1618,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 59698
     },
     {
       "week": "CW22-2025",
@@ -622,7 +682,8 @@
       "hq": null,
       "cost_per_fti": 2520,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 56302
     },
     {
       "week": "CW23-2025",
@@ -632,7 +693,8 @@
       "hq": null,
       "cost_per_fti": 2803,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 63280
     },
     {
       "week": "CW24-2025",
@@ -642,7 +704,8 @@
       "hq": null,
       "cost_per_fti": 1242,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 73371
     },
     {
       "week": "CW25-2025",
@@ -652,7 +715,8 @@
       "hq": null,
       "cost_per_fti": 850,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 70336
     },
     {
       "week": "CW26-2025",
@@ -662,7 +726,8 @@
       "hq": null,
       "cost_per_fti": 821,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 82456
     },
     {
       "week": "CW27-2025",
@@ -672,7 +737,8 @@
       "hq": null,
       "cost_per_fti": 665,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 84536
     },
     {
       "week": "CW28-2025",
@@ -682,7 +748,8 @@
       "hq": null,
       "cost_per_fti": 698,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 94593
     },
     {
       "week": "CW29-2025",
@@ -692,7 +759,8 @@
       "hq": null,
       "cost_per_fti": 1355,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 87303
     },
     {
       "week": "CW30-2025",
@@ -702,7 +770,8 @@
       "hq": null,
       "cost_per_fti": 1212,
       "cost_per_qualified": null,
-      "cost_per_hq": null
+      "cost_per_hq": null,
+      "spend_google": 77233
     },
     {
       "week": "CW31-2025",
@@ -712,7 +781,8 @@
       "hq": 7,
       "cost_per_fti": 1434,
       "cost_per_qualified": 14341,
-      "cost_per_hq": 18439
+      "cost_per_hq": 18439,
+      "spend_google": 60765
     },
     {
       "week": "CW32-2025",
@@ -722,7 +792,8 @@
       "hq": 6,
       "cost_per_fti": 1175,
       "cost_per_qualified": 17922,
-      "cost_per_hq": 20909
+      "cost_per_hq": 20909,
+      "spend_google": 79538
     },
     {
       "week": "CW33-2025",
@@ -732,7 +803,8 @@
       "hq": 9,
       "cost_per_fti": 1946,
       "cost_per_qualified": 13585,
-      "cost_per_hq": 16604
+      "cost_per_hq": 16604,
+      "spend_google": 76839
     },
     {
       "week": "CW34-2025",
@@ -742,7 +814,8 @@
       "hq": 18,
       "cost_per_fti": 5799,
       "cost_per_qualified": 7259,
-      "cost_per_hq": 10889
+      "cost_per_hq": 10889,
+      "spend_google": 115597
     },
     {
       "week": "CW35-2025",
@@ -752,7 +825,8 @@
       "hq": 16,
       "cost_per_fti": 9143,
       "cost_per_qualified": 5978,
-      "cost_per_hq": 9714
+      "cost_per_hq": 9714,
+      "spend_google": 116729
     },
     {
       "week": "CW36-2025",
@@ -762,7 +836,8 @@
       "hq": 15,
       "cost_per_fti": 20449,
       "cost_per_qualified": 6816,
-      "cost_per_hq": 9543
+      "cost_per_hq": 9543,
+      "spend_google": 107678
     },
     {
       "week": "CW37-2025",
@@ -772,7 +847,8 @@
       "hq": 22,
       "cost_per_fti": 11890,
       "cost_per_qualified": 6399,
-      "cost_per_hq": 9890
+      "cost_per_hq": 9890,
+      "spend_google": 148357
     },
     {
       "week": "CW38-2025",
@@ -782,7 +858,8 @@
       "hq": 8,
       "cost_per_fti": 9101,
       "cost_per_qualified": 18810,
-      "cost_per_hq": 28214
+      "cost_per_hq": 28214,
+      "spend_google": 135777
     },
     {
       "week": "CW39-2025",
@@ -792,7 +869,8 @@
       "hq": 9,
       "cost_per_fti": 12013,
       "cost_per_qualified": 18319,
-      "cost_per_hq": 24426
+      "cost_per_hq": 24426,
+      "spend_google": 161048
     },
     {
       "week": "CW40-2025",
@@ -802,7 +880,8 @@
       "hq": 5,
       "cost_per_fti": 9821,
       "cost_per_qualified": 30321,
-      "cost_per_hq": 48514
+      "cost_per_hq": 48514,
+      "spend_google": 167380
     },
     {
       "week": "CW41-2025",
@@ -812,7 +891,8 @@
       "hq": 5,
       "cost_per_fti": 20627,
       "cost_per_qualified": 46204,
-      "cost_per_hq": 46204
+      "cost_per_hq": 46204,
+      "spend_google": 137123
     },
     {
       "week": "CW42-2025",
@@ -822,7 +902,8 @@
       "hq": 3,
       "cost_per_fti": 29508,
       "cost_per_qualified": 78689,
-      "cost_per_hq": 78689
+      "cost_per_hq": 78689,
+      "spend_google": 132973
     },
     {
       "week": "CW43-2025",
@@ -832,7 +913,8 @@
       "hq": 7,
       "cost_per_fti": 29175,
       "cost_per_qualified": 16880,
-      "cost_per_hq": 33760
+      "cost_per_hq": 33760,
+      "spend_google": 166963
     },
     {
       "week": "CW44-2025",
@@ -842,7 +924,8 @@
       "hq": 9,
       "cost_per_fti": 14430,
       "cost_per_qualified": 13148,
-      "cost_per_hq": 26296
+      "cost_per_hq": 26296,
+      "spend_google": 180617
     },
     {
       "week": "CW45-2025",
@@ -852,7 +935,8 @@
       "hq": 22,
       "cost_per_fti": 11567,
       "cost_per_qualified": 7179,
-      "cost_per_hq": 11094
+      "cost_per_hq": 11094,
+      "spend_google": 158071
     },
     {
       "week": "CW46-2025",
@@ -862,7 +946,8 @@
       "hq": 13,
       "cost_per_fti": 11813,
       "cost_per_qualified": 5906,
-      "cost_per_hq": 12722
+      "cost_per_hq": 12722,
+      "spend_google": 99697
     },
     {
       "week": "CW47-2025",
@@ -872,7 +957,8 @@
       "hq": 23,
       "cost_per_fti": 10424,
       "cost_per_qualified": 6671,
-      "cost_per_hq": 8702
+      "cost_per_hq": 8702,
+      "spend_google": 91478
     },
     {
       "week": "CW48-2025",
@@ -882,7 +968,8 @@
       "hq": 4,
       "cost_per_fti": 9015,
       "cost_per_qualified": 37682,
-      "cost_per_hq": 47103
+      "cost_per_hq": 47103,
+      "spend_google": 118406
     },
     {
       "week": "CW49-2025",
@@ -892,7 +979,8 @@
       "hq": 7,
       "cost_per_fti": 10873,
       "cost_per_qualified": 27804,
-      "cost_per_hq": 27804
+      "cost_per_hq": 27804,
+      "spend_google": 116426
     },
     {
       "week": "CW50-2025",
@@ -902,7 +990,8 @@
       "hq": 10,
       "cost_per_fti": 8198,
       "cost_per_qualified": 19153,
-      "cost_per_hq": 21069
+      "cost_per_hq": 21069,
+      "spend_google": 101129
     },
     {
       "week": "CW51-2025",
@@ -912,7 +1001,8 @@
       "hq": 7,
       "cost_per_fti": 11558,
       "cost_per_qualified": 25684,
-      "cost_per_hq": 33023
+      "cost_per_hq": 33023,
+      "spend_google": 115031
     },
     {
       "week": "CW52-2025",
@@ -922,7 +1012,8 @@
       "hq": 10,
       "cost_per_fti": 7228,
       "cost_per_qualified": 9603,
-      "cost_per_hq": 13444
+      "cost_per_hq": 13444,
+      "spend_google": 66244
     },
     {
       "week": "CW01-2026",
@@ -932,7 +1023,8 @@
       "hq": 9,
       "cost_per_fti": 10932,
       "cost_per_qualified": 13791,
-      "cost_per_hq": 19920
+      "cost_per_hq": 19920,
+      "spend_google": 108637
     },
     {
       "week": "CW02-2026",
@@ -942,7 +1034,8 @@
       "hq": 24,
       "cost_per_fti": 7046,
       "cost_per_qualified": 7811,
-      "cost_per_hq": 11391
+      "cost_per_hq": 11391,
+      "spend_google": 176098
     },
     {
       "week": "CW03-2026",
@@ -952,7 +1045,8 @@
       "hq": 24,
       "cost_per_fti": 6583,
       "cost_per_qualified": 11000,
-      "cost_per_hq": 14208
+      "cost_per_hq": 14208,
+      "spend_google": 214670
     },
     {
       "week": "CW04-2026",
@@ -962,7 +1056,8 @@
       "hq": 21,
       "cost_per_fti": 7792,
       "cost_per_qualified": 6211,
-      "cost_per_hq": 10352
+      "cost_per_hq": 10352,
+      "spend_google": 139485
     },
     {
       "week": "CW05-2026",
@@ -972,7 +1067,8 @@
       "hq": 15,
       "cost_per_fti": 12210,
       "cost_per_qualified": 12413,
-      "cost_per_hq": 19861
+      "cost_per_hq": 19861,
+      "spend_google": 201933
     },
     {
       "week": "CW06-2026",
@@ -982,7 +1078,8 @@
       "hq": 20,
       "cost_per_fti": 12101,
       "cost_per_qualified": 9525,
-      "cost_per_hq": 14763
+      "cost_per_hq": 14763,
+      "spend_google": 197377
     },
     {
       "week": "CW07-2026",
@@ -992,7 +1089,8 @@
       "hq": 26,
       "cost_per_fti": 20828,
       "cost_per_qualified": 8982,
-      "cost_per_hq": 11055
+      "cost_per_hq": 11055,
+      "spend_google": 160282
     },
     {
       "week": "CW08-2026",
@@ -1002,7 +1100,8 @@
       "hq": 22,
       "cost_per_fti": 19767,
       "cost_per_qualified": 7588,
-      "cost_per_hq": 10692
+      "cost_per_hq": 10692,
+      "spend_google": 152066
     },
     {
       "week": "CW09-2026",
@@ -1012,7 +1111,8 @@
       "hq": 17,
       "cost_per_fti": 15236,
       "cost_per_qualified": 9396,
-      "cost_per_hq": 13265
+      "cost_per_hq": 13265,
+      "spend_google": 189615
     },
     {
       "week": "CW10-2026",
@@ -1022,7 +1122,8 @@
       "hq": 13,
       "cost_per_fti": 17228,
       "cost_per_qualified": 15506,
-      "cost_per_hq": 25047
+      "cost_per_hq": 25047,
+      "spend_google": 212100
     },
     {
       "week": "CW11-2026",
@@ -1032,7 +1133,8 @@
       "hq": 14,
       "cost_per_fti": 24660,
       "cost_per_qualified": 19079,
-      "cost_per_hq": 25894
+      "cost_per_hq": 25894,
+      "spend_google": 274719
     },
     {
       "week": "CW12-2026",
@@ -1042,7 +1144,8 @@
       "hq": 15,
       "cost_per_fti": 23911,
       "cost_per_qualified": 15599,
-      "cost_per_hq": 21839
+      "cost_per_hq": 21839,
+      "spend_google": 229798
     },
     {
       "week": "CW13-2026",
@@ -1052,7 +1155,8 @@
       "hq": 11,
       "cost_per_fti": 66000,
       "cost_per_qualified": 16867,
-      "cost_per_hq": 27600
+      "cost_per_hq": 27600,
+      "spend_google": 228944
     },
     {
       "week": "CW14-2026",
@@ -1062,7 +1166,8 @@
       "hq": 13,
       "cost_per_fti": 22677,
       "cost_per_qualified": 9071,
-      "cost_per_hq": 16048
+      "cost_per_hq": 16048,
+      "spend_google": 110750
     },
     {
       "week": "CW15-2026",
@@ -1072,14 +1177,10 @@
       "hq": 20,
       "cost_per_fti": 12776,
       "cost_per_qualified": 8380,
-      "cost_per_hq": 14245
+      "cost_per_hq": 14245,
+      "spend_google": 151500
     }
   ],
-  "history_by_region": {
-    "TH": [],
-    "SEA": [],
-    "ROW": []
-  },
   "region_spend": [
     {
       "region": "TH",
@@ -1122,7 +1223,8 @@
         "hq": null,
         "cost_per_fti": 3413,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 21158
       },
       {
         "week": "CW15-2024",
@@ -1132,7 +1234,8 @@
         "hq": null,
         "cost_per_fti": 1706,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 20478
       },
       {
         "week": "CW16-2024",
@@ -1142,7 +1245,8 @@
         "hq": null,
         "cost_per_fti": 3879,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 19396
       },
       {
         "week": "CW17-2024",
@@ -1152,7 +1256,8 @@
         "hq": null,
         "cost_per_fti": 1725,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 26388
       },
       {
         "week": "CW18-2024",
@@ -1162,7 +1267,8 @@
         "hq": null,
         "cost_per_fti": 1192,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 21815
       },
       {
         "week": "CW19-2024",
@@ -1172,7 +1278,8 @@
         "hq": null,
         "cost_per_fti": 2033,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 29273
       },
       {
         "week": "CW20-2024",
@@ -1182,7 +1289,8 @@
         "hq": null,
         "cost_per_fti": 2798,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 40013
       },
       {
         "week": "CW21-2024",
@@ -1192,7 +1300,8 @@
         "hq": null,
         "cost_per_fti": 4359,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 40539
       },
       {
         "week": "CW22-2024",
@@ -1202,7 +1311,8 @@
         "hq": null,
         "cost_per_fti": 1464,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 27375
       },
       {
         "week": "CW23-2024",
@@ -1212,7 +1322,8 @@
         "hq": null,
         "cost_per_fti": 1577,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 31541
       },
       {
         "week": "CW24-2024",
@@ -1222,7 +1333,8 @@
         "hq": null,
         "cost_per_fti": 1477,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 37669
       },
       {
         "week": "CW25-2024",
@@ -1232,7 +1344,8 @@
         "hq": null,
         "cost_per_fti": 647,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 38644
       },
       {
         "week": "CW26-2024",
@@ -1242,7 +1355,8 @@
         "hq": null,
         "cost_per_fti": 289,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 32916
       },
       {
         "week": "CW27-2024",
@@ -1252,7 +1366,8 @@
         "hq": null,
         "cost_per_fti": 245,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 37485
       },
       {
         "week": "CW28-2024",
@@ -1262,7 +1377,8 @@
         "hq": null,
         "cost_per_fti": 193,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 38469
       },
       {
         "week": "CW29-2024",
@@ -1272,7 +1388,8 @@
         "hq": null,
         "cost_per_fti": 137,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 33850
       },
       {
         "week": "CW30-2024",
@@ -1282,7 +1399,8 @@
         "hq": null,
         "cost_per_fti": 114,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 32160
       },
       {
         "week": "CW31-2024",
@@ -1292,7 +1410,8 @@
         "hq": null,
         "cost_per_fti": 76,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 33666
       },
       {
         "week": "CW32-2024",
@@ -1302,7 +1421,8 @@
         "hq": null,
         "cost_per_fti": 95,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 36350
       },
       {
         "week": "CW33-2024",
@@ -1312,7 +1432,8 @@
         "hq": null,
         "cost_per_fti": 82,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 34078
       },
       {
         "week": "CW34-2024",
@@ -1322,7 +1443,8 @@
         "hq": null,
         "cost_per_fti": 92,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 33242
       },
       {
         "week": "CW35-2024",
@@ -1332,7 +1454,8 @@
         "hq": null,
         "cost_per_fti": 99,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 34562
       },
       {
         "week": "CW36-2024",
@@ -1342,7 +1465,8 @@
         "hq": null,
         "cost_per_fti": 75,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 36976
       },
       {
         "week": "CW37-2024",
@@ -1352,7 +1476,8 @@
         "hq": null,
         "cost_per_fti": 82,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 38601
       },
       {
         "week": "CW38-2024",
@@ -1362,7 +1487,8 @@
         "hq": null,
         "cost_per_fti": 72,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 28239
       },
       {
         "week": "CW39-2024",
@@ -1372,7 +1498,8 @@
         "hq": null,
         "cost_per_fti": 82,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 27401
       },
       {
         "week": "CW40-2024",
@@ -1382,7 +1509,8 @@
         "hq": null,
         "cost_per_fti": 90,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 31217
       },
       {
         "week": "CW41-2024",
@@ -1392,7 +1520,8 @@
         "hq": null,
         "cost_per_fti": 85,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 34528
       },
       {
         "week": "CW42-2024",
@@ -1402,7 +1531,8 @@
         "hq": null,
         "cost_per_fti": 79,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 37735
       },
       {
         "week": "CW43-2024",
@@ -1412,7 +1542,8 @@
         "hq": null,
         "cost_per_fti": 81,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 35222
       },
       {
         "week": "CW44-2024",
@@ -1422,7 +1553,8 @@
         "hq": null,
         "cost_per_fti": 77,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 34460
       },
       {
         "week": "CW45-2024",
@@ -1432,7 +1564,8 @@
         "hq": null,
         "cost_per_fti": 80,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 36453
       },
       {
         "week": "CW46-2024",
@@ -1442,7 +1575,8 @@
         "hq": null,
         "cost_per_fti": 81,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 32083
       },
       {
         "week": "CW47-2024",
@@ -1452,7 +1586,8 @@
         "hq": null,
         "cost_per_fti": 100,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 34379
       },
       {
         "week": "CW48-2024",
@@ -1462,7 +1597,8 @@
         "hq": null,
         "cost_per_fti": 171,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 39647
       },
       {
         "week": "CW49-2024",
@@ -1472,7 +1608,8 @@
         "hq": null,
         "cost_per_fti": 123,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 42400
       },
       {
         "week": "CW50-2024",
@@ -1482,7 +1619,8 @@
         "hq": null,
         "cost_per_fti": 118,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 44535
       },
       {
         "week": "CW51-2024",
@@ -1492,7 +1630,8 @@
         "hq": null,
         "cost_per_fti": 123,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 42353
       },
       {
         "week": "CW52-2024",
@@ -1502,7 +1641,8 @@
         "hq": null,
         "cost_per_fti": 119,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 42711
       },
       {
         "week": "CW01-2025",
@@ -1512,7 +1652,8 @@
         "hq": null,
         "cost_per_fti": 103,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 39460
       },
       {
         "week": "CW02-2025",
@@ -1522,7 +1663,8 @@
         "hq": null,
         "cost_per_fti": 158,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 46511
       },
       {
         "week": "CW03-2025",
@@ -1532,7 +1674,8 @@
         "hq": null,
         "cost_per_fti": 133,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 43564
       },
       {
         "week": "CW04-2025",
@@ -1542,7 +1685,8 @@
         "hq": null,
         "cost_per_fti": 132,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 51749
       },
       {
         "week": "CW05-2025",
@@ -1552,7 +1696,8 @@
         "hq": null,
         "cost_per_fti": 129,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 49293
       },
       {
         "week": "CW06-2025",
@@ -1562,7 +1707,8 @@
         "hq": null,
         "cost_per_fti": 145,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 52714
       },
       {
         "week": "CW07-2025",
@@ -1572,7 +1718,8 @@
         "hq": null,
         "cost_per_fti": 116,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 41113
       },
       {
         "week": "CW08-2025",
@@ -1582,7 +1729,8 @@
         "hq": null,
         "cost_per_fti": 54,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 44774
       },
       {
         "week": "CW09-2025",
@@ -1592,7 +1740,8 @@
         "hq": null,
         "cost_per_fti": 166,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 29649
       },
       {
         "week": "CW10-2025",
@@ -1602,7 +1751,8 @@
         "hq": null,
         "cost_per_fti": 454,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 41753
       },
       {
         "week": "CW11-2025",
@@ -1612,7 +1762,8 @@
         "hq": null,
         "cost_per_fti": 911,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 66520
       },
       {
         "week": "CW12-2025",
@@ -1622,7 +1773,8 @@
         "hq": null,
         "cost_per_fti": 897,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 55618
       },
       {
         "week": "CW13-2025",
@@ -1632,7 +1784,8 @@
         "hq": null,
         "cost_per_fti": 1126,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 59865
       },
       {
         "week": "CW14-2025",
@@ -1642,7 +1795,8 @@
         "hq": null,
         "cost_per_fti": 823,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 43463
       },
       {
         "week": "CW15-2025",
@@ -1652,7 +1806,8 @@
         "hq": null,
         "cost_per_fti": 1837,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 22204
       },
       {
         "week": "CW16-2025",
@@ -1662,7 +1817,8 @@
         "hq": null,
         "cost_per_fti": 2603,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 24715
       },
       {
         "week": "CW17-2025",
@@ -1672,7 +1828,8 @@
         "hq": null,
         "cost_per_fti": 1643,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 35446
       },
       {
         "week": "CW18-2025",
@@ -1682,7 +1839,8 @@
         "hq": null,
         "cost_per_fti": 2158,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 51882
       },
       {
         "week": "CW19-2025",
@@ -1692,7 +1850,8 @@
         "hq": null,
         "cost_per_fti": 1376,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 67651
       },
       {
         "week": "CW20-2025",
@@ -1702,7 +1861,8 @@
         "hq": null,
         "cost_per_fti": 1460,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 38891
       },
       {
         "week": "CW21-2025",
@@ -1712,7 +1872,8 @@
         "hq": null,
         "cost_per_fti": 1468,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 40882
       },
       {
         "week": "CW22-2025",
@@ -1722,7 +1883,8 @@
         "hq": null,
         "cost_per_fti": 2085,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 42930
       },
       {
         "week": "CW23-2025",
@@ -1732,7 +1894,8 @@
         "hq": null,
         "cost_per_fti": 2544,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 50928
       },
       {
         "week": "CW24-2025",
@@ -1742,7 +1905,8 @@
         "hq": null,
         "cost_per_fti": 1090,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 62011
       },
       {
         "week": "CW25-2025",
@@ -1752,7 +1916,8 @@
         "hq": null,
         "cost_per_fti": 678,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 57201
       },
       {
         "week": "CW26-2025",
@@ -1762,7 +1927,8 @@
         "hq": null,
         "cost_per_fti": 651,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 61470
       },
       {
         "week": "CW27-2025",
@@ -1772,7 +1938,8 @@
         "hq": null,
         "cost_per_fti": 505,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 57477
       },
       {
         "week": "CW28-2025",
@@ -1782,7 +1949,8 @@
         "hq": null,
         "cost_per_fti": 600,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 69429
       },
       {
         "week": "CW29-2025",
@@ -1792,7 +1960,8 @@
         "hq": null,
         "cost_per_fti": 978,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 59544
       },
       {
         "week": "CW30-2025",
@@ -1802,7 +1971,8 @@
         "hq": null,
         "cost_per_fti": 939,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 58672
       },
       {
         "week": "CW31-2025",
@@ -1812,7 +1982,8 @@
         "hq": 7,
         "cost_per_fti": 1078,
         "cost_per_qualified": 10540,
-        "cost_per_hq": 13551
+        "cost_per_hq": 13551,
+        "spend_google": 48662
       },
       {
         "week": "CW32-2025",
@@ -1822,7 +1993,8 @@
         "hq": 6,
         "cost_per_fti": 922,
         "cost_per_qualified": 12485,
-        "cost_per_hq": 14566
+        "cost_per_hq": 14566,
+        "spend_google": 60774
       },
       {
         "week": "CW33-2025",
@@ -1832,7 +2004,8 @@
         "hq": 9,
         "cost_per_fti": 1617,
         "cost_per_qualified": 8645,
-        "cost_per_hq": 10566
+        "cost_per_hq": 10566,
+        "spend_google": 54538
       },
       {
         "week": "CW34-2025",
@@ -1842,7 +2015,8 @@
         "hq": 18,
         "cost_per_fti": 3976,
         "cost_per_qualified": 4389,
-        "cost_per_hq": 6583
+        "cost_per_hq": 6583,
+        "spend_google": 70897
       },
       {
         "week": "CW35-2025",
@@ -1852,7 +2026,8 @@
         "hq": 16,
         "cost_per_fti": 6245,
         "cost_per_qualified": 3843,
-        "cost_per_hq": 6245
+        "cost_per_hq": 6245,
+        "spend_google": 80725
       },
       {
         "week": "CW36-2025",
@@ -1862,7 +2037,8 @@
         "hq": 15,
         "cost_per_fti": 11939,
         "cost_per_qualified": 3980,
-        "cost_per_hq": 5572
+        "cost_per_hq": 5572,
+        "spend_google": 64128
       },
       {
         "week": "CW37-2025",
@@ -1872,7 +2048,8 @@
         "hq": 22,
         "cost_per_fti": 8250,
         "cost_per_qualified": 3931,
-        "cost_per_hq": 6075
+        "cost_per_hq": 6075,
+        "spend_google": 97591
       },
       {
         "week": "CW38-2025",
@@ -1882,7 +2059,8 @@
         "hq": 8,
         "cost_per_fti": 10885,
         "cost_per_qualified": 12518,
-        "cost_per_hq": 18777
+        "cost_per_hq": 18777,
+        "spend_google": 101963
       },
       {
         "week": "CW39-2025",
@@ -1892,7 +2070,8 @@
         "hq": 9,
         "cost_per_fti": 8466,
         "cost_per_qualified": 10794,
-        "cost_per_hq": 14392
+        "cost_per_hq": 14392,
+        "spend_google": 103748
       },
       {
         "week": "CW40-2025",
@@ -1902,7 +2081,8 @@
         "hq": 5,
         "cost_per_fti": 8079,
         "cost_per_qualified": 18884,
-        "cost_per_hq": 30215
+        "cost_per_hq": 30215,
+        "spend_google": 107180
       },
       {
         "week": "CW41-2025",
@@ -1912,7 +2092,8 @@
         "hq": 5,
         "cost_per_fti": 16933,
         "cost_per_qualified": 32512,
-        "cost_per_hq": 32512
+        "cost_per_hq": 32512,
+        "spend_google": 96095
       },
       {
         "week": "CW42-2025",
@@ -1922,7 +2103,8 @@
         "hq": 3,
         "cost_per_fti": 24060,
         "cost_per_qualified": 48119,
-        "cost_per_hq": 48119
+        "cost_per_hq": 48119,
+        "spend_google": 77992
       },
       {
         "week": "CW43-2025",
@@ -1932,7 +2114,8 @@
         "hq": 7,
         "cost_per_fti": 22338,
         "cost_per_qualified": 10531,
-        "cost_per_hq": 21061
+        "cost_per_hq": 21061,
+        "spend_google": 106798
       },
       {
         "week": "CW44-2025",
@@ -1942,7 +2125,8 @@
         "hq": 9,
         "cost_per_fti": 11696,
         "cost_per_qualified": 8642,
-        "cost_per_hq": 17284
+        "cost_per_hq": 17284,
+        "spend_google": 111589
       },
       {
         "week": "CW45-2025",
@@ -1952,7 +2136,8 @@
         "hq": 22,
         "cost_per_fti": 8375,
         "cost_per_qualified": 4458,
-        "cost_per_hq": 6890
+        "cost_per_hq": 6890,
+        "spend_google": 93939
       },
       {
         "week": "CW46-2025",
@@ -1962,7 +2147,8 @@
         "hq": 13,
         "cost_per_fti": 7443,
         "cost_per_qualified": 3456,
-        "cost_per_hq": 7443
+        "cost_per_hq": 7443,
+        "spend_google": 57196
       },
       {
         "week": "CW47-2025",
@@ -1972,7 +2158,8 @@
         "hq": 23,
         "cost_per_fti": 7519,
         "cost_per_qualified": 3910,
-        "cost_per_hq": 5100
+        "cost_per_hq": 5100,
+        "spend_google": 60203
       },
       {
         "week": "CW48-2025",
@@ -1982,7 +2169,8 @@
         "hq": 4,
         "cost_per_fti": 6060,
         "cost_per_qualified": 24118,
-        "cost_per_hq": 30147
+        "cost_per_hq": 30147,
+        "spend_google": 77711
       },
       {
         "week": "CW49-2025",
@@ -1992,7 +2180,8 @@
         "hq": 7,
         "cost_per_fti": 8501,
         "cost_per_qualified": 19309,
-        "cost_per_hq": 19309
+        "cost_per_hq": 19309,
+        "spend_google": 87351
       },
       {
         "week": "CW50-2025",
@@ -2002,7 +2191,8 @@
         "hq": 10,
         "cost_per_fti": 6498,
         "cost_per_qualified": 13409,
-        "cost_per_hq": 14750
+        "cost_per_hq": 14750,
+        "spend_google": 72113
       },
       {
         "week": "CW51-2025",
@@ -2012,7 +2202,8 @@
         "hq": 7,
         "cost_per_fti": 8400,
         "cost_per_qualified": 18106,
-        "cost_per_hq": 23279
+        "cost_per_hq": 23279,
+        "spend_google": 85468
       },
       {
         "week": "CW52-2025",
@@ -2022,7 +2213,8 @@
         "hq": 10,
         "cost_per_fti": 5191,
         "cost_per_qualified": 6526,
-        "cost_per_hq": 9137
+        "cost_per_hq": 9137,
+        "spend_google": 56096
       },
       {
         "week": "CW01-2026",
@@ -2032,7 +2224,8 @@
         "hq": 9,
         "cost_per_fti": 9613,
         "cost_per_qualified": 9539,
-        "cost_per_hq": 13779
+        "cost_per_hq": 13779,
+        "spend_google": 81459
       },
       {
         "week": "CW02-2026",
@@ -2042,7 +2235,8 @@
         "hq": 24,
         "cost_per_fti": 6025,
         "cost_per_qualified": 5715,
-        "cost_per_hq": 8334
+        "cost_per_hq": 8334,
+        "spend_google": 136867
       },
       {
         "week": "CW03-2026",
@@ -2052,7 +2246,8 @@
         "hq": 24,
         "cost_per_fti": 5328,
         "cost_per_qualified": 7683,
-        "cost_per_hq": 9924
+        "cost_per_hq": 9924,
+        "spend_google": 180689
       },
       {
         "week": "CW04-2026",
@@ -2062,7 +2257,8 @@
         "hq": 21,
         "cost_per_fti": 5618,
         "cost_per_qualified": 3419,
-        "cost_per_hq": 5698
+        "cost_per_hq": 5698,
+        "spend_google": 81165
       },
       {
         "week": "CW05-2026",
@@ -2072,7 +2268,8 @@
         "hq": 15,
         "cost_per_fti": 7438,
         "cost_per_qualified": 7562,
-        "cost_per_hq": 12099
+        "cost_per_hq": 12099,
+        "spend_google": 135043
       },
       {
         "week": "CW06-2026",
@@ -2082,7 +2279,8 @@
         "hq": 20,
         "cost_per_fti": 9270,
         "cost_per_qualified": 6399,
-        "cost_per_hq": 9919
+        "cost_per_hq": 9919,
+        "spend_google": 151473
       },
       {
         "week": "CW07-2026",
@@ -2092,7 +2290,8 @@
         "hq": 26,
         "cost_per_fti": 14774,
         "cost_per_qualified": 4986,
-        "cost_per_hq": 6137
+        "cost_per_hq": 6137,
+        "spend_google": 117816
       },
       {
         "week": "CW08-2026",
@@ -2102,7 +2301,8 @@
         "hq": 22,
         "cost_per_fti": 12903,
         "cost_per_qualified": 4537,
-        "cost_per_hq": 6393
+        "cost_per_hq": 6393,
+        "spend_google": 103178
       },
       {
         "week": "CW09-2026",
@@ -2112,7 +2312,8 @@
         "hq": 17,
         "cost_per_fti": 11348,
         "cost_per_qualified": 6998,
-        "cost_per_hq": 9880
+        "cost_per_hq": 9880,
+        "spend_google": 145313
       },
       {
         "week": "CW10-2026",
@@ -2122,7 +2323,8 @@
         "hq": 13,
         "cost_per_fti": 12634,
         "cost_per_qualified": 10168,
-        "cost_per_hq": 16424
+        "cost_per_hq": 16424,
+        "spend_google": 155330
       },
       {
         "week": "CW11-2026",
@@ -2132,7 +2334,8 @@
         "hq": 14,
         "cost_per_fti": 17414,
         "cost_per_qualified": 12557,
-        "cost_per_hq": 17041
+        "cost_per_hq": 17041,
+        "spend_google": 195992
       },
       {
         "week": "CW12-2026",
@@ -2142,7 +2345,8 @@
         "hq": 15,
         "cost_per_fti": 14035,
         "cost_per_qualified": 9156,
-        "cost_per_hq": 12818
+        "cost_per_hq": 12818,
+        "spend_google": 138930
       },
       {
         "week": "CW13-2026",
@@ -2152,7 +2356,8 @@
         "hq": 11,
         "cost_per_fti": 47969,
         "cost_per_qualified": 9594,
-        "cost_per_hq": 15699
+        "cost_per_hq": 15699,
+        "spend_google": 132807
       },
       {
         "week": "CW14-2026",
@@ -2162,7 +2367,8 @@
         "hq": 13,
         "cost_per_fti": 10988,
         "cost_per_qualified": 4395,
-        "cost_per_hq": 7776
+        "cost_per_hq": 7776,
+        "spend_google": 50098
       },
       {
         "week": "CW15-2026",
@@ -2172,7 +2378,8 @@
         "hq": 20,
         "cost_per_fti": 8139,
         "cost_per_qualified": 4860,
-        "cost_per_hq": 8261
+        "cost_per_hq": 8261,
+        "spend_google": 87750
       }
     ],
     "SEA": [
@@ -2184,7 +2391,8 @@
         "hq": null,
         "cost_per_fti": 174,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 38428
       },
       {
         "week": "CW09-2025",
@@ -2194,7 +2402,8 @@
         "hq": null,
         "cost_per_fti": 117,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 44844
       },
       {
         "week": "CW10-2025",
@@ -2204,7 +2413,8 @@
         "hq": null,
         "cost_per_fti": 66,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 19854
       },
       {
         "week": "CW11-2025",
@@ -2214,7 +2424,8 @@
         "hq": null,
         "cost_per_fti": 69,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 23218
       },
       {
         "week": "CW12-2025",
@@ -2224,7 +2435,8 @@
         "hq": null,
         "cost_per_fti": 56,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 17893
       },
       {
         "week": "CW13-2025",
@@ -2234,7 +2446,8 @@
         "hq": null,
         "cost_per_fti": 109,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 7629
       },
       {
         "week": "CW14-2025",
@@ -2244,7 +2457,8 @@
         "hq": null,
         "cost_per_fti": 185,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 10364
       },
       {
         "week": "CW15-2025",
@@ -2254,7 +2468,8 @@
         "hq": null,
         "cost_per_fti": 100,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 7310
       },
       {
         "week": "CW16-2025",
@@ -2264,7 +2479,8 @@
         "hq": null,
         "cost_per_fti": 956,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 5739
       },
       {
         "week": "CW17-2025",
@@ -2274,7 +2490,8 @@
         "hq": null,
         "cost_per_fti": 2138,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 12825
       },
       {
         "week": "CW18-2025",
@@ -2284,7 +2501,8 @@
         "hq": null,
         "cost_per_fti": 1096,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 30144
       },
       {
         "week": "CW19-2025",
@@ -2294,7 +2512,8 @@
         "hq": null,
         "cost_per_fti": 2404,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 33659
       },
       {
         "week": "CW20-2025",
@@ -2304,7 +2523,8 @@
         "hq": null,
         "cost_per_fti": 1581,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 33205
       },
       {
         "week": "CW21-2025",
@@ -2314,7 +2534,8 @@
         "hq": null,
         "cost_per_fti": 2352,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 18816
       },
       {
         "week": "CW22-2025",
@@ -2324,7 +2545,8 @@
         "hq": null,
         "cost_per_fti": 4460,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 13372
       },
       {
         "week": "CW23-2025",
@@ -2334,7 +2556,8 @@
         "hq": null,
         "cost_per_fti": 3953,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 12353
       },
       {
         "week": "CW24-2025",
@@ -2344,7 +2567,8 @@
         "hq": null,
         "cost_per_fti": 3352,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 11360
       },
       {
         "week": "CW25-2025",
@@ -2354,7 +2578,8 @@
         "hq": null,
         "cost_per_fti": 7249,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 13135
       },
       {
         "week": "CW26-2025",
@@ -2364,7 +2589,8 @@
         "hq": null,
         "cost_per_fti": 2671,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 20986
       },
       {
         "week": "CW27-2025",
@@ -2374,7 +2600,8 @@
         "hq": null,
         "cost_per_fti": 2198,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 27059
       },
       {
         "week": "CW28-2025",
@@ -2384,7 +2611,8 @@
         "hq": null,
         "cost_per_fti": 1284,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 25164
       },
       {
         "week": "CW29-2025",
@@ -2394,7 +2622,8 @@
         "hq": null,
         "cost_per_fti": 8325,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 27759
       },
       {
         "week": "CW30-2025",
@@ -2404,7 +2633,8 @@
         "hq": null,
         "cost_per_fti": 6715,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 18560
       },
       {
         "week": "CW31-2025",
@@ -2414,7 +2644,8 @@
         "hq": 1,
         "cost_per_fti": 17106,
         "cost_per_qualified": 34211,
-        "cost_per_hq": 34211
+        "cost_per_hq": 34211,
+        "spend_google": 12103
       },
       {
         "week": "CW32-2025",
@@ -2424,7 +2655,8 @@
         "hq": 3,
         "cost_per_fti": 3172,
         "cost_per_qualified": 12686,
-        "cost_per_hq": 12686
+        "cost_per_hq": 12686,
+        "spend_google": 18763
       },
       {
         "week": "CW33-2025",
@@ -2434,7 +2666,8 @@
         "hq": 1,
         "cost_per_fti": 3019,
         "cost_per_qualified": 54337,
-        "cost_per_hq": 54337
+        "cost_per_hq": 54337,
+        "spend_google": 22301
       },
       {
         "week": "CW34-2025",
@@ -2444,7 +2677,8 @@
         "hq": 3,
         "cost_per_fti": 19379,
         "cost_per_qualified": 19379,
-        "cost_per_hq": 25839
+        "cost_per_hq": 25839,
+        "spend_google": 44699
       },
       {
         "week": "CW35-2025",
@@ -2454,7 +2688,8 @@
         "hq": 2,
         "cost_per_fti": 55502,
         "cost_per_qualified": 11100,
-        "cost_per_hq": 27751
+        "cost_per_hq": 27751,
+        "spend_google": 36004
       },
       {
         "week": "CW36-2025",
@@ -2464,7 +2699,8 @@
         "hq": 0,
         "cost_per_fti": null,
         "cost_per_qualified": 59567,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 43550
       },
       {
         "week": "CW37-2025",
@@ -2474,7 +2710,8 @@
         "hq": 1,
         "cost_per_fti": 41966,
         "cost_per_qualified": 83932,
-        "cost_per_hq": 83932
+        "cost_per_hq": 83932,
+        "spend_google": 50766
       },
       {
         "week": "CW38-2025",
@@ -2484,7 +2721,8 @@
         "hq": 0,
         "cost_per_fti": 6863,
         "cost_per_qualified": 75496,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 33814
       },
       {
         "week": "CW39-2025",
@@ -2494,7 +2732,8 @@
         "hq": 2,
         "cost_per_fti": 30101,
         "cost_per_qualified": 22576,
-        "cost_per_hq": 45152
+        "cost_per_hq": 45152,
+        "spend_google": 57300
       },
       {
         "week": "CW40-2025",
@@ -2504,7 +2743,8 @@
         "hq": 1,
         "cost_per_fti": 14999,
         "cost_per_qualified": 45747,
-        "cost_per_hq": 91494
+        "cost_per_hq": 91494,
+        "spend_google": 60200
       },
       {
         "week": "CW41-2025",
@@ -2514,7 +2754,8 @@
         "hq": 0,
         "cost_per_fti": 42786,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 41028
       },
       {
         "week": "CW42-2025",
@@ -2524,7 +2765,8 @@
         "hq": 1,
         "cost_per_fti": 45854,
         "cost_per_qualified": 91709,
-        "cost_per_hq": 91709
+        "cost_per_hq": 91709,
+        "spend_google": 54981
       },
       {
         "week": "CW43-2025",
@@ -2534,7 +2776,8 @@
         "hq": 5,
         "cost_per_fti": 55556,
         "cost_per_qualified": 17778,
-        "cost_per_hq": 17778
+        "cost_per_hq": 17778,
+        "spend_google": 60165
       },
       {
         "week": "CW44-2025",
@@ -2544,7 +2787,8 @@
         "hq": 2,
         "cost_per_fti": 27036,
         "cost_per_qualified": 40554,
-        "cost_per_hq": 40554
+        "cost_per_hq": 40554,
+        "spend_google": 69027
       },
       {
         "week": "CW45-2025",
@@ -2554,7 +2798,8 @@
         "hq": 2,
         "cost_per_fti": 30831,
         "cost_per_qualified": 30831,
-        "cost_per_hq": 46247
+        "cost_per_hq": 46247,
+        "spend_google": 64132
       },
       {
         "week": "CW46-2025",
@@ -2564,7 +2809,8 @@
         "hq": 5,
         "cost_per_fti": 68616,
         "cost_per_qualified": 11436,
-        "cost_per_hq": 13723
+        "cost_per_hq": 13723,
+        "spend_google": 42502
       },
       {
         "week": "CW47-2025",
@@ -2574,7 +2820,8 @@
         "hq": 3,
         "cost_per_fti": 23011,
         "cost_per_qualified": 16568,
-        "cost_per_hq": 27613
+        "cost_per_hq": 27613,
+        "spend_google": 31275
       },
       {
         "week": "CW48-2025",
@@ -2584,7 +2831,8 @@
         "hq": 1,
         "cost_per_fti": 67825,
         "cost_per_qualified": 67825,
-        "cost_per_hq": 67825
+        "cost_per_hq": 67825,
+        "spend_google": 40695
       },
       {
         "week": "CW49-2025",
@@ -2594,7 +2842,8 @@
         "hq": 1,
         "cost_per_fti": 29734,
         "cost_per_qualified": 59467,
-        "cost_per_hq": 59467
+        "cost_per_hq": 59467,
+        "spend_google": 29075
       },
       {
         "week": "CW50-2025",
@@ -2604,7 +2853,8 @@
         "hq": 2,
         "cost_per_fti": 21063,
         "cost_per_qualified": 31595,
-        "cost_per_hq": 31595
+        "cost_per_hq": 31595,
+        "spend_google": 29017
       },
       {
         "week": "CW51-2025",
@@ -2614,7 +2864,8 @@
         "hq": 3,
         "cost_per_fti": 113675,
         "cost_per_qualified": 22735,
-        "cost_per_hq": 22735
+        "cost_per_hq": 22735,
+        "spend_google": 29563
       },
       {
         "week": "CW52-2025",
@@ -2624,7 +2875,8 @@
         "hq": 0,
         "cost_per_fti": 43077,
         "cost_per_qualified": 43077,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 10148
       },
       {
         "week": "CW01-2026",
@@ -2634,7 +2886,8 @@
         "hq": 3,
         "cost_per_fti": 15792,
         "cost_per_qualified": 13818,
-        "cost_per_hq": 18424
+        "cost_per_hq": 18424,
+        "spend_google": 27178
       },
       {
         "week": "CW02-2026",
@@ -2644,7 +2897,8 @@
         "hq": 3,
         "cost_per_fti": 13100,
         "cost_per_qualified": 12227,
-        "cost_per_hq": 24454
+        "cost_per_hq": 24454,
+        "spend_google": 39231
       },
       {
         "week": "CW03-2026",
@@ -2654,7 +2908,8 @@
         "hq": 2,
         "cost_per_fti": 14689,
         "cost_per_qualified": 17137,
-        "cost_per_hq": 51410
+        "cost_per_hq": 51410,
+        "spend_google": 33981
       },
       {
         "week": "CW04-2026",
@@ -2664,7 +2919,8 @@
         "hq": 3,
         "cost_per_fti": 14809,
         "cost_per_qualified": 19548,
-        "cost_per_hq": 32579
+        "cost_per_hq": 32579,
+        "spend_google": 58320
       },
       {
         "week": "CW05-2026",
@@ -2674,7 +2930,8 @@
         "hq": 4,
         "cost_per_fti": null,
         "cost_per_qualified": 14554,
-        "cost_per_hq": 29108
+        "cost_per_hq": 29108,
+        "spend_google": 66890
       },
       {
         "week": "CW06-2026",
@@ -2684,7 +2941,8 @@
         "hq": 5,
         "cost_per_fti": 31253,
         "cost_per_qualified": 12111,
-        "cost_per_hq": 19377
+        "cost_per_hq": 19377,
+        "spend_google": 45904
       },
       {
         "week": "CW07-2026",
@@ -2694,7 +2952,8 @@
         "hq": 3,
         "cost_per_fti": 42621,
         "cost_per_qualified": 42621,
-        "cost_per_hq": 42621
+        "cost_per_hq": 42621,
+        "spend_google": 42466
       },
       {
         "week": "CW08-2026",
@@ -2704,7 +2963,8 @@
         "hq": 2,
         "cost_per_fti": 81518,
         "cost_per_qualified": 40759,
-        "cost_per_hq": 40759
+        "cost_per_hq": 40759,
+        "spend_google": 41334
       },
       {
         "week": "CW09-2026",
@@ -2714,7 +2974,8 @@
         "hq": 1,
         "cost_per_fti": null,
         "cost_per_qualified": 8793,
-        "cost_per_hq": 43967
+        "cost_per_hq": 43967,
+        "spend_google": 32773
       },
       {
         "week": "CW10-2026",
@@ -2724,7 +2985,8 @@
         "hq": 4,
         "cost_per_fti": 47374,
         "cost_per_qualified": 18950,
-        "cost_per_hq": 23687
+        "cost_per_hq": 23687,
+        "spend_google": 47264
       },
       {
         "week": "CW11-2026",
@@ -2734,7 +2996,8 @@
         "hq": 3,
         "cost_per_fti": 102911,
         "cost_per_qualified": 34304,
-        "cost_per_hq": 34304
+        "cost_per_hq": 34304,
+        "spend_google": 65909
       },
       {
         "week": "CW12-2026",
@@ -2744,7 +3007,8 @@
         "hq": 4,
         "cost_per_fti": null,
         "cost_per_qualified": 25647,
-        "cost_per_hq": 25647
+        "cost_per_hq": 25647,
+        "spend_google": 66651
       },
       {
         "week": "CW13-2026",
@@ -2754,7 +3018,8 @@
         "hq": 2,
         "cost_per_fti": 93942,
         "cost_per_qualified": 31314,
-        "cost_per_hq": 46971
+        "cost_per_hq": 46971,
+        "spend_google": 65064
       },
       {
         "week": "CW14-2026",
@@ -2764,7 +3029,8 @@
         "hq": 4,
         "cost_per_fti": null,
         "cost_per_qualified": 17337,
-        "cost_per_hq": 21672
+        "cost_per_hq": 21672,
+        "spend_google": 51949
       },
       {
         "week": "CW15-2026",
@@ -2774,7 +3040,8 @@
         "hq": 0,
         "cost_per_fti": 37854,
         "cost_per_qualified": 37854,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 35031
       }
     ],
     "ROW": [
@@ -2786,7 +3053,8 @@
         "hq": 0,
         "cost_per_fti": null,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 7554
       },
       {
         "week": "CW09-2026",
@@ -2796,7 +3064,8 @@
         "hq": 0,
         "cost_per_fti": null,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 11530
       },
       {
         "week": "CW10-2026",
@@ -2806,7 +3075,8 @@
         "hq": 0,
         "cost_per_fti": null,
         "cost_per_qualified": 17351,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 9506
       },
       {
         "week": "CW11-2026",
@@ -2816,7 +3086,8 @@
         "hq": 0,
         "cost_per_fti": null,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 12818
       },
       {
         "week": "CW12-2026",
@@ -2826,7 +3097,8 @@
         "hq": 0,
         "cost_per_fti": null,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 24217
       },
       {
         "week": "CW13-2026",
@@ -2836,7 +3108,8 @@
         "hq": 1,
         "cost_per_fti": null,
         "cost_per_qualified": 36968,
-        "cost_per_hq": 36968
+        "cost_per_hq": 36968,
+        "spend_google": 31072
       },
       {
         "week": "CW14-2026",
@@ -2846,7 +3119,8 @@
         "hq": 0,
         "cost_per_fti": null,
         "cost_per_qualified": null,
-        "cost_per_hq": null
+        "cost_per_hq": null,
+        "spend_google": 8704
       },
       {
         "week": "CW15-2026",
@@ -2856,7 +3130,8 @@
         "hq": 1,
         "cost_per_fti": null,
         "cost_per_qualified": null,
-        "cost_per_hq": 43968
+        "cost_per_hq": 43968,
+        "spend_google": 28719
       }
     ]
   }
