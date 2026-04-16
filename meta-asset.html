@@ -417,6 +417,129 @@
       background: #fcfcfb;
     }
 
+    .pattern-tabs {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+      background: var(--bg-subtle);
+    }
+
+    .pattern-tab {
+      border: none;
+      background: transparent;
+      padding: 0.45rem 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .pattern-tab + .pattern-tab {
+      border-left: 1px solid var(--border);
+    }
+
+    .pattern-tab.active {
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .axis-block + .axis-block { margin-top: 1rem; }
+
+    .axis-title {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-faint);
+      margin-bottom: 0.55rem;
+    }
+
+    .pattern-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 0.7rem;
+    }
+
+    .pattern-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      background: var(--bg-card);
+    }
+
+    .pattern-name {
+      font-weight: 600;
+      font-size: 0.94rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .pattern-meta {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 0.45rem;
+    }
+
+    .confidence-low,
+    .confidence-medium { color: #9a6a00; }
+    .confidence-high { color: var(--up); }
+
+    .pattern-metrics {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .pattern-verdict {
+      margin-top: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .verdict-scale { color: var(--up); }
+    .verdict-kill { color: var(--down); }
+    .verdict-fix { color: #8c6d1f; }
+
+    .pattern-ranking {
+      margin-top: 0.55rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .pattern-ranking ol { margin-left: 1.15rem; }
+    .pattern-ranking li + li { margin-top: 0.2rem; }
+
+    .coverage-wrap {
+      margin-top: 1.2rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.8rem;
+      background: var(--bg-subtle);
+    }
+
+    .coverage-title {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 0.45rem;
+    }
+
+    .coverage-list {
+      margin-left: 1rem;
+      color: var(--text-muted);
+      font-size: 0.84rem;
+    }
+
+    .coverage-list li + li { margin-top: 0.2rem; }
+
     @media (max-width: 920px) {
       .header { flex-direction: column; }
       .snapshot-grid { grid-template-columns: 1fr; }
@@ -480,6 +603,17 @@
     <section class="section">
       <h2 class="section-title">Section 4 — Performance Snapshot</h2>
       <div id="performance-snapshot"></div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Section 5 — Creative Pattern Analysis</h2>
+      <div class="pattern-tabs" role="tablist" aria-label="Pattern analysis region tabs">
+        <button class="pattern-tab" type="button" data-region="TH">TH</button>
+        <button class="pattern-tab" type="button" data-region="SEA">SEA</button>
+        <button class="pattern-tab" type="button" data-region="ROW">ROW</button>
+        <button class="pattern-tab active" type="button" data-region="All">ALL</button>
+      </div>
+      <div id="pattern-analysis"></div>
     </section>
   </main>
 
