@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zaapi · Meta Asset Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --bg-subtle: #f7f7f5;
+      --border: #e8e6e1;
+      --border-strong: #d0cec8;
+      --text: #1a1916;
+      --text-muted: #7a786f;
+      --text-faint: #b0ada5;
+      --accent: #0f9e75;
+      --font-sans: 'DM Sans', system-ui, sans-serif;
+      --font-mono: 'DM Mono', 'Courier New', monospace;
+    }
+
+    html { font-size: 15px; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-weight: 400;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 1100px;
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 3rem 2rem 5rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 3rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    #week-label {
+      font-size: 0.8rem;
+      color: var(--text-faint);
+      font-family: var(--font-mono);
+    }
+
+    .nav-btn {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 10px;
+      background: var(--bg-subtle);
+    }
+
+    .nav-btn:hover {
+      color: var(--text);
+      border-color: var(--border-strong);
+      background: var(--bg);
+    }
+
+    .nav-btn.active {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+
+    .forex-ctrl {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .forex-ctrl input {
+      width: 52px;
+      padding: 4px 8px;
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+      border: 1px solid var(--border-strong);
+      border-radius: 5px;
+      background: var(--bg-subtle);
+      color: var(--text);
+      text-align: center;
+    }
+
+    .forex-ctrl input:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+
+    .coming-soon {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .coming-soon h1 {
+      font-size: 2rem;
+      font-weight: 300;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.01em;
+    }
+
+    .coming-soon h2 {
+      font-size: 1rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.9rem;
+    }
+
+    .coming-soon p {
+      font-size: 0.9rem;
+      color: var(--text-faint);
+    }
+
+    @media (max-width: 760px) {
+      .page { padding: 1.5rem 1rem 3rem; }
+      .header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">Zaapi · Growth Dashboard</div>
+        <div id="week-label">loading…</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap;">
+        <nav style="display:flex;align-items:center;gap:0.4rem;">
+          <a href="index.html" class="nav-btn">Overview</a>
+          <a href="search.html" class="nav-btn">Search</a>
+          <a href="meta-asset.html" class="nav-btn">Meta Asset</a>
+        </nav>
+        <div class="forex-ctrl">
+          <input type="number" id="forex-rate" value="34" min="1" step="0.1" />
+          <span>THB = $1</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="coming-soon">
+      <div>
+        <h1>Meta Asset Dashboard</h1>
+        <h2>Coming Soon</h2>
+        <p>This page will track creative performance and fatigue.</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="shared-nav.js"></script>
+</body>
+</html>

@@ -70,24 +70,59 @@
       margin-bottom: 0.3rem;
     }
 
-    .page-title {
-      font-size: 1.35rem;
-      font-weight: 300;
-      color: var(--text);
-      letter-spacing: -0.01em;
+    #week-label {
+      font-size: 0.8rem;
+      color: var(--text-faint);
+      font-family: var(--font-mono);
     }
 
-    .nav-link {
+    .nav-btn {
       font-family: var(--font-mono);
       font-size: 0.72rem;
-      color: var(--text-faint);
+      color: var(--text-muted);
       text-decoration: none;
       border: 1px solid var(--border);
-      border-radius: 5px;
+      border-radius: 6px;
       padding: 5px 10px;
-      align-self: flex-start;
+      background: var(--bg-subtle);
     }
-    .nav-link:hover { color: var(--text-muted); border-color: var(--border-strong); }
+
+    .nav-btn:hover {
+      color: var(--text);
+      border-color: var(--border-strong);
+      background: var(--bg);
+    }
+
+    .nav-btn.active {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+
+    .forex-ctrl {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .forex-ctrl input {
+      width: 52px;
+      padding: 4px 8px;
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+      border: 1px solid var(--border-strong);
+      border-radius: 5px;
+      background: var(--bg-subtle);
+      color: var(--text);
+      text-align: center;
+    }
+
+    .forex-ctrl input:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
 
     /* ── Controls ── */
     .controls-bar {
@@ -330,6 +365,7 @@
     /* ── Responsive ── */
     @media (max-width: 760px) {
       .page { padding: 1.5rem 1rem 3rem; }
+      .header { flex-direction: column; align-items: flex-start; }
       .suggestion-body { grid-template-columns: 1fr; gap: 0.75rem; }
       .controls-bar { gap: 1rem; }
     }
@@ -340,11 +376,21 @@
 
   <!-- Header -->
   <header class="header">
-    <div>
+    <div class="header-left">
       <div class="logo">Zaapi · Growth Dashboard</div>
-      <div class="page-title">Search Diagnosis</div>
+      <div id="week-label">loading…</div>
     </div>
-    <a class="nav-link" href="index.html">← Overview</a>
+    <div style="display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap;">
+      <nav style="display:flex;align-items:center;gap:0.4rem;">
+        <a href="index.html" class="nav-btn">Overview</a>
+        <a href="search.html" class="nav-btn">Search</a>
+        <a href="meta-asset.html" class="nav-btn">Meta Asset</a>
+      </nav>
+      <div class="forex-ctrl">
+        <input type="number" id="forex-rate" value="34" min="1" step="0.1" />
+        <span>THB = $1</span>
+      </div>
+    </div>
   </header>
 
   <!-- Controls -->
@@ -442,6 +488,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="shared-nav.js"></script>
 <script src="search.js"></script>
 </body>
 </html>
