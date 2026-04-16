@@ -469,6 +469,9 @@
       border-radius: 8px;
       padding: 0.75rem;
       background: var(--bg-card);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
 
     .pattern-name {
@@ -488,23 +491,92 @@
     .confidence-medium { color: #9a6a00; }
     .confidence-high { color: var(--up); }
 
-    .pattern-metrics {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      line-height: 1.45;
+    .signal-block {
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-top: 6px;
+      font-size: 13px;
     }
 
-    .pattern-verdict {
-      margin-top: 0.5rem;
+    .signal-block .label {
       font-family: var(--font-mono);
-      font-size: 0.72rem;
+      font-size: 10px;
       letter-spacing: 0.06em;
-      text-transform: uppercase;
+      margin-bottom: 2px;
     }
 
-    .verdict-scale { color: var(--up); }
-    .verdict-kill { color: var(--down); }
-    .verdict-fix { color: #8c6d1f; }
+    .signal-block .metrics {
+      display: block;
+      gap: 0;
+      margin: 0;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .signal-block.tof {
+      background: rgba(80, 120, 255, 0.08);
+    }
+
+    .signal-block.tof .label {
+      color: #5b7cff;
+    }
+
+    .signal-block.bof {
+      background: rgba(40, 180, 120, 0.08);
+    }
+
+    .signal-block.bof .label {
+      color: #2bb673;
+    }
+
+    .delta {
+      font-size: 12px;
+      margin-top: 4px;
+      color: var(--text-muted);
+    }
+
+    .delta.positive {
+      color: var(--up);
+    }
+
+    .delta.negative {
+      color: var(--down);
+    }
+
+    .diagnosis {
+      margin-top: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .diagnosis.strong-hook {
+      background: rgba(255, 170, 0, 0.12);
+      color: #b7791f;
+    }
+
+    .diagnosis.strong-bof {
+      background: rgba(40, 180, 120, 0.12);
+      color: #2bb673;
+    }
+
+    .diagnosis.weak {
+      background: rgba(255, 80, 80, 0.12);
+      color: #d64545;
+    }
+
+    .diagnosis.neutral {
+      background: rgba(120,120,120,0.1);
+      color: var(--text-muted);
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
 
     .pattern-ranking {
       margin-top: 0.55rem;
