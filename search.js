@@ -193,11 +193,19 @@ function renderPerfChart(rows, rate) {
   const ctx = document.getElementById("perf-chart");
   if (!rows.length) return;
 
+  // Check if Google-only spend is available
+  const hasSearchSpend = rows.some(r => typeof r.spend_google === "number");
+  const spendLabel = hasSearchSpend ? "Search Spend (USD)" : "Total Spend (USD) ⚠";
+
   const labels = rows.map(r => r.week);
   const datasets = [
     {
-      label: "FTI",
-      data: rows.map(r => r.fti),
+      label: "FTI (Google)",
+      data: rows.map(r => {
+        // Use fti_google if available (Google-only), else fall back to total fti
+        const v = typeof r.fti_google === "number" ? r.fti_google : r.fti;
+        return v != null ? v : null;
+      }),
       borderColor: "#0f9e75",
       backgroundColor: "#0f9e75",
       yAxisID: "yLeft",
@@ -209,7 +217,7 @@ function renderPerfChart(rows, rate) {
     },
     {
       label: "HQ+",
-      data: rows.map(r => r.hq),
+      data: rows.map(r => r.hq != null ? r.hq : null),
       borderColor: "#8d5cf6",
       backgroundColor: "#8d5cf6",
       yAxisID: "yLeft",
@@ -220,8 +228,11 @@ function renderPerfChart(rows, rate) {
       spanGaps: true
     },
     {
-      label: "Spend (USD)",
-      data: rows.map(r => typeof r.spend === "number" ? Math.round(toUSD(r.spend, rate)) : null),
+      label: spendLabel,
+      data: rows.map(r => {
+        const s = hasSearchSpend ? r.spend_google : r.spend;
+        return typeof s === "number" ? Math.round(toUSD(s, rate)) : null;
+      }),
       borderColor: "#2d7ff9",
       backgroundColor: "#2d7ff9",
       yAxisID: "yRight",
@@ -235,106 +246,91 @@ function renderPerfChart(rows, rate) {
   ];
 
   perfChart = buildChart(ctx, labels, datasets, "Count", "Spend $");
+
+  // Show note if using total spend as proxy
+  if (!hasSearchSpend) {
+    const note = document.getElementById("perf-note");
+    if (note) note.textContent = "⚠ Search-only spend not available in data.json — showing combined Google + Meta spend. Add spend_google to history entries to fix.";
+  }
 }
 
-function renderCapChart(rows) {
-  if (capChart) { capChart.destroy(); capChart = null; }
-  const ctx = document.getElementById("cap-chart");
+// ── Capacity chart: Lost IS WoW per region ────
+// Builds one line per region from history_by_region, using lost_is_rank field.
+// For Global view: show TH, SEA, ROW as three separate lines on one chart.
+// For single region: show just that region's Lost IS trend.
+// Time window is the same as the performance chart.
 
-  // IS / Lost IS data lives on region_spend for current week only in data.json
-  // For the chart, we use spend_target as IS proxy if actual IS not in history
-  // Check if history has is_pct or lost_is_rank fields
-  const hasIS = rows.some(r => typeof r.is_pct === "number" || typeof r.lost_is_rank === "number");
+function getRegionCapacityData(data) {
+  const byRegion = data.history_by_region || {};
+  const allRegions = ["TH", "SEA", "ROW"];
+  const regions = selectedRegion === "Global" ? allRegions : [selectedRegion];
 
-  if (!hasIS || !rows.length) {
-    // Show current week snapshot if available
-    const noteEl = document.getElementById("cap-note");
-    if (appData && appData.region_spend) {
-      const reg = selectedRegion === "Global" ? null : selectedRegion;
-      if (reg) {
-        const rd = appData.region_spend.find(r => r.region === reg);
-        if (rd) {
-          const is = rd.lost_is_rank;
-          const headroom = is > 50 ? "High headroom — scaling available" : is > 30 ? "Limited headroom — cap scale at +5%" : "Low headroom — hold";
-          noteEl.textContent = `Current week: Lost IS rank ${is}% · ${headroom}`;
-        } else {
-          noteEl.textContent = "No IS data available for this region.";
-        }
-      } else {
-        // Global — show all regions
-        const parts = appData.region_spend.map(r => `${r.region} ${r.lost_is_rank}%`).join(" · ");
-        noteEl.textContent = `Current week Lost IS rank → ${parts}`;
-      }
-    }
+  // Collect filtered history per region
+  const seriesMap = {};
+  regions.forEach(reg => {
+    const base = Array.isArray(byRegion[reg]) ? byRegion[reg] : [];
+    seriesMap[reg] = getFilteredHistory(base, selectedRange);
+  });
 
-    // Draw placeholder with region_spend current data as single-point
-    if (appData && appData.region_spend) {
-      const reg = selectedRegion === "Global" ? null : selectedRegion;
-      const sources = reg
-        ? appData.region_spend.filter(r => r.region === reg)
-        : appData.region_spend;
+  // Build a unified sorted label set across all regions
+  const weekSet = new Set();
+  Object.values(seriesMap).forEach(rows => rows.forEach(r => weekSet.add(r.week)));
+  const labels = Array.from(weekSet).sort((a, b) => {
+    const parse = w => { const m = w.match(/CW(\d+)-(\d+)/); return m ? parseInt(m[2]) * 100 + parseInt(m[1]) : 0; };
+    return parse(a) - parse(b);
+  });
 
-      const labels = sources.map(r => r.region);
-      const isVals = sources.map(() => null);
-      const lostVals = sources.map(r => r.lost_is_rank);
+  // For each region build a value array aligned to labels
+  const regionColors = { TH: "#0f9e75", SEA: "#2d7ff9", ROW: "#e24b4a" };
 
-      const datasets = [
-        {
-          label: "IS %",
-          data: isVals,
-          borderColor: "#0f9e75",
-          backgroundColor: "#0f9e75",
-          borderWidth: 2,
-          pointRadius: 2,
-          tension: 0.15,
-          spanGaps: true
-        },
-        {
-          label: "Lost IS rank %",
-          data: lostVals,
-          borderColor: "#e24b4a",
-          backgroundColor: "#e24b4a",
-          borderDash: [5, 4],
-          borderWidth: 2,
-          pointRadius: 4,
-          pointHoverRadius: 6,
-          tension: 0.15,
-          spanGaps: true
-        }
-      ];
-      capChart = buildChart(ctx, labels, datasets, "% Share", null);
-    }
-    return;
-  }
-
-  const labels = rows.map(r => r.week);
-  const datasets = [
-    {
-      label: "IS %",
-      data: rows.map(r => typeof r.is_pct === "number" ? r.is_pct : null),
-      borderColor: "#0f9e75",
-      backgroundColor: "#0f9e75",
-      borderWidth: 2,
-      pointRadius: 2,
-      pointHoverRadius: 4,
-      tension: 0.15,
-      spanGaps: true
-    },
-    {
-      label: "Lost IS rank %",
-      data: rows.map(r => typeof r.lost_is_rank === "number" ? r.lost_is_rank : null),
-      borderColor: "#e24b4a",
-      backgroundColor: "#e24b4a",
+  const datasets = regions.map(reg => {
+    const rowMap = {};
+    seriesMap[reg].forEach(r => { rowMap[r.week] = r; });
+    return {
+      label: `${reg} Lost IS rank %`,
+      data: labels.map(wk => {
+        const r = rowMap[wk];
+        return r && typeof r.lost_is_rank === "number" ? r.lost_is_rank : null;
+      }),
+      borderColor: regionColors[reg] || "#888",
+      backgroundColor: regionColors[reg] || "#888",
       borderDash: [5, 4],
       borderWidth: 2,
       pointRadius: 2,
       pointHoverRadius: 4,
       tension: 0.15,
       spanGaps: true
-    }
-  ];
+    };
+  });
 
-  capChart = buildChart(ctx, labels, datasets, "% Share", null);
+  return { labels, datasets };
+}
+
+function renderCapChart(rows) {
+  if (capChart) { capChart.destroy(); capChart = null; }
+  const ctx = document.getElementById("cap-chart");
+  const noteEl = document.getElementById("cap-note");
+
+  // Current-week snapshot note
+  if (appData && appData.region_spend) {
+    const regs = selectedRegion === "Global"
+      ? appData.region_spend
+      : appData.region_spend.filter(r => r.region === selectedRegion);
+    const parts = regs.map(r => {
+      const h = r.lost_is_rank > 50 ? "↑ High headroom" : r.lost_is_rank > 30 ? "→ Limited" : "↓ Low headroom";
+      return `${r.region} ${r.lost_is_rank}% ${h}`;
+    }).join("  ·  ");
+    noteEl.textContent = `Current week: ${parts}`;
+  }
+
+  const { labels, datasets } = getRegionCapacityData(appData);
+
+  if (!labels.length) {
+    noteEl.textContent += "  ·  No historical IS data in data.json yet.";
+    return;
+  }
+
+  capChart = buildChart(ctx, labels, datasets, "Lost IS rank %", null);
 }
 
 // ── AI Suggestion (deterministic rule-based) ──
@@ -435,13 +431,25 @@ function renderSuggestion(data, rows) {
 
 // ── Log Table ─────────────────────────────────
 
+function sortLogNewestFirst(rows) {
+  // Sort by week label descending: "CW15-2026" > "CW14-2026" > "CW08-2025"
+  return [...rows].sort((a, b) => {
+    const parse = w => {
+      const m = w.match(/CW(\d+)-(\d+)/);
+      return m ? parseInt(m[2]) * 100 + parseInt(m[1]) : 0;
+    };
+    return parse(b.week) - parse(a.week);
+  });
+}
+
 function renderLog() {
   const tbody = document.getElementById("log-tbody");
 
-  // Filter by region if not Global
-  const rows = selectedRegion === "Global"
+  // Filter by region if not Global, then sort newest first
+  const filtered = selectedRegion === "Global"
     ? WEEKLY_LOG
     : WEEKLY_LOG.filter(r => r.region === selectedRegion || r.region === "Global");
+  const rows = sortLogNewestFirst(filtered);
 
   if (!rows.length) {
     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-faint);font-family:var(--font-mono);font-size:0.72rem;padding:1.5rem">No log entries for this region yet.</td></tr>`;
@@ -500,7 +508,7 @@ function setupControls(data) {
 function refresh(data) {
   const { rows, rate } = getHistory(data);
   renderPerfChart(rows, rate);
-  renderCapChart(rows);
+  renderCapChart();
   renderSuggestion(data, rows);
   renderLog();
 }
