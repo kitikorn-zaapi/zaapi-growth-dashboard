@@ -418,8 +418,10 @@ function renderPatternAnalysis(rows) {
   }
 
   const benchmarks = {
-    avgHookRate: average(spendRows, (row) => row.hook_rate),
-    avgFti: average(spendRows, (row) => row.fti)
+    avgHook: average(spendRows, (row) => row.hook_rate),
+    avgThumb: average(spendRows, (row) => row.thumb_stop),
+    avgFti: average(spendRows, (row) => row.fti),
+    avgCpa: average(spendRows, (row) => row.cpa)
   };
 
   const axes = [
@@ -477,8 +479,20 @@ function aggregateByAxis(rows, axisKey, benchmarks) {
       const avgThumbStop = average(tofRows, (row) => row.thumb_stop);
       const avgFti = average(bofRows, (row) => row.fti);
       const avgCpa = average(bofRows, (row) => row.cpa);
-      const tofStrong = avgHookRate > benchmarks.avgHookRate;
-      const bofStrong = avgFti > benchmarks.avgFti;
+      const tofStrong = avgHookRate >= benchmarks.avgHook;
+      const bofStrong = avgFti >= benchmarks.avgFti && avgCpa <= benchmarks.avgCpa;
+      let diagnosis = "WEAK";
+
+      if (adsCount === 1) {
+        diagnosis = "INSUFFICIENT DATA";
+      } else if (tofStrong && bofStrong) {
+        diagnosis = "STRONG";
+      } else if (tofStrong && !bofStrong) {
+        diagnosis = "HOOK WORKS";
+      } else if (!tofStrong && bofStrong) {
+        diagnosis = "NICHE";
+      }
+
       return {
         name: group.name,
         adsCount,
@@ -488,7 +502,10 @@ function aggregateByAxis(rows, axisKey, benchmarks) {
         avgFti,
         avgCpa,
         confidence: confidenceLabel(adsCount),
-        verdict: verdictLabel(tofStrong, bofStrong)
+        diagnosis,
+        benchmarkDeltaHook: percentDelta(avgHookRate, benchmarks.avgHook),
+        benchmarkDeltaFti: percentDelta(avgFti, benchmarks.avgFti),
+        benchmarkDeltaCpa: percentDelta(avgCpa, benchmarks.avgCpa)
       };
     })
     .sort((a, b) => b.adsCount - a.adsCount || b.totalSpend - a.totalSpend);
@@ -496,7 +513,7 @@ function aggregateByAxis(rows, axisKey, benchmarks) {
 
 function renderPatternCard(group) {
   const confidenceClass = `confidence-${group.confidence.toLowerCase()}`;
-  const verdictClass = verdictClassName(group.verdict);
+  const diagnosisClass = diagnosisClassName(group.diagnosis);
   const caution = group.adsCount < 3 ? " ⚠" : "";
 
   return `
@@ -507,7 +524,8 @@ function renderPatternCard(group) {
         <div>TOF: Hook ${formatPercent(group.avgHookRate)} · Thumb ${formatPercent(group.avgThumbStop)}</div>
         <div>BOF: FTI ${formatNumber(group.avgFti)} · CPA ${formatCurrency(group.avgCpa)}</div>
       </div>
-      <div class="pattern-verdict ${verdictClass}">Verdict: ${group.verdict}</div>
+      <div class="pattern-benchmark">vs benchmark: Hook ${formatSignedPercent(group.benchmarkDeltaHook)} · FTI ${formatSignedPercent(group.benchmarkDeltaFti)} · CPA ${formatSignedPercent(group.benchmarkDeltaCpa)}</div>
+      <div class="pattern-verdict ${diagnosisClass}">DIAGNOSIS: ${group.diagnosis}</div>
     </article>
   `;
 }
@@ -567,17 +585,15 @@ function confidenceLabel(adsCount) {
   return "High";
 }
 
-function verdictLabel(tofStrong, bofStrong) {
-  if (tofStrong && !bofStrong) return "Fix funnel";
-  if (!tofStrong && bofStrong) return "Fix creative";
-  if (tofStrong && bofStrong) return "Scale";
-  return "Kill";
+function diagnosisClassName(diagnosis) {
+  if (diagnosis === "STRONG") return "verdict-scale";
+  if (diagnosis === "WEAK") return "verdict-kill";
+  return "verdict-fix";
 }
 
-function verdictClassName(verdict) {
-  if (verdict === "Scale") return "verdict-scale";
-  if (verdict === "Kill") return "verdict-kill";
-  return "verdict-fix";
+function percentDelta(value, benchmark) {
+  if (benchmark === 0) return 0;
+  return ((value - benchmark) / benchmark) * 100;
 }
 
 function formatPercent(value) {
