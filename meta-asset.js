@@ -479,6 +479,14 @@ function aggregateByAxis(rows, axisKey, benchmarks) {
     const avgCpa = convGrp.length ? average(convGrp, r => r.cpa) : null;
 
     if (n === 1) {
+      const tofDelta = percentDelta(avgHook, benchmarks.avgHook);
+      const tofState = avgHook >= benchmarks.avgHook
+        ? "good"
+        : avgHook < benchmarks.avgHook * 0.7
+          ? "bad"
+          : "neutral";
+      const tofLabel = tofState === "good" ? "GOOD" : tofState === "bad" ? "BAD" : "OK";
+
       return {
         name,
         n,
@@ -486,8 +494,12 @@ function aggregateByAxis(rows, axisKey, benchmarks) {
         avgThumb,
         avgFti,
         avgCpa,
-        tofDelta: null,
+        tofDelta,
         bofDelta: null,
+        tofState,
+        tofLabel,
+        bofState: "neutral",
+        bofLabel: "NO DATA",
         tofGood: false,
         bofGood: false,
         bofDeltaPositive: false,
@@ -499,13 +511,23 @@ function aggregateByAxis(rows, axisKey, benchmarks) {
 
     const tofStrong = avgHook >= benchmarks.avgHook;
     const tofVsAvg = percentDelta(avgHook, benchmarks.avgHook);
+    const tofState = avgHook >= benchmarks.avgHook
+      ? "good"
+      : avgHook < benchmarks.avgHook * 0.7
+        ? "bad"
+        : "neutral";
+    const tofLabel = tofState === "good" ? "GOOD" : tofState === "bad" ? "BAD" : "OK";
 
     let bofDelta = null;
     let bofStrong = false;
     let bofPositive = false;
+    let bofState = "neutral";
+    let bofLabel = "OK";
 
     if (!convGrp.length) {
       bofDelta = null;
+      bofState = "neutral";
+      bofLabel = "NO DATA";
     } else {
       const ftiVsAvg = benchmarks.avgFti > 0
         ? ((avgFti - benchmarks.avgFti) / benchmarks.avgFti * 100)
@@ -514,6 +536,14 @@ function aggregateByAxis(rows, axisKey, benchmarks) {
       bofStrong = avgFti >= benchmarks.avgFti && avgCpa <= benchmarks.avgCpa;
       bofDelta = ftiVsAvg;
       bofPositive = avgFti >= benchmarks.avgFti;
+
+      if (avgFti >= benchmarks.avgFti && avgCpa <= benchmarks.avgCpa) {
+        bofState = "good";
+        bofLabel = "GOOD";
+      } else if (avgFti < benchmarks.avgFti * 0.7) {
+        bofState = "bad";
+        bofLabel = "BAD";
+      }
     }
 
     let diagnosis;
@@ -545,6 +575,10 @@ function aggregateByAxis(rows, axisKey, benchmarks) {
       avgCpa,
       tofDelta: tofVsAvg,
       bofDelta,
+      tofState,
+      tofLabel,
+      bofState,
+      bofLabel,
       tofGood: tofStrong,
       bofGood: bofStrong,
       bofDeltaPositive: bofPositive,
@@ -577,15 +611,21 @@ function renderPatternCard(group) {
     <article class="pattern-card">
       <div class="pattern-name">${escapeHtml(group.name)}</div>
       <div class="pattern-meta">n=${group.n} · <span class="${confidenceClass}">${group.confidence} confidence${caution}</span></div>
-      <div class="signal-block tof">
-        <div class="signal-label">👁 TOF</div>
-        <div class="signal-main">Hook ${formatPercent(group.avgHook)} ${group.tofGood ? "✓" : "✗"}</div>
+      <div class="signal-block tof ${group.tofState}">
+        <div class="signal-header">
+          <span class="signal-title">👁 TOF</span>
+          <span class="signal-badge ${group.tofState}">${group.tofLabel}</span>
+        </div>
+        <div class="signal-metric">Hook ${formatPercent(group.avgHook)}</div>
         <div class="signal-sub">vs avg ${group.tofDelta === null ? "—" : `${group.tofDelta >= 0 ? "+" : ""}${group.tofDelta.toFixed(0)}%`}</div>
       </div>
-      <div class="signal-block bof">
-        <div class="signal-label">💰 BOF</div>
-        <div class="signal-main">FTI ${group.avgFti === null ? "—" : formatNumber(group.avgFti)} ${group.bofGood ? "✓" : "✗"}</div>
-        <div class="signal-sub">vs avg ${group.bofDelta === null ? "—" : `${group.bofDelta >= 0 ? "+" : ""}${group.bofDelta.toFixed(0)}%`}</div>
+      <div class="signal-block bof ${group.bofState}">
+        <div class="signal-header">
+          <span class="signal-title">💰 BOF</span>
+          <span class="signal-badge ${group.bofState}">${group.bofLabel}</span>
+        </div>
+        <div class="signal-metric">FTI ${group.avgFti === null ? "—" : formatNumber(group.avgFti)}</div>
+        <div class="signal-sub">${group.avgFti === null ? "No data" : `vs avg ${group.bofDelta >= 0 ? "+" : ""}${group.bofDelta.toFixed(0)}%`}</div>
       </div>
       <div class="pattern-metrics">Hook ${formatPercent(group.avgHook)} · Thumb ${formatPercent(group.avgThumb)} · FTI ${group.avgFti === null ? "—" : formatNumber(group.avgFti)} · CPA ${group.avgCpa === null ? "—" : formatCurrency(group.avgCpa)}</div>
       <div class="pattern-diagnosis">${escapeHtml(diagnosisText)}</div>

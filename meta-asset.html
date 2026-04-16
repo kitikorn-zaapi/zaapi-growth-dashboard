@@ -497,29 +497,59 @@
       margin-top: 10px;
     }
 
-    .signal-label {
-      font-family: var(--font-mono);
-      font-size: 13px;
+    .signal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .signal-title {
+      font-size: 15px;
       font-weight: 700;
-      letter-spacing: 0.06em;
+    }
+
+    .signal-badge {
+      font-size: 10px;
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .signal-badge.good {
+      background: rgba(40, 180, 120, 0.2);
+      color: #2bb673;
+    }
+
+    .signal-badge.bad {
+      background: rgba(255, 80, 80, 0.2);
+      color: #d64545;
+    }
+
+    .signal-badge.neutral {
+      background: rgba(120, 120, 120, 0.15);
+      color: var(--text-muted);
     }
 
     .signal-main {
-      font-size: 18px;
-      font-weight: 700;
-      margin-top: 2px;
+      display: none;
+    }
+
+    .signal-metric {
+      font-size: 14px;
+      font-weight: 500;
+      margin-top: 4px;
     }
 
     .signal-sub {
-      font-size: 12px;
-      opacity: 0.75;
+      font-size: 11px;
+      opacity: 0.7;
     }
 
     .signal-block.tof {
       background: rgba(80, 120, 255, 0.08);
     }
 
-    .signal-block.tof .signal-label {
+    .signal-block.tof .signal-title {
       color: #5b7cff;
     }
 
@@ -527,7 +557,7 @@
       background: rgba(40, 180, 120, 0.08);
     }
 
-    .signal-block.bof .signal-label {
+    .signal-block.bof .signal-title {
       color: #2bb673;
     }
 
