@@ -13,10 +13,52 @@
     "hq": null,
     "hq_prev": null
   },
+  "history": [
+    {
+      "week": "CW09",
+      "spend": 5000,
+      "fti": 10,
+      "qualified": 5,
+      "hq": 2,
+      "cost_per_fti": 500,
+      "cost_per_qualified": 1000,
+      "cost_per_hq": 2500
+    },
+    {
+      "week": "CW10",
+      "spend": 6200,
+      "fti": 12,
+      "qualified": 6,
+      "hq": 3,
+      "cost_per_fti": 517,
+      "cost_per_qualified": 1033,
+      "cost_per_hq": 2067
+    },
+    {
+      "week": "CW11",
+      "spend": 5600,
+      "fti": 11,
+      "qualified": 5,
+      "hq": 2,
+      "cost_per_fti": 509,
+      "cost_per_qualified": 1120,
+      "cost_per_hq": 2800
+    },
+    {
+      "week": "CW12",
+      "spend": 8400,
+      "fti": 22,
+      "qualified": 9,
+      "hq": 4,
+      "cost_per_fti": 382,
+      "cost_per_qualified": 933,
+      "cost_per_hq": 2100
+    }
+  ],
   "region_spend": [
-    { "region": "TH",  "google": 87750, "meta": 77477, "fti": 20.3, "lost_is_rank": 58.3 },
-    { "region": "SEA", "google": 35031, "meta": 40677, "fti": 2.0,  "lost_is_rank": 34.1 },
-    { "region": "ROW", "google": 28719, "meta": 15249, "fti": 0.0,  "lost_is_rank": 74.7 }
+    { "region": "TH", "google": 87750, "meta": 77477, "fti": 20.3, "lost_is_rank": 58.3 },
+    { "region": "SEA", "google": 35031, "meta": 40677, "fti": 2.0, "lost_is_rank": 34.1 },
+    { "region": "ROW", "google": 28719, "meta": 15249, "fti": 0.0, "lost_is_rank": 74.7 }
   ],
   "insights": [
     "FTI up +144% WoW — TH driving 20 of 22 conversions this week.",

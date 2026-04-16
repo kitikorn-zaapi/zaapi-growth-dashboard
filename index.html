@@ -9,26 +9,23 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
 
   <style>
-    /* ── Reset & base ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #ffffff;
+      --bg: #ffffff;
       --bg-subtle: #f7f7f5;
-      --bg-card:   #ffffff;
-      --border:    #e8e6e1;
+      --bg-card: #ffffff;
+      --border: #e8e6e1;
       --border-strong: #d0cec8;
-      --text:      #1a1916;
-      --text-muted:#7a786f;
-      --text-faint:#b0ada5;
-      --accent:    #0f9e75;
+      --text: #1a1916;
+      --text-muted: #7a786f;
+      --text-faint: #b0ada5;
+      --accent: #0f9e75;
       --accent-bg: #e6f7f1;
-      --up:        #1a7a4a;
-      --up-bg:     #e8f7ee;
-      --down:      #c0392b;
-      --down-bg:   #fdecea;
-      --warn:      #9a6200;
-      --warn-bg:   #fef3dc;
+      --up: #1a7a4a;
+      --up-bg: #e8f7ee;
+      --down: #c0392b;
+      --down-bg: #fdecea;
       --font-sans: 'DM Sans', system-ui, sans-serif;
       --font-mono: 'DM Mono', 'Courier New', monospace;
     }
@@ -44,25 +41,21 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Layout ── */
     .page {
-      max-width: 860px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 2.5rem 1.5rem 4rem;
+      padding: 3rem 2rem 5rem;
     }
 
-    /* ── Header ── */
     .header {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       gap: 1rem;
-      margin-bottom: 2.5rem;
+      margin-bottom: 3rem;
       padding-bottom: 1.5rem;
       border-bottom: 1px solid var(--border);
     }
-
-    .header-left {}
 
     .logo {
       font-family: var(--font-mono);
@@ -105,9 +98,8 @@
       outline-offset: 1px;
     }
 
-    /* ── State badge ── */
     .state-row {
-      margin-bottom: 2rem;
+      margin-bottom: 2.5rem;
     }
 
     .state-badge {
@@ -124,29 +116,27 @@
       border: 1px solid transparent;
     }
 
-    .state-improving { background: var(--up-bg);   color: var(--up);   border-color: #b6e4c8; }
-    .state-flat      { background: var(--bg-subtle); color: var(--text-muted); border-color: var(--border-strong); }
-    .state-blocked   { background: var(--down-bg); color: var(--down); border-color: #f5c0bb; }
+    .state-improving { background: var(--up-bg); color: var(--up); border-color: #b6e4c8; }
+    .state-flat { background: var(--bg-subtle); color: var(--text-muted); border-color: var(--border-strong); }
+    .state-blocked { background: var(--down-bg); color: var(--down); border-color: #f5c0bb; }
 
     .state-icon {
       font-size: 1rem;
       line-height: 1;
     }
 
-    /* ── Section titles ── */
-    .section { margin-bottom: 2.5rem; }
+    .section { margin-bottom: 3.25rem; }
 
     .section-title {
       font-family: var(--font-mono);
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       font-weight: 500;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--text-faint);
-      margin-bottom: 0.85rem;
+      margin-bottom: 1rem;
     }
 
-    /* ── Snapshot cards ── */
     #snapshot-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -157,9 +147,10 @@
     }
 
     .card {
-      padding: 1.1rem 1.2rem;
+      padding: 1.3rem 1.35rem;
       background: var(--bg-card);
       border-right: 1px solid var(--border);
+      min-height: 150px;
     }
 
     .card:last-child { border-right: none; }
@@ -170,36 +161,30 @@
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--text-faint);
-      margin-bottom: 0.3rem;
+      margin-bottom: 0.4rem;
     }
 
     .card-value {
-      font-size: 1.65rem;
+      font-size: 1.9rem;
       font-weight: 300;
       line-height: 1.1;
       color: var(--text);
-      margin-bottom: 0.35rem;
+      margin-bottom: 0.5rem;
     }
 
     .card-row {
       display: flex;
       align-items: center;
-      gap: 0.4rem;
-      margin-bottom: 0.25rem;
+      gap: 0.45rem;
+      margin-bottom: 0.3rem;
     }
 
-    .card-sub {
+    .card-sub,
+    .card-note {
       font-size: 0.75rem;
       color: var(--text-faint);
     }
 
-    .card-note {
-      font-size: 0.7rem;
-      color: var(--text-faint);
-      margin-top: 0.25rem;
-    }
-
-    /* ── WoW pill ── */
     .wow {
       display: inline-block;
       font-size: 0.68rem;
@@ -209,14 +194,68 @@
       border-radius: 3px;
     }
 
-    .wow.up      { background: var(--up-bg);   color: var(--up); }
-    .wow.down    { background: var(--down-bg); color: var(--down); }
+    .wow.up { background: var(--up-bg); color: var(--up); }
+    .wow.down { background: var(--down-bg); color: var(--down); }
     .wow.neutral { background: var(--bg-subtle); color: var(--text-muted); }
 
-    /* ── Tables ── */
-    .table-wrap {
-      overflow-x: auto;
+    .graph-toggle-wrap {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 1rem;
     }
+
+    #graph-toggle {
+      border: 1px solid var(--border-strong);
+      background: var(--bg-subtle);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 0.45rem 0.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    #graph-toggle:hover { background: #f1f1ef; }
+
+    #graph-content {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem;
+      background: #fcfcfb;
+    }
+
+    #graph-content[hidden] { display: none; }
+
+    .graph-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.2rem;
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.9rem 1rem;
+    }
+
+    .chart-title {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .chart-canvas-wrap {
+      position: relative;
+      height: 260px;
+    }
+
+    .table-wrap { overflow-x: auto; }
 
     table {
       width: 100%;
@@ -260,27 +299,18 @@
 
     .muted { color: var(--text-faint); }
 
-    .tag-high {
-      display: inline-block;
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      padding: 1px 6px;
-      border-radius: 3px;
-      background: var(--up-bg);
-      color: var(--up);
-    }
-
+    .tag-high,
     .tag-low {
       display: inline-block;
       font-family: var(--font-mono);
       font-size: 0.68rem;
       padding: 1px 6px;
       border-radius: 3px;
-      background: var(--bg-subtle);
-      color: var(--text-muted);
     }
 
-    /* ── Insights ── */
+    .tag-high { background: var(--up-bg); color: var(--up); }
+    .tag-low { background: var(--bg-subtle); color: var(--text-muted); }
+
     #insights-list {
       list-style: none;
       display: flex;
@@ -292,8 +322,8 @@
       display: flex;
       align-items: baseline;
       gap: 0.75rem;
-      font-size: 0.88rem;
-      line-height: 1.55;
+      font-size: 0.9rem;
+      line-height: 1.6;
     }
 
     .insight-num {
@@ -305,12 +335,11 @@
       padding-top: 0.05rem;
     }
 
-    /* ── Next step ── */
     .next-step-box {
       display: flex;
       align-items: center;
       gap: 0.85rem;
-      padding: 0.9rem 1.1rem;
+      padding: 1rem 1.1rem;
       background: var(--accent-bg);
       border: 1px solid #9de4c9;
       border-radius: 7px;
@@ -323,35 +352,32 @@
     }
 
     #next-step-text {
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       color: #0b7a5a;
     }
 
-    /* ── Divider ── */
     .divider {
       height: 1px;
       background: var(--border);
-      margin: 2rem 0;
+      margin: 2.5rem 0;
     }
 
-    /* ── Responsive ── */
-    @media (max-width: 620px) {
-      #snapshot-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
+    @media (max-width: 900px) {
+      .page { padding: 2rem 1.25rem 3rem; }
+      #snapshot-grid { grid-template-columns: repeat(2, 1fr); }
       .card:nth-child(2) { border-right: none; }
-      .card:nth-child(1),
-      .card:nth-child(2) { border-bottom: 1px solid var(--border); }
+      .card:nth-child(1), .card:nth-child(2) { border-bottom: 1px solid var(--border); }
+      .graph-grid { grid-template-columns: 1fr; }
+    }
 
-      thead th:nth-child(3) { display: none; }
-      tbody td:nth-child(3) { display: none; }
+    @media (max-width: 620px) {
+      .header { flex-direction: column; align-items: flex-start; }
+      thead th:nth-child(3), tbody td:nth-child(3) { display: none; }
     }
   </style>
 </head>
 <body>
   <div class="page">
-
-    <!-- Header -->
     <header class="header">
       <div class="header-left">
         <div class="logo">Zaapi · Growth Dashboard</div>
@@ -363,7 +389,6 @@
       </div>
     </header>
 
-    <!-- 1 · State -->
     <div class="state-row">
       <div id="state-badge" class="state-badge state-flat">
         <span class="state-icon">→</span>
@@ -371,14 +396,35 @@
       </div>
     </div>
 
-    <!-- 2 · Snapshot cards -->
-    <div class="section">
+    <section class="section">
       <div class="section-title">Snapshot</div>
       <div id="snapshot-grid"></div>
-    </div>
+    </section>
 
-    <!-- 3 · WoW table -->
-    <div class="section">
+    <section class="section">
+      <div class="section-title">Performance graphs</div>
+      <div class="graph-toggle-wrap">
+        <button id="graph-toggle" type="button" aria-expanded="false" aria-controls="graph-content">Show Graph</button>
+      </div>
+      <div id="graph-content" hidden>
+        <div class="graph-grid">
+          <div class="chart-card">
+            <div class="chart-title">Graph A · Volume</div>
+            <div class="chart-canvas-wrap">
+              <canvas id="volume-chart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Graph B · Efficiency</div>
+            <div class="chart-canvas-wrap">
+              <canvas id="efficiency-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
       <div class="section-title">Week-on-week comparison</div>
       <div class="table-wrap">
         <table>
@@ -393,10 +439,9 @@
           <tbody id="wow-tbody"></tbody>
         </table>
       </div>
-    </div>
+    </section>
 
-    <!-- Region breakdown -->
-    <div class="section">
+    <section class="section">
       <div class="section-title">Spend by region</div>
       <div class="table-wrap">
         <table>
@@ -413,27 +458,25 @@
           <tbody id="region-tbody"></tbody>
         </table>
       </div>
-    </div>
+    </section>
 
     <div class="divider"></div>
 
-    <!-- 4 · What's happening -->
-    <div class="section">
+    <section class="section">
       <div class="section-title">What's happening</div>
       <ul id="insights-list"></ul>
-    </div>
+    </section>
 
-    <!-- 5 · Where to look next -->
-    <div class="section">
+    <section class="section">
       <div class="section-title">Where to look next</div>
       <div class="next-step-box">
         <span class="next-step-arrow">→</span>
         <span id="next-step-text"></span>
       </div>
-    </div>
-
+    </section>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
