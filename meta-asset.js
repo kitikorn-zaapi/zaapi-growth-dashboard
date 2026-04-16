@@ -214,13 +214,23 @@ function render() {
 }
 
 function renderLeaderboard(rows) {
-  if (!rows.length) {
+  const groupedRows = getLeaderboardRows(rows);
+
+  if (!groupedRows.length) {
     leaderboardEl.innerHTML = '<div class="empty">No assets found for this region.</div>';
     return;
   }
 
-  leaderboardEl.innerHTML = rows.map((row) => {
-    const adCode = row.ad_code || "UNKNOWN";
+  leaderboardEl.innerHTML = groupedRows.map((group) => {
+    const adCode = group.ad_code || "UNKNOWN";
+    const tofRow = group.tofRow;
+    const bofRow = group.bofRow;
+    const baseRow = tofRow || bofRow || {};
+    const status = baseRow.status || "Live";
+    const assessment = baseRow.assessment || "No assessment";
+    const region = baseRow.region || "-";
+    const prod = baseRow.prod || "-";
+    const angle = baseRow.angle || "-";
 
     return `
       <article class="asset-card">
@@ -229,21 +239,28 @@ function renderLeaderboard(rows) {
         </div>
         <div class="row-top">
           <div class="ad-code">${escapeHtml(adCode)}</div>
-          <span class="status status-${row.status.toLowerCase()}">${row.status}</span>
+          <span class="status status-${status.toLowerCase()}">${status}</span>
         </div>
         <div class="pills">
-          <span class="pill">${escapeHtml(row.region || "-")}</span>
-          <span class="pill">${escapeHtml(row.prod || "-")}</span>
-          <span class="pill">${escapeHtml(row.angle || "-")}</span>
+          <span class="pill">${escapeHtml(region)}</span>
+          <span class="pill">${escapeHtml(prod)}</span>
+          <span class="pill">${escapeHtml(angle)}</span>
         </div>
         <div class="metrics">
-          ${metricCell("Hook Rate", `${row.hook_rate.toFixed(1)}%`)}
-          ${metricCell("CTR", `${row.ctr.toFixed(2)}%`)}
-          ${metricCell("FTI", row.fti.toFixed(2))}
-          ${metricCell("CPA", `$${row.cpa.toFixed(2)}`)}
-          ${metricCell("Frequency", row.frequency.toFixed(2))}
+          <div><div class="metric-label">TOF</div><div class="metric-value">${tofRow ? "Live" : "—"}</div></div>
+          ${metricCell("Hook Rate", tofRow ? `${tofRow.hook_rate.toFixed(1)}%` : "—")}
+          ${metricCell("Thumb Stop", tofRow ? `${tofRow.thumb_stop.toFixed(1)}%` : "—")}
+          ${metricCell("Frequency", tofRow ? tofRow.frequency.toFixed(2) : "—")}
+          ${metricCell("CPM", tofRow ? `$${tofRow.cpm.toFixed(2)}` : "—")}
         </div>
-        <p class="assessment" title="Click to expand/collapse">${escapeHtml(row.assessment || "No assessment")}</p>
+        <div class="metrics">
+          <div><div class="metric-label">BOF</div><div class="metric-value">${bofRow ? "Live" : "BOF not launched"}</div></div>
+          ${metricCell("CTR", bofRow ? `${bofRow.ctr.toFixed(2)}%` : "—")}
+          ${metricCell("FTI", bofRow ? bofRow.fti.toFixed(2) : "—")}
+          ${metricCell("CPA", bofRow ? `$${bofRow.cpa.toFixed(2)}` : "—")}
+          ${metricCell("Spend", `$${group.spend.toFixed(2)}`)}
+        </div>
+        <p class="assessment" title="Click to expand/collapse">${escapeHtml(assessment)}</p>
       </article>
     `;
   }).join("");
@@ -262,6 +279,35 @@ function renderLeaderboard(rows) {
     assessment.addEventListener("click", () => {
       assessment.classList.toggle("expanded");
     });
+  });
+}
+
+function getLeaderboardRows(rows) {
+  const grouped = new Map();
+
+  rows.forEach((row) => {
+    const adCode = row.ad_code || "UNKNOWN";
+    if (!grouped.has(adCode)) {
+      grouped.set(adCode, { ad_code: adCode, tofRow: null, bofRow: null, spend: 0 });
+    }
+
+    const group = grouped.get(adCode);
+    const objective = (row.objective || "").trim().toUpperCase();
+
+    if (objective === "BOF") {
+      group.bofRow = group.bofRow || row;
+    } else {
+      group.tofRow = group.tofRow || row;
+    }
+
+    group.spend += row.spend || 0;
+  });
+
+  return Array.from(grouped.values()).sort((a, b) => {
+    if (state.sortBy === "hook_rate_desc") return (b.tofRow?.hook_rate || 0) - (a.tofRow?.hook_rate || 0);
+    if (state.sortBy === "spend_desc") return b.spend - a.spend;
+    if (state.sortBy === "cpa_asc") return (a.bofRow?.cpa ?? Infinity) - (b.bofRow?.cpa ?? Infinity);
+    return (b.bofRow?.fti || 0) - (a.bofRow?.fti || 0);
   });
 }
 
@@ -449,11 +495,11 @@ function renderAxisBlock(spendRows, axis, benchmarks) {
   const cards = groups.map((group) => renderPatternCard(group)).join("");
   const ranked = groups
     .filter((group) => group.n >= 3 && group.avgFti !== null)
-    .sort((a, b) => (b.avgFti - a.avgFti) || (b.avgHook - a.avgHook));
+    .sort((a, b) => (b.avgFti - a.avgFti) || ((b.avgHook || 0) - (a.avgHook || 0)));
 
   const rankingHtml = ranked.length
     ? `<div class="pattern-ranking"><strong>Ranked (n ≥ 3):</strong><ol>${ranked
-      .map((group) => `<li>${escapeHtml(group.name)} · FTI ${formatNumber(group.avgFti)} · Hook ${formatPercent(group.avgHook)}</li>`)
+      .map((group) => `<li>${escapeHtml(group.name)} · FTI ${formatNumber(group.avgFti)} · Hook ${group.avgHook === null ? "—" : formatPercent(group.avgHook)}</li>`)
       .join("")}</ol></div>`
     : '<div class="pattern-ranking">No groups meet ranking threshold (n ≥ 3).</div>';
 
