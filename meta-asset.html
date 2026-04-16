@@ -493,31 +493,33 @@
 
     .signal-block {
       border-radius: 8px;
-      padding: 8px 10px;
-      margin-top: 6px;
-      font-size: 13px;
+      padding: 10px 12px;
+      margin-top: 10px;
     }
 
-    .signal-block .label {
+    .signal-label {
       font-family: var(--font-mono);
-      font-size: 10px;
+      font-size: 13px;
+      font-weight: 700;
       letter-spacing: 0.06em;
-      margin-bottom: 2px;
     }
 
-    .signal-block .metrics {
-      display: block;
-      gap: 0;
-      margin: 0;
-      font-size: 13px;
-      color: var(--text);
+    .signal-main {
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .signal-sub {
+      font-size: 12px;
+      opacity: 0.75;
     }
 
     .signal-block.tof {
       background: rgba(80, 120, 255, 0.08);
     }
 
-    .signal-block.tof .label {
+    .signal-block.tof .signal-label {
       color: #5b7cff;
     }
 
@@ -525,55 +527,25 @@
       background: rgba(40, 180, 120, 0.08);
     }
 
-    .signal-block.bof .label {
+    .signal-block.bof .signal-label {
       color: #2bb673;
     }
 
-    .delta {
+    .pattern-metrics {
       font-size: 12px;
-      margin-top: 4px;
       color: var(--text-muted);
-    }
-
-    .delta.positive {
-      color: var(--up);
-    }
-
-    .delta.negative {
-      color: var(--down);
-    }
-
-    .diagnosis {
       margin-top: 8px;
-      font-weight: 600;
-      font-size: 13px;
-      padding: 6px 10px;
-      border-radius: 6px;
-      display: inline-block;
     }
 
-    .diagnosis.strong-hook {
-      background: rgba(255, 170, 0, 0.12);
-      color: #b7791f;
-    }
-
-    .diagnosis.strong-bof {
-      background: rgba(40, 180, 120, 0.12);
-      color: #2bb673;
-    }
-
-    .diagnosis.weak {
-      background: rgba(255, 80, 80, 0.12);
-      color: #d64545;
-    }
-
-    .diagnosis.neutral {
-      background: rgba(120,120,120,0.1);
-      color: var(--text-muted);
-    }
-
-    .hint {
+    .pattern-diagnosis {
       font-size: 12px;
+      color: var(--text);
+      opacity: 0.7;
+      margin-top: 10px;
+    }
+
+    .pattern-hint {
+      font-size: 11px;
       color: var(--text-muted);
       margin-top: 2px;
     }
