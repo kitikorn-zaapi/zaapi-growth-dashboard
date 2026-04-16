@@ -486,54 +486,54 @@ function aggregateByAxis(rows, axisKey, benchmarks) {
         avgThumb,
         avgFti,
         avgCpa,
-        tofSignal: "Data point only",
-        bofSignal: "No reliable signal",
+        tofDelta: null,
+        bofDelta: null,
+        tofGood: false,
+        bofGood: false,
+        bofDeltaPositive: false,
         diagnosis: "Insufficient data — do not conclude",
-        diagClass: "verdict-neutral",
+        diagnosisClass: "neutral",
         confidence: confidenceLabel(n)
       };
     }
 
     const tofStrong = avgHook >= benchmarks.avgHook;
-    const tofSignal = tofStrong
-      ? `Hook ${avgHook.toFixed(0)}% — above avg (${benchmarks.avgHook.toFixed(0)}%) ✓`
-      : `Hook ${avgHook.toFixed(0)}% — below avg (${benchmarks.avgHook.toFixed(0)}%)`;
+    const tofVsAvg = percentDelta(avgHook, benchmarks.avgHook);
 
-    let bofSignal;
+    let bofDelta = null;
     let bofStrong = false;
+    let bofPositive = false;
 
     if (!convGrp.length) {
-      bofSignal = "No conversions yet";
+      bofDelta = null;
     } else {
       const ftiVsAvg = benchmarks.avgFti > 0
         ? ((avgFti - benchmarks.avgFti) / benchmarks.avgFti * 100)
         : 0;
-      const sign = ftiVsAvg >= 0 ? "+" : "";
 
       bofStrong = avgFti >= benchmarks.avgFti && avgCpa <= benchmarks.avgCpa;
-      bofSignal = avgFti >= benchmarks.avgFti
-        ? `FTI ${avgFti.toFixed(0)} — above avg ${sign}${ftiVsAvg.toFixed(0)}% ✓`
-        : `FTI ${avgFti.toFixed(0)} — below avg ${sign}${ftiVsAvg.toFixed(0)}%`;
+      bofDelta = ftiVsAvg;
+      bofPositive = avgFti >= benchmarks.avgFti;
     }
 
     let diagnosis;
-    let diagClass;
+    let diagnosisClass;
 
     if (tofStrong && bofStrong) {
       diagnosis = "Working — strong TOF and BOF";
-      diagClass = "verdict-strong";
+      diagnosisClass = "strong-bof";
     } else if (tofStrong && !convGrp.length) {
       diagnosis = "Strong hook — no conversion data yet";
-      diagClass = "verdict-mixed";
+      diagnosisClass = "strong-hook";
     } else if (tofStrong && !bofStrong) {
       diagnosis = "Strong hook — weak conversion";
-      diagClass = "verdict-mixed";
+      diagnosisClass = "strong-hook";
     } else if (!tofStrong && bofStrong) {
       diagnosis = "Weak hook — strong conversion (niche)";
-      diagClass = "verdict-mixed";
+      diagnosisClass = "strong-bof";
     } else {
       diagnosis = "Weak on both layers";
-      diagClass = "verdict-weak";
+      diagnosisClass = "weak";
     }
 
     return {
@@ -543,10 +543,13 @@ function aggregateByAxis(rows, axisKey, benchmarks) {
       avgThumb,
       avgFti,
       avgCpa,
-      tofSignal,
-      bofSignal,
+      tofDelta: tofVsAvg,
+      bofDelta,
+      tofGood: tofStrong,
+      bofGood: bofStrong,
+      bofDeltaPositive: bofPositive,
       diagnosis,
-      diagClass,
+      diagnosisClass,
       confidence: confidenceLabel(n)
     };
   }).sort((a, b) => b.n - a.n);
@@ -555,17 +558,45 @@ function aggregateByAxis(rows, axisKey, benchmarks) {
 function renderPatternCard(group) {
   const confidenceClass = `confidence-${group.confidence.toLowerCase()}`;
   const caution = group.n < 3 ? " ⚠" : "";
+  const tofDeltaText = group.tofDelta === null
+    ? "— Hook"
+    : `${group.tofDelta >= 0 ? "+" : ""}${group.tofDelta.toFixed(0)}% Hook`;
+  const bofDeltaText = group.bofDelta === null
+    ? "— FTI"
+    : `${group.bofDelta >= 0 ? "+" : ""}${group.bofDelta.toFixed(0)}% FTI`;
+  const tofDeltaClass = group.tofDelta === null ? "" : (group.tofGood ? "positive" : "negative");
+  const bofDeltaClass = group.bofDelta === null ? "" : (group.bofDeltaPositive ? "positive" : "negative");
+  const diagnosisText = group.diagnosis
+    .replace(" — ", " · ")
+    .replace("Working · strong TOF and BOF", "Strong TOF · Strong BOF")
+    .replace("Weak on both layers", "Weak TOF · Weak BOF")
+    .replace("Insufficient data · do not conclude", "Insufficient data");
+  const hintText = group.n === 1
+    ? "→ Need more data"
+    : group.tofGood && !group.bofGood
+      ? "→ Fix funnel (LP / offer / targeting)"
+      : !group.tofGood && group.bofGood
+        ? "→ Improve hook (creative)"
+        : group.tofGood && group.bofGood
+          ? "→ Scale this pattern"
+          : "→ Rethink creative";
 
   return `
     <article class="pattern-card">
+      <div class="diagnosis ${group.diagnosisClass}">${escapeHtml(diagnosisText)}</div>
+      <div class="hint">${escapeHtml(hintText)}</div>
       <div class="pattern-name">${escapeHtml(group.name)}</div>
       <div class="pattern-meta">n=${group.n} · <span class="${confidenceClass}">${group.confidence} confidence${caution}</span></div>
-      <div class="pattern-metrics">
-        <div>TOF: Hook ${formatPercent(group.avgHook)} · Thumb ${formatPercent(group.avgThumb)}</div>
-        <div>BOF: FTI ${group.avgFti === null ? "—" : formatNumber(group.avgFti)} · CPA ${group.avgCpa === null ? "—" : formatCurrency(group.avgCpa)}</div>
+      <div class="signal-block tof">
+        <div class="label">👁 TOF</div>
+        <div class="metrics">Hook ${formatPercent(group.avgHook)} ${group.tofGood ? "✓" : "✗"} · Thumb ${formatPercent(group.avgThumb)}</div>
       </div>
-      <div class="pattern-benchmark">TOF signal: ${group.tofSignal} · BOF signal: ${group.bofSignal}</div>
-      <div class="pattern-verdict ${group.diagClass}">DIAGNOSIS: ${group.diagnosis}</div>
+      <div class="signal-block bof">
+        <div class="label">💰 BOF</div>
+        <div class="metrics">FTI ${group.avgFti === null ? "—" : formatNumber(group.avgFti)} ${group.bofGood ? "✓" : "✗"} · CPA ${group.avgCpa === null ? "—" : formatCurrency(group.avgCpa)}</div>
+      </div>
+      <div class="delta ${tofDeltaClass}">${tofDeltaText}</div>
+      <div class="delta ${bofDeltaClass}">${bofDeltaText}</div>
     </article>
   `;
 }
