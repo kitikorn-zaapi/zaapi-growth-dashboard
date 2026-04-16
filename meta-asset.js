@@ -15,17 +15,30 @@ const leaderboardEl = document.getElementById("leaderboard");
 const fatigueEl = document.getElementById("fatigue");
 const nextTestEl = document.getElementById("next-test");
 const performanceSnapshotEl = document.getElementById("performance-snapshot");
+const patternAnalysisEl = document.getElementById("pattern-analysis");
 const regionFilterEl = document.getElementById("region-filter");
 const sortByEl = document.getElementById("sort-by");
+const patternTabs = Array.from(document.querySelectorAll(".pattern-tab"));
 
 regionFilterEl.addEventListener("change", (event) => {
   state.region = event.target.value;
+  syncPatternTabs();
   render();
 });
 
 sortByEl.addEventListener("change", (event) => {
   state.sortBy = event.target.value;
   render();
+});
+
+patternTabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    const region = tab.dataset.region || "All";
+    state.region = region;
+    regionFilterEl.value = region;
+    syncPatternTabs();
+    render();
+  });
 });
 
 document.addEventListener("click", (event) => {
@@ -190,6 +203,7 @@ function render() {
   renderFatigue(rows);
   renderNextTest(rows);
   renderPerformanceSnapshot(rows);
+  renderPatternAnalysis(rows);
 }
 
 function renderLeaderboard(rows) {
@@ -393,6 +407,195 @@ function formatSignedPoints(value) {
 
 function metricCell(label, value) {
   return `<div><div class="metric-label">${label}</div><div class="metric-value">${value}</div></div>`;
+}
+
+function renderPatternAnalysis(rows) {
+  const spendRows = rows.filter((row) => row.spend > 0);
+  if (!spendRows.length) {
+    patternAnalysisEl.innerHTML = '<div class="empty">No spend data for pattern analysis in this region.</div>';
+    return;
+  }
+
+  const benchmarks = {
+    avgHookRate: average(spendRows, (row) => row.hook_rate),
+    avgFti: average(spendRows, (row) => row.fti)
+  };
+
+  const axes = [
+    { key: "angle", label: "Angle" },
+    { key: "prod", label: "Prod" },
+    { key: "feature1", label: "Feature" }
+  ];
+
+  const axisBlocks = axes.map((axis) => renderAxisBlock(spendRows, axis, benchmarks)).join("");
+  const coverage = renderCoverageGaps(axes);
+
+  patternAnalysisEl.innerHTML = `${axisBlocks}${coverage}`;
+}
+
+function renderAxisBlock(spendRows, axis, benchmarks) {
+  const groups = aggregateByAxis(spendRows, axis.key, benchmarks);
+  const cards = groups.map((group) => renderPatternCard(group)).join("");
+  const ranked = groups
+    .filter((group) => group.adsCount >= 3)
+    .sort((a, b) => (b.avgFti - a.avgFti) || (b.avgHookRate - a.avgHookRate));
+
+  const rankingHtml = ranked.length
+    ? `<div class="pattern-ranking"><strong>Ranked (n ≥ 3):</strong><ol>${ranked
+      .map((group) => `<li>${escapeHtml(group.name)} · FTI ${formatNumber(group.avgFti)} · Hook ${formatPercent(group.avgHookRate)}</li>`)
+      .join("")}</ol></div>`
+    : '<div class="pattern-ranking">No groups meet ranking threshold (n ≥ 3).</div>';
+
+  return `
+    <section class="axis-block">
+      <h3 class="axis-title">${escapeHtml(axis.label)} patterns</h3>
+      <div class="pattern-grid">${cards}</div>
+      ${rankingHtml}
+    </section>
+  `;
+}
+
+function aggregateByAxis(rows, axisKey, benchmarks) {
+  const groups = new Map();
+
+  rows.forEach((row) => {
+    const rawName = (row[axisKey] || "").trim();
+    const name = rawName || "Unspecified";
+    if (!groups.has(name)) {
+      groups.set(name, { name, rows: [] });
+    }
+    groups.get(name).rows.push(row);
+  });
+
+  return Array.from(groups.values())
+    .map((group) => {
+      const tofRows = group.rows.filter((row) => String(row.stage || "").trim() === "Awareness");
+      const bofRows = group.rows.filter((row) => String(row.stage || "").trim() === "Conversion");
+      const adsCount = group.rows.length;
+      const avgHookRate = average(tofRows, (row) => row.hook_rate);
+      const avgThumbStop = average(tofRows, (row) => row.thumb_stop);
+      const avgFti = average(bofRows, (row) => row.fti);
+      const avgCpa = average(bofRows, (row) => row.cpa);
+      const tofStrong = avgHookRate > benchmarks.avgHookRate;
+      const bofStrong = avgFti > benchmarks.avgFti;
+      return {
+        name: group.name,
+        adsCount,
+        totalSpend: group.rows.reduce((sum, row) => sum + row.spend, 0),
+        avgHookRate,
+        avgThumbStop,
+        avgFti,
+        avgCpa,
+        confidence: confidenceLabel(adsCount),
+        verdict: verdictLabel(tofStrong, bofStrong)
+      };
+    })
+    .sort((a, b) => b.adsCount - a.adsCount || b.totalSpend - a.totalSpend);
+}
+
+function renderPatternCard(group) {
+  const confidenceClass = `confidence-${group.confidence.toLowerCase()}`;
+  const verdictClass = verdictClassName(group.verdict);
+  const caution = group.adsCount < 3 ? " ⚠" : "";
+
+  return `
+    <article class="pattern-card">
+      <div class="pattern-name">${escapeHtml(group.name)}</div>
+      <div class="pattern-meta">n=${group.adsCount} · <span class="${confidenceClass}">${group.confidence} confidence${caution}</span></div>
+      <div class="pattern-metrics">
+        <div>TOF: Hook ${formatPercent(group.avgHookRate)} · Thumb ${formatPercent(group.avgThumbStop)}</div>
+        <div>BOF: FTI ${formatNumber(group.avgFti)} · CPA ${formatCurrency(group.avgCpa)}</div>
+      </div>
+      <div class="pattern-verdict ${verdictClass}">Verdict: ${group.verdict}</div>
+    </article>
+  `;
+}
+
+function renderCoverageGaps(axes) {
+  const allSpendRows = state.rows.filter((row) => row.spend > 0);
+  const selectedSpendRows = state.region === "All"
+    ? allSpendRows
+    : allSpendRows.filter((row) => row.region === state.region);
+
+  if (!allSpendRows.length) {
+    return '<div class="coverage-wrap"><div class="empty">No spend rows found for coverage analysis.</div></div>';
+  }
+
+  const regionLabel = state.region === "All" ? "ALL" : state.region;
+  const gaps = [];
+
+  axes.forEach((axis) => {
+    const allValues = uniqueAxisValues(allSpendRows, axis.key);
+    const regionValues = uniqueAxisValues(selectedSpendRows, axis.key);
+
+    allValues.forEach((value) => {
+      if (!regionValues.has(value)) {
+        gaps.push(`${value} ${axis.label.toLowerCase()} not tested in ${regionLabel}`);
+      }
+    });
+  });
+
+  const list = gaps.length
+    ? `<ul class="coverage-list">${gaps.map((gap) => `<li>${escapeHtml(gap)}</li>`).join("")}</ul>`
+    : `<div class="empty">No coverage gaps for ${escapeHtml(regionLabel)}.</div>`;
+
+  return `
+    <section class="coverage-wrap">
+      <h3 class="coverage-title">Coverage gaps</h3>
+      ${list}
+    </section>
+  `;
+}
+
+function uniqueAxisValues(rows, axisKey) {
+  return new Set(
+    rows
+      .map((row) => ((row[axisKey] || "").trim() || "Unspecified"))
+  );
+}
+
+function average(rows, selector) {
+  if (!rows.length) return 0;
+  const total = rows.reduce((sum, row) => sum + selector(row), 0);
+  return total / rows.length;
+}
+
+function confidenceLabel(adsCount) {
+  if (adsCount === 1) return "Low";
+  if (adsCount === 2) return "Medium";
+  return "High";
+}
+
+function verdictLabel(tofStrong, bofStrong) {
+  if (tofStrong && !bofStrong) return "Fix funnel";
+  if (!tofStrong && bofStrong) return "Fix creative";
+  if (tofStrong && bofStrong) return "Scale";
+  return "Kill";
+}
+
+function verdictClassName(verdict) {
+  if (verdict === "Scale") return "verdict-scale";
+  if (verdict === "Kill") return "verdict-kill";
+  return "verdict-fix";
+}
+
+function formatPercent(value) {
+  return `${value.toFixed(1)}%`;
+}
+
+function formatCurrency(value) {
+  return `$${value.toFixed(2)}`;
+}
+
+function formatNumber(value) {
+  return value.toFixed(2);
+}
+
+function syncPatternTabs() {
+  patternTabs.forEach((tab) => {
+    const isActive = (tab.dataset.region || "All") === state.region;
+    tab.classList.toggle("active", isActive);
+  });
 }
 
 function escapeHtml(value) {
