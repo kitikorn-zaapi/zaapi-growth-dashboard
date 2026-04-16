@@ -14,6 +14,7 @@ const state = {
 const leaderboardEl = document.getElementById("leaderboard");
 const fatigueEl = document.getElementById("fatigue");
 const nextTestEl = document.getElementById("next-test");
+const performanceSnapshotEl = document.getElementById("performance-snapshot");
 const regionFilterEl = document.getElementById("region-filter");
 const sortByEl = document.getElementById("sort-by");
 
@@ -164,6 +165,7 @@ function render() {
   renderLeaderboard(rows);
   renderFatigue(rows);
   renderNextTest(rows);
+  renderPerformanceSnapshot(rows);
 }
 
 function renderLeaderboard(rows) {
@@ -178,7 +180,7 @@ function renderLeaderboard(rows) {
     return `
       <article class="asset-card">
         <div class="thumb-wrap" data-ad-code="${escapeHtml(adCode)}">
-          <img src="assets/${encodeURIComponent(adCode)}.jpg" alt="${escapeHtml(adCode)}" loading="lazy" />
+          <img alt="${escapeHtml(adCode)}" loading="lazy" />
         </div>
         <div class="row-top">
           <div class="ad-code">${escapeHtml(adCode)}</div>
@@ -202,10 +204,12 @@ function renderLeaderboard(rows) {
   }).join("");
 
   leaderboardEl.querySelectorAll(".thumb-wrap img").forEach((img) => {
+    const wrapper = img.parentElement;
+    const adCode = wrapper.dataset.adCode || "UNKNOWN";
+    img.src = `/zaapi-growth-dashboard/assets/${adCode}.webp`;
+    console.log("IMG:", img.src);
     img.addEventListener("error", () => {
-      const wrapper = img.parentElement;
-      const adCode = wrapper.dataset.adCode || "UNKNOWN";
-      wrapper.innerHTML = `<div class="img-placeholder">${escapeHtml(adCode)}</div>`;
+      wrapper.innerHTML = `<div class="placeholder">${escapeHtml(adCode)}</div>`;
     }, { once: true });
   });
 
@@ -269,6 +273,73 @@ function renderNextTest(rows) {
   const adCode = winner.ad_code || "-";
 
   nextTestEl.innerHTML = `Winner: <strong>${escapeHtml(adCode)}</strong> (${winner.fti.toFixed(2)} FTI, $${winner.cpa.toFixed(2)} CPA)<br>→ Suggested next: test new angle`;
+}
+
+function renderPerformanceSnapshot(rows) {
+  const spendRows = rows.filter((row) => row.spend > 0);
+
+  if (!spendRows.length) {
+    performanceSnapshotEl.innerHTML = '<div class="empty">No spend data available for benchmark comparison.</div>';
+    return;
+  }
+
+  const avgFti = spendRows.reduce((sum, row) => sum + row.fti, 0) / spendRows.length;
+  const avgCpa = spendRows.reduce((sum, row) => sum + row.cpa, 0) / spendRows.length;
+  const avgHookRate = spendRows.reduce((sum, row) => sum + row.hook_rate, 0) / spendRows.length;
+
+  const rankedDesc = [...spendRows].sort((a, b) => b.fti - a.fti);
+  const top3 = rankedDesc.slice(0, 3);
+  const bottom3 = [...spendRows].sort((a, b) => a.fti - b.fti).slice(0, 3);
+
+  performanceSnapshotEl.innerHTML = `
+    <div class="snapshot-grid">
+      <section class="snapshot-col">
+        <h3 class="snapshot-title">Top Performers</h3>
+        ${top3.map((row) => snapshotItem(row, avgFti, avgCpa, avgHookRate)).join("")}
+      </section>
+      <section class="snapshot-col">
+        <h3 class="snapshot-title">Worst Performers</h3>
+        ${bottom3.map((row) => snapshotItem(row, avgFti, avgCpa, avgHookRate)).join("")}
+      </section>
+    </div>
+  `;
+}
+
+function snapshotItem(row, avgFti, avgCpa, avgHookRate) {
+  const deltaFti = avgFti === 0 ? 0 : ((row.fti - avgFti) / avgFti) * 100;
+  const deltaCpa = avgCpa === 0 ? 0 : ((avgCpa - row.cpa) / avgCpa) * 100;
+  const deltaHook = row.hook_rate - avgHookRate;
+
+  return `
+    <article class="snapshot-item">
+      <div class="snapshot-ad">${escapeHtml(row.ad_code || "-")}</div>
+      <div class="snapshot-metric">
+        <span>FTI: ${row.fti.toFixed(2)}</span>
+        <span class="delta ${deltaClass(deltaFti)}">${formatSignedPercent(deltaFti)}</span>
+      </div>
+      <div class="snapshot-metric">
+        <span>CPA: $${row.cpa.toFixed(2)}</span>
+        <span class="delta ${deltaClass(deltaCpa)}">${formatSignedPercent(deltaCpa)}</span>
+      </div>
+      <div class="snapshot-metric">
+        <span>Hook Rate: ${row.hook_rate.toFixed(1)}%</span>
+        <span class="delta ${deltaClass(deltaHook)}">${formatSignedPoints(deltaHook)}</span>
+      </div>
+    </article>
+  `;
+}
+
+function deltaClass(deltaValue) {
+  if (Math.abs(deltaValue) <= 5) return "delta-neutral";
+  return deltaValue > 0 ? "delta-positive" : "delta-negative";
+}
+
+function formatSignedPercent(value) {
+  return `${value >= 0 ? "+" : ""}${value.toFixed(1)}%`;
+}
+
+function formatSignedPoints(value) {
+  return `${value >= 0 ? "+" : ""}${value.toFixed(1)} pts`;
 }
 
 function metricCell(label, value) {
