@@ -558,14 +558,6 @@ function aggregateByAxis(rows, axisKey, benchmarks) {
 function renderPatternCard(group) {
   const confidenceClass = `confidence-${group.confidence.toLowerCase()}`;
   const caution = group.n < 3 ? " ⚠" : "";
-  const tofDeltaText = group.tofDelta === null
-    ? "— Hook"
-    : `${group.tofDelta >= 0 ? "+" : ""}${group.tofDelta.toFixed(0)}% Hook`;
-  const bofDeltaText = group.bofDelta === null
-    ? "— FTI"
-    : `${group.bofDelta >= 0 ? "+" : ""}${group.bofDelta.toFixed(0)}% FTI`;
-  const tofDeltaClass = group.tofDelta === null ? "" : (group.tofGood ? "positive" : "negative");
-  const bofDeltaClass = group.bofDelta === null ? "" : (group.bofDeltaPositive ? "positive" : "negative");
   const diagnosisText = group.diagnosis
     .replace(" — ", " · ")
     .replace("Working · strong TOF and BOF", "Strong TOF · Strong BOF")
@@ -583,20 +575,21 @@ function renderPatternCard(group) {
 
   return `
     <article class="pattern-card">
-      <div class="diagnosis ${group.diagnosisClass}">${escapeHtml(diagnosisText)}</div>
-      <div class="hint">${escapeHtml(hintText)}</div>
       <div class="pattern-name">${escapeHtml(group.name)}</div>
       <div class="pattern-meta">n=${group.n} · <span class="${confidenceClass}">${group.confidence} confidence${caution}</span></div>
       <div class="signal-block tof">
-        <div class="label">👁 TOF</div>
-        <div class="metrics">Hook ${formatPercent(group.avgHook)} ${group.tofGood ? "✓" : "✗"} · Thumb ${formatPercent(group.avgThumb)}</div>
+        <div class="signal-label">👁 TOF</div>
+        <div class="signal-main">Hook ${formatPercent(group.avgHook)} ${group.tofGood ? "✓" : "✗"}</div>
+        <div class="signal-sub">vs avg ${group.tofDelta === null ? "—" : `${group.tofDelta >= 0 ? "+" : ""}${group.tofDelta.toFixed(0)}%`}</div>
       </div>
       <div class="signal-block bof">
-        <div class="label">💰 BOF</div>
-        <div class="metrics">FTI ${group.avgFti === null ? "—" : formatNumber(group.avgFti)} ${group.bofGood ? "✓" : "✗"} · CPA ${group.avgCpa === null ? "—" : formatCurrency(group.avgCpa)}</div>
+        <div class="signal-label">💰 BOF</div>
+        <div class="signal-main">FTI ${group.avgFti === null ? "—" : formatNumber(group.avgFti)} ${group.bofGood ? "✓" : "✗"}</div>
+        <div class="signal-sub">vs avg ${group.bofDelta === null ? "—" : `${group.bofDelta >= 0 ? "+" : ""}${group.bofDelta.toFixed(0)}%`}</div>
       </div>
-      <div class="delta ${tofDeltaClass}">${tofDeltaText}</div>
-      <div class="delta ${bofDeltaClass}">${bofDeltaText}</div>
+      <div class="pattern-metrics">Hook ${formatPercent(group.avgHook)} · Thumb ${formatPercent(group.avgThumb)} · FTI ${group.avgFti === null ? "—" : formatNumber(group.avgFti)} · CPA ${group.avgCpa === null ? "—" : formatCurrency(group.avgCpa)}</div>
+      <div class="pattern-diagnosis">${escapeHtml(diagnosisText)}</div>
+      <div class="pattern-hint">${escapeHtml(hintText)}</div>
     </article>
   `;
 }
