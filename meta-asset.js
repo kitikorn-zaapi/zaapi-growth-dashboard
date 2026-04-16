@@ -149,9 +149,11 @@ function normalizeKey(value) {
 }
 
 function classifyStatus(row) {
-  const sheetStatus = (row.status || "").trim();
-  if (sheetStatus === "Paused" || sheetStatus === "Kill") return sheetStatus;
-  if (!["", "Live", "Watch", "Testing"].includes(sheetStatus)) return sheetStatus || "Live";
+  const rawStatus = String(row.status || "").trim();
+  if (rawStatus === "Paused" || rawStatus === "Kill") return rawStatus;
+
+  const metricEligibleStatuses = new Set(["", "Live", "Watch", "Testing"]);
+  if (!metricEligibleStatuses.has(rawStatus)) return rawStatus || "Pending";
 
   if (row.spend === 0) return "Pending";
   if (row.hook_rate < 15 || row.ctr < 0.8 || (row.fti === 0 && row.spend > 15)) return "Kill";
@@ -372,15 +374,15 @@ function renderNextTest(rows) {
 
 function renderPerformanceSnapshot(rows) {
   const spendRows = rows.filter((row) => row.spend > 0);
+  const convRows = spendRows.filter((row) => row.fti > 0);
 
   if (!spendRows.length) {
     performanceSnapshotEl.innerHTML = '<div class="empty">No spend data available for benchmark comparison.</div>';
     return;
   }
 
-  const convRows = spendRows.filter((row) => row.fti > 0);
-  const avgFti = convRows.length ? average(convRows, (row) => row.fti) : 0;
-  const avgCpa = convRows.length ? average(convRows, (row) => row.cpa) : 0;
+  const avgFti = convRows.length ? convRows.reduce((sum, row) => sum + row.fti, 0) / convRows.length : 0;
+  const avgCpa = convRows.length ? convRows.reduce((sum, row) => sum + row.cpa, 0) / convRows.length : 0;
   const avgHookRate = spendRows.reduce((sum, row) => sum + row.hook_rate, 0) / spendRows.length;
 
   const rankedDesc = [...spendRows].sort((a, b) => b.fti - a.fti);
@@ -468,12 +470,12 @@ function renderPatternAnalysis(rows) {
     return;
   }
 
-  const tofRows = spendRows.filter((row) => (row.objective || "").toUpperCase() === "TOF");
-  const convRows = spendRows.filter((row) => (row.objective || "").toUpperCase() === "BOF" && row.fti > 0);
+  const tofRows = spendRows.filter((row) => normalizeObjective(row.objective) === "TOF");
+  const bofConvRows = spendRows.filter((row) => normalizeObjective(row.objective) === "BOF" && row.fti > 0);
   const benchmarks = {
     avgHook: tofRows.length ? average(tofRows, (row) => row.hook_rate) : 0,
-    avgFti: convRows.length ? average(convRows, (row) => row.fti) : 0,
-    avgCpa: convRows.length ? average(convRows, (row) => row.cpa) : 0
+    avgFti: bofConvRows.length ? average(bofConvRows, (row) => row.fti) : 0,
+    avgCpa: bofConvRows.length ? average(bofConvRows, (row) => row.cpa) : 0
   };
 
   const axes = [
@@ -522,31 +524,39 @@ function aggregateByAxis(rows, axisKey, benchmarks) {
   return Array.from(groups.entries()).map(([name, grp]) => {
     const n = grp.length;
 
-    const tofGrp = grp.filter((row) => (row.objective || "").toUpperCase() === "TOF");
-    const bofGrp = grp.filter((row) => (row.objective || "").toUpperCase() === "BOF");
+    const tofGrp = grp.filter((row) => normalizeObjective(row.objective) === "TOF");
+    const bofGrp = grp.filter((row) => normalizeObjective(row.objective) === "BOF");
     const convGrp = bofGrp.filter((row) => row.fti > 0);
 
-    const avgHook = tofGrp.length ? average(tofGrp, r => r.hook_rate) : null;
-    const avgThumb = tofGrp.length ? average(tofGrp, r => r.thumb_stop) : null;
-    const avgFti = convGrp.length ? average(convGrp, r => r.fti) : null;
-    const avgCpa = convGrp.length ? average(convGrp, r => r.cpa) : null;
+    const avgHook = tofGrp.length ? average(tofGrp, (r) => r.hook_rate) : null;
+    const avgThumb = tofGrp.length ? average(tofGrp, (r) => r.thumb_stop) : null;
+    const avgFrequency = tofGrp.length ? average(tofGrp, (r) => r.frequency) : null;
+    const avgCpm = tofGrp.length ? average(tofGrp, (r) => r.cpm) : null;
+    const avgFti = convGrp.length ? average(convGrp, (r) => r.fti) : null;
+    const avgCpa = convGrp.length ? average(convGrp, (r) => r.cpa) : null;
 
     if (n === 1) {
+      const hasTof = tofGrp.length > 0;
+      const hasBof = bofGrp.length > 0;
       const tofDelta = avgHook === null ? null : percentDelta(avgHook, benchmarks.avgHook);
       const tofState = avgHook === null
         ? "neutral"
         : avgHook >= benchmarks.avgHook
-        ? "good"
-        : avgHook < benchmarks.avgHook * 0.7
-          ? "bad"
-          : "neutral";
-      const tofLabel = avgHook === null ? "NO DATA" : tofState === "good" ? "GOOD" : tofState === "bad" ? "BAD" : "OK";
+          ? "good"
+          : avgHook < benchmarks.avgHook * 0.7
+            ? "bad"
+            : "neutral";
+      const tofLabel = avgHook === null
+        ? "NO DATA"
+        : tofState === "good" ? "GOOD" : tofState === "bad" ? "BAD" : "OK";
 
       return {
         name,
         n,
         avgHook,
         avgThumb,
+        avgFrequency,
+        avgCpm,
         avgFti,
         avgCpa,
         tofDelta,
@@ -560,32 +570,38 @@ function aggregateByAxis(rows, axisKey, benchmarks) {
         bofDeltaPositive: false,
         diagnosis: "Insufficient data — do not conclude",
         diagnosisClass: "neutral",
-        confidence: confidenceLabel(n)
+        confidence: confidenceLabel(n),
+        tofSignal: hasTof ? null : "No TOF data",
+        bofSignal: hasBof ? null : "BOF not launched yet"
       };
     }
 
-    const hasTofData = tofGrp.length > 0;
-    const tofStrong = hasTofData && avgHook !== null && avgHook >= benchmarks.avgHook;
-    const tofVsAvg = hasTofData && avgHook !== null ? percentDelta(avgHook, benchmarks.avgHook) : null;
-    const tofState = !hasTofData
+    const hasTof = tofGrp.length > 0;
+    const hasBof = bofGrp.length > 0;
+    const tofStrong = hasTof && avgHook >= benchmarks.avgHook;
+    const tofVsAvg = hasTof ? percentDelta(avgHook, benchmarks.avgHook) : null;
+    const tofState = !hasTof
       ? "neutral"
       : avgHook >= benchmarks.avgHook
         ? "good"
         : avgHook < benchmarks.avgHook * 0.7
           ? "bad"
           : "neutral";
-    const tofLabel = !hasTofData ? "NO DATA" : tofState === "good" ? "GOOD" : tofState === "bad" ? "BAD" : "OK";
+    const tofLabel = !hasTof ? "NO DATA" : tofState === "good" ? "GOOD" : tofState === "bad" ? "BAD" : "OK";
 
     let bofDelta = null;
     let bofStrong = false;
     let bofPositive = false;
     let bofState = "neutral";
-    let bofLabel = "OK";
+    let bofLabel = "NO DATA";
+    let bofSignal = null;
+    let tofSignal = hasTof ? null : "No TOF data";
 
-    if (!bofGrp.length) {
+    if (!hasBof) {
       bofDelta = null;
       bofState = "neutral";
       bofLabel = "NO DATA";
+      bofSignal = "BOF not launched yet";
     } else if (!convGrp.length) {
       bofDelta = null;
       bofState = "neutral";
@@ -611,14 +627,8 @@ function aggregateByAxis(rows, axisKey, benchmarks) {
     let diagnosis;
     let diagnosisClass;
 
-    if (!hasTofData && !bofGrp.length) {
-      diagnosis = "No TOF or BOF data";
-      diagnosisClass = "neutral";
-    } else if (!hasTofData) {
-      diagnosis = "No TOF data";
-      diagnosisClass = "neutral";
-    } else if (!bofGrp.length) {
-      diagnosis = "BOF not launched yet";
+    if (!hasTof && !hasBof) {
+      diagnosis = "No TOF or BOF data yet";
       diagnosisClass = "neutral";
     } else if (tofStrong && bofStrong) {
       diagnosis = "Working — strong TOF and BOF";
@@ -642,6 +652,8 @@ function aggregateByAxis(rows, axisKey, benchmarks) {
       n,
       avgHook,
       avgThumb,
+      avgFrequency,
+      avgCpm,
       avgFti,
       avgCpa,
       tofDelta: tofVsAvg,
@@ -655,9 +667,9 @@ function aggregateByAxis(rows, axisKey, benchmarks) {
       bofDeltaPositive: bofPositive,
       diagnosis,
       diagnosisClass,
-      tofSignal: hasTofData ? null : "No TOF data",
-      bofSignal: bofGrp.length ? null : "BOF not launched yet",
-      confidence: confidenceLabel(n)
+      confidence: confidenceLabel(n),
+      tofSignal,
+      bofSignal
     };
   }).sort((a, b) => b.n - a.n);
 }
@@ -700,7 +712,7 @@ function renderPatternCard(group) {
         <div class="signal-metric">FTI ${group.avgFti === null ? "—" : formatNumber(group.avgFti)}</div>
         <div class="signal-sub">${group.bofSignal || (group.avgFti === null ? "No data" : `vs avg ${group.bofDelta >= 0 ? "+" : ""}${group.bofDelta.toFixed(0)}%`)}</div>
       </div>
-      <div class="pattern-metrics">Hook ${group.avgHook === null ? "—" : formatPercent(group.avgHook)} · Thumb ${group.avgThumb === null ? "—" : formatPercent(group.avgThumb)} · FTI ${group.avgFti === null ? "—" : formatNumber(group.avgFti)} · CPA ${group.avgCpa === null ? "—" : formatCurrency(group.avgCpa)}</div>
+      <div class="pattern-metrics">Hook ${group.avgHook === null ? "—" : formatPercent(group.avgHook)} · Thumb ${group.avgThumb === null ? "—" : formatPercent(group.avgThumb)} · Frequency ${group.avgFrequency === null ? "—" : formatNumber(group.avgFrequency)} · CPM ${group.avgCpm === null ? "—" : formatCurrency(group.avgCpm)} · FTI ${group.avgFti === null ? "—" : formatNumber(group.avgFti)} · CPA ${group.avgCpa === null ? "—" : formatCurrency(group.avgCpa)}</div>
       <div class="pattern-diagnosis">${escapeHtml(diagnosisText)}</div>
       <div class="pattern-hint">${escapeHtml(hintText)}</div>
     </article>
@@ -748,6 +760,10 @@ function uniqueAxisValues(rows, axisKey) {
     rows
       .map((row) => ((row[axisKey] || "").trim() || "Unspecified"))
   );
+}
+
+function normalizeObjective(value) {
+  return String(value || "").trim().toUpperCase();
 }
 
 function average(rows, selector) {
