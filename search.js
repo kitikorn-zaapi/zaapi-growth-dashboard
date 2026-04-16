@@ -81,6 +81,13 @@ const WEEKLY_LOG = [
 
 // ── Utilities ─────────────────────────────────
 
+
+function readStoredForexRate() {
+  const raw = localStorage.getItem("zaapi_forex_rate");
+  const parsed = parseFloat(raw);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
 function toUSD(thb, rate) {
   return thb / rate;
 }
@@ -527,9 +534,17 @@ async function init() {
     return;
   }
 
+  data.forex_rate = readStoredForexRate() || data.forex_rate || FOREX_DEFAULT;
+
   appData = data;
   setupControls(data);
   refresh(data);
+
+  window.addEventListener("zaapi:forex-change", (event) => {
+    const nextRate = parseFloat(event.detail?.rate);
+    data.forex_rate = Number.isFinite(nextRate) && nextRate > 0 ? nextRate : FOREX_DEFAULT;
+    refresh(data);
+  });
 }
 
 document.addEventListener("DOMContentLoaded", init);

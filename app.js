@@ -10,6 +10,13 @@ let efficiencyChart = null;
 let selectedRange = "L4W";
 let selectedRegion = "Global";
 
+
+function readStoredForexRate() {
+  const raw = localStorage.getItem("zaapi_forex_rate");
+  const parsed = parseFloat(raw);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
 function toUSD(thb, rate) {
   return thb / rate;
 }
@@ -40,7 +47,6 @@ function fmtWoW(pct, invert) {
 function renderState(data) {
   const el = document.getElementById("state-badge");
   const label = document.getElementById("state-label");
-  const week = document.getElementById("week-label");
 
   const map = {
     Improving: { cls: "state-improving", icon: "↑" },
@@ -52,7 +58,6 @@ function renderState(data) {
   el.className = "state-badge " + s.cls;
   el.querySelector(".state-icon").textContent = s.icon;
   label.textContent = data.state;
-  week.textContent = data.week + "  ·  prev: " + data.week_prev;
 }
 
 function renderSnapshot(data) {
@@ -322,6 +327,8 @@ async function init() {
     return;
   }
 
+  data.forex_rate = readStoredForexRate() || data.forex_rate || FOREX_DEFAULT;
+
   renderState(data);
   renderSnapshot(data);
   renderTable(data);
@@ -331,9 +338,9 @@ async function init() {
   setupGraphFilters(data);
   renderGraphs(data);
 
-  document.getElementById("forex-rate").value = data.forex_rate || FOREX_DEFAULT;
-  document.getElementById("forex-rate").addEventListener("input", () => {
-    data.forex_rate = parseFloat(document.getElementById("forex-rate").value) || FOREX_DEFAULT;
+  window.addEventListener("zaapi:forex-change", (event) => {
+    const nextRate = parseFloat(event.detail?.rate);
+    data.forex_rate = Number.isFinite(nextRate) && nextRate > 0 ? nextRate : FOREX_DEFAULT;
     renderSnapshot(data);
     renderTable(data);
     renderRegions(data);
