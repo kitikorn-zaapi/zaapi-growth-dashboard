@@ -1106,5 +1106,1753 @@
   "next_step": {
     "type": "pipedrive",
     "label": "Enter HQ+ from Pipedrive to complete the funnel picture."
+  },
+  "history_by_region": {
+    "TH": [
+      {
+        "week": "CW14-2024",
+        "spend": 21158,
+        "fti": 6.2,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 3413,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW15-2024",
+        "spend": 20478,
+        "fti": 12.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 1706,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW16-2024",
+        "spend": 19396,
+        "fti": 5.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 3879,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW17-2024",
+        "spend": 26388,
+        "fti": 15.3,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 1725,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW18-2024",
+        "spend": 21815,
+        "fti": 18.3,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 1192,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW19-2024",
+        "spend": 29273,
+        "fti": 14.4,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 2033,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW20-2024",
+        "spend": 40013,
+        "fti": 14.3,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 2798,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW21-2024",
+        "spend": 40539,
+        "fti": 9.3,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 4359,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW22-2024",
+        "spend": 27375,
+        "fti": 18.7,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 1464,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW23-2024",
+        "spend": 31541,
+        "fti": 20.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 1577,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW24-2024",
+        "spend": 37669,
+        "fti": 25.5,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 1477,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW25-2024",
+        "spend": 38644,
+        "fti": 59.7,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 647,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW26-2024",
+        "spend": 32916,
+        "fti": 113.9,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 289,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW27-2024",
+        "spend": 37485,
+        "fti": 152.8,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 245,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW28-2024",
+        "spend": 38469,
+        "fti": 199.1,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 193,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW29-2024",
+        "spend": 33850,
+        "fti": 247.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 137,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW30-2024",
+        "spend": 32160,
+        "fti": 282.4,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 114,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW31-2024",
+        "spend": 33666,
+        "fti": 442.4,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 76,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW32-2024",
+        "spend": 36350,
+        "fti": 384.5,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 95,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW33-2024",
+        "spend": 34078,
+        "fti": 416.9,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 82,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW34-2024",
+        "spend": 33242,
+        "fti": 362.8,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 92,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW35-2024",
+        "spend": 34562,
+        "fti": 350.7,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 99,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW36-2024",
+        "spend": 36976,
+        "fti": 491.4,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 75,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW37-2024",
+        "spend": 38601,
+        "fti": 473.5,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 82,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW38-2024",
+        "spend": 28239,
+        "fti": 389.9,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 72,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW39-2024",
+        "spend": 27401,
+        "fti": 335.9,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 82,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW40-2024",
+        "spend": 31217,
+        "fti": 346.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 90,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW41-2024",
+        "spend": 34528,
+        "fti": 404.2,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 85,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW42-2024",
+        "spend": 37735,
+        "fti": 480.1,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 79,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW43-2024",
+        "spend": 35222,
+        "fti": 436.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 81,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW44-2024",
+        "spend": 34460,
+        "fti": 448.8,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 77,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW45-2024",
+        "spend": 36453,
+        "fti": 457.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 80,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW46-2024",
+        "spend": 32083,
+        "fti": 396.9,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 81,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW47-2024",
+        "spend": 34379,
+        "fti": 344.7,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 100,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW48-2024",
+        "spend": 39647,
+        "fti": 232.3,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 171,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW49-2024",
+        "spend": 42400,
+        "fti": 344.9,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 123,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW50-2024",
+        "spend": 44535,
+        "fti": 378.2,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 118,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW51-2024",
+        "spend": 42353,
+        "fti": 344.7,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 123,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW52-2024",
+        "spend": 42711,
+        "fti": 358.4,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 119,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW01-2025",
+        "spend": 44474,
+        "fti": 429.8,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 103,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW02-2025",
+        "spend": 59163,
+        "fti": 374.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 158,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW03-2025",
+        "spend": 53494,
+        "fti": 402.8,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 133,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW04-2025",
+        "spend": 57974,
+        "fti": 438.2,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 132,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW05-2025",
+        "spend": 54752,
+        "fti": 424.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 129,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW06-2025",
+        "spend": 59545,
+        "fti": 411.5,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 145,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW07-2025",
+        "spend": 46074,
+        "fti": 398.5,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 116,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW08-2025",
+        "spend": 48012,
+        "fti": 888.5,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 54,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW09-2025",
+        "spend": 30291,
+        "fti": 182.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 166,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW10-2025",
+        "spend": 41753,
+        "fti": 92.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 454,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW11-2025",
+        "spend": 66520,
+        "fti": 73.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 911,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW12-2025",
+        "spend": 55618,
+        "fti": 62.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 897,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW13-2025",
+        "spend": 68672,
+        "fti": 61.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 1126,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW14-2025",
+        "spend": 57610,
+        "fti": 70.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 823,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW15-2025",
+        "spend": 53276,
+        "fti": 29.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 1837,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW16-2025",
+        "spend": 61692,
+        "fti": 23.7,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 2603,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW17-2025",
+        "spend": 51265,
+        "fti": 31.2,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 1643,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW18-2025",
+        "spend": 75537,
+        "fti": 35.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 2158,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW19-2025",
+        "spend": 97573,
+        "fti": 70.9,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 1376,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW20-2025",
+        "spend": 62778,
+        "fti": 43.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 1460,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW21-2025",
+        "spend": 57251,
+        "fti": 39.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 1468,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW22-2025",
+        "spend": 55890,
+        "fti": 26.8,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 2085,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW23-2025",
+        "spend": 67938,
+        "fti": 26.7,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 2544,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW24-2025",
+        "spend": 90652,
+        "fti": 83.2,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 1090,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW25-2025",
+        "spend": 75643,
+        "fti": 111.6,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 678,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW26-2025",
+        "spend": 92566,
+        "fti": 142.1,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 651,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW27-2025",
+        "spend": 106440,
+        "fti": 210.7,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 505,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW28-2025",
+        "spend": 111622,
+        "fti": 186.1,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 600,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW29-2025",
+        "spend": 72357,
+        "fti": 74.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 978,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW30-2025",
+        "spend": 75788,
+        "fti": 80.7,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 939,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW31-2025",
+        "spend": 94859,
+        "fti": 88.0,
+        "qualified": 9,
+        "hq": 7,
+        "cost_per_fti": 1078,
+        "cost_per_qualified": 10540,
+        "cost_per_hq": 13551
+      },
+      {
+        "week": "CW32-2025",
+        "spend": 87397,
+        "fti": 94.8,
+        "qualified": 7,
+        "hq": 6,
+        "cost_per_fti": 922,
+        "cost_per_qualified": 12485,
+        "cost_per_hq": 14566
+      },
+      {
+        "week": "CW33-2025",
+        "spend": 95097,
+        "fti": 58.8,
+        "qualified": 11,
+        "hq": 9,
+        "cost_per_fti": 1617,
+        "cost_per_qualified": 8645,
+        "cost_per_hq": 10566
+      },
+      {
+        "week": "CW34-2025",
+        "spend": 118490,
+        "fti": 29.8,
+        "qualified": 27,
+        "hq": 18,
+        "cost_per_fti": 3976,
+        "cost_per_qualified": 4389,
+        "cost_per_hq": 6583
+      },
+      {
+        "week": "CW35-2025",
+        "spend": 99926,
+        "fti": 16.0,
+        "qualified": 26,
+        "hq": 16,
+        "cost_per_fti": 6245,
+        "cost_per_qualified": 3843,
+        "cost_per_hq": 6245
+      },
+      {
+        "week": "CW36-2025",
+        "spend": 83573,
+        "fti": 7.0,
+        "qualified": 21,
+        "hq": 15,
+        "cost_per_fti": 11939,
+        "cost_per_qualified": 3980,
+        "cost_per_hq": 5572
+      },
+      {
+        "week": "CW37-2025",
+        "spend": 133647,
+        "fti": 16.2,
+        "qualified": 34,
+        "hq": 22,
+        "cost_per_fti": 8250,
+        "cost_per_qualified": 3931,
+        "cost_per_hq": 6075
+      },
+      {
+        "week": "CW38-2025",
+        "spend": 150218,
+        "fti": 13.8,
+        "qualified": 12,
+        "hq": 8,
+        "cost_per_fti": 10885,
+        "cost_per_qualified": 12518,
+        "cost_per_hq": 18777
+      },
+      {
+        "week": "CW39-2025",
+        "spend": 129526,
+        "fti": 15.3,
+        "qualified": 12,
+        "hq": 9,
+        "cost_per_fti": 8466,
+        "cost_per_qualified": 10794,
+        "cost_per_hq": 14392
+      },
+      {
+        "week": "CW40-2025",
+        "spend": 151075,
+        "fti": 18.7,
+        "qualified": 8,
+        "hq": 5,
+        "cost_per_fti": 8079,
+        "cost_per_qualified": 18884,
+        "cost_per_hq": 30215
+      },
+      {
+        "week": "CW41-2025",
+        "spend": 162561,
+        "fti": 9.6,
+        "qualified": 5,
+        "hq": 5,
+        "cost_per_fti": 16933,
+        "cost_per_qualified": 32512,
+        "cost_per_hq": 32512
+      },
+      {
+        "week": "CW42-2025",
+        "spend": 144357,
+        "fti": 6.0,
+        "qualified": 3,
+        "hq": 3,
+        "cost_per_fti": 24060,
+        "cost_per_qualified": 48119,
+        "cost_per_hq": 48119
+      },
+      {
+        "week": "CW43-2025",
+        "spend": 147429,
+        "fti": 6.6,
+        "qualified": 14,
+        "hq": 7,
+        "cost_per_fti": 22338,
+        "cost_per_qualified": 10531,
+        "cost_per_hq": 21061
+      },
+      {
+        "week": "CW44-2025",
+        "spend": 155552,
+        "fti": 13.3,
+        "qualified": 18,
+        "hq": 9,
+        "cost_per_fti": 11696,
+        "cost_per_qualified": 8642,
+        "cost_per_hq": 17284
+      },
+      {
+        "week": "CW45-2025",
+        "spend": 151579,
+        "fti": 18.1,
+        "qualified": 34,
+        "hq": 22,
+        "cost_per_fti": 8375,
+        "cost_per_qualified": 4458,
+        "cost_per_hq": 6890
+      },
+      {
+        "week": "CW46-2025",
+        "spend": 96765,
+        "fti": 13.0,
+        "qualified": 28,
+        "hq": 13,
+        "cost_per_fti": 7443,
+        "cost_per_qualified": 3456,
+        "cost_per_hq": 7443
+      },
+      {
+        "week": "CW47-2025",
+        "spend": 117304,
+        "fti": 15.6,
+        "qualified": 30,
+        "hq": 23,
+        "cost_per_fti": 7519,
+        "cost_per_qualified": 3910,
+        "cost_per_hq": 5100
+      },
+      {
+        "week": "CW48-2025",
+        "spend": 120588,
+        "fti": 19.9,
+        "qualified": 5,
+        "hq": 4,
+        "cost_per_fti": 6060,
+        "cost_per_qualified": 24118,
+        "cost_per_hq": 30147
+      },
+      {
+        "week": "CW49-2025",
+        "spend": 135164,
+        "fti": 15.9,
+        "qualified": 7,
+        "hq": 7,
+        "cost_per_fti": 8501,
+        "cost_per_qualified": 19309,
+        "cost_per_hq": 19309
+      },
+      {
+        "week": "CW50-2025",
+        "spend": 147498,
+        "fti": 22.7,
+        "qualified": 11,
+        "hq": 10,
+        "cost_per_fti": 6498,
+        "cost_per_qualified": 13409,
+        "cost_per_hq": 14750
+      },
+      {
+        "week": "CW51-2025",
+        "spend": 162954,
+        "fti": 19.4,
+        "qualified": 9,
+        "hq": 7,
+        "cost_per_fti": 8400,
+        "cost_per_qualified": 18106,
+        "cost_per_hq": 23279
+      },
+      {
+        "week": "CW52-2025",
+        "spend": 91368,
+        "fti": 17.6,
+        "qualified": 14,
+        "hq": 10,
+        "cost_per_fti": 5191,
+        "cost_per_qualified": 6526,
+        "cost_per_hq": 9137
+      },
+      {
+        "week": "CW01-2026",
+        "spend": 124007,
+        "fti": 12.9,
+        "qualified": 13,
+        "hq": 9,
+        "cost_per_fti": 9613,
+        "cost_per_qualified": 9539,
+        "cost_per_hq": 13779
+      },
+      {
+        "week": "CW02-2026",
+        "spend": 200015,
+        "fti": 33.2,
+        "qualified": 35,
+        "hq": 24,
+        "cost_per_fti": 6025,
+        "cost_per_qualified": 5715,
+        "cost_per_hq": 8334
+      },
+      {
+        "week": "CW03-2026",
+        "spend": 238175,
+        "fti": 44.7,
+        "qualified": 31,
+        "hq": 24,
+        "cost_per_fti": 5328,
+        "cost_per_qualified": 7683,
+        "cost_per_hq": 9924
+      },
+      {
+        "week": "CW04-2026",
+        "spend": 119664,
+        "fti": 21.3,
+        "qualified": 35,
+        "hq": 21,
+        "cost_per_fti": 5618,
+        "cost_per_qualified": 3419,
+        "cost_per_hq": 5698
+      },
+      {
+        "week": "CW05-2026",
+        "spend": 181483,
+        "fti": 24.4,
+        "qualified": 24,
+        "hq": 15,
+        "cost_per_fti": 7438,
+        "cost_per_qualified": 7562,
+        "cost_per_hq": 12099
+      },
+      {
+        "week": "CW06-2026",
+        "spend": 198382,
+        "fti": 21.4,
+        "qualified": 31,
+        "hq": 20,
+        "cost_per_fti": 9270,
+        "cost_per_qualified": 6399,
+        "cost_per_hq": 9919
+      },
+      {
+        "week": "CW07-2026",
+        "spend": 159558,
+        "fti": 10.8,
+        "qualified": 32,
+        "hq": 26,
+        "cost_per_fti": 14774,
+        "cost_per_qualified": 4986,
+        "cost_per_hq": 6137
+      },
+      {
+        "week": "CW08-2026",
+        "spend": 140645,
+        "fti": 10.9,
+        "qualified": 31,
+        "hq": 22,
+        "cost_per_fti": 12903,
+        "cost_per_qualified": 4537,
+        "cost_per_hq": 6393
+      },
+      {
+        "week": "CW09-2026",
+        "spend": 167952,
+        "fti": 14.8,
+        "qualified": 24,
+        "hq": 17,
+        "cost_per_fti": 11348,
+        "cost_per_qualified": 6998,
+        "cost_per_hq": 9880
+      },
+      {
+        "week": "CW10-2026",
+        "spend": 213518,
+        "fti": 16.9,
+        "qualified": 21,
+        "hq": 13,
+        "cost_per_fti": 12634,
+        "cost_per_qualified": 10168,
+        "cost_per_hq": 16424
+      },
+      {
+        "week": "CW11-2026",
+        "spend": 238577,
+        "fti": 13.7,
+        "qualified": 19,
+        "hq": 14,
+        "cost_per_fti": 17414,
+        "cost_per_qualified": 12557,
+        "cost_per_hq": 17041
+      },
+      {
+        "week": "CW12-2026",
+        "spend": 192277,
+        "fti": 13.7,
+        "qualified": 21,
+        "hq": 15,
+        "cost_per_fti": 14035,
+        "cost_per_qualified": 9156,
+        "cost_per_hq": 12818
+      },
+      {
+        "week": "CW13-2026",
+        "spend": 172690,
+        "fti": 3.6,
+        "qualified": 18,
+        "hq": 11,
+        "cost_per_fti": 47969,
+        "cost_per_qualified": 9594,
+        "cost_per_hq": 15699
+      },
+      {
+        "week": "CW14-2026",
+        "spend": 101085,
+        "fti": 9.2,
+        "qualified": 23,
+        "hq": 13,
+        "cost_per_fti": 10988,
+        "cost_per_qualified": 4395,
+        "cost_per_hq": 7776
+      },
+      {
+        "week": "CW15-2026",
+        "spend": 165228,
+        "fti": 20.3,
+        "qualified": 34,
+        "hq": 20,
+        "cost_per_fti": 8139,
+        "cost_per_qualified": 4860,
+        "cost_per_hq": 8261
+      }
+    ],
+    "SEA": [
+      {
+        "week": "CW08-2025",
+        "spend": 38428,
+        "fti": 221.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 174,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW09-2025",
+        "spend": 44844,
+        "fti": 384.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 117,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW10-2025",
+        "spend": 19854,
+        "fti": 300.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 66,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW11-2025",
+        "spend": 23218,
+        "fti": 338.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 69,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW12-2025",
+        "spend": 17893,
+        "fti": 320.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 56,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW13-2025",
+        "spend": 7629,
+        "fti": 70.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 109,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW14-2025",
+        "spend": 10364,
+        "fti": 56.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 185,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW15-2025",
+        "spend": 7310,
+        "fti": 73.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 100,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW16-2025",
+        "spend": 5739,
+        "fti": 6.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 956,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW17-2025",
+        "spend": 12825,
+        "fti": 6.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 2138,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW18-2025",
+        "spend": 30144,
+        "fti": 27.5,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 1096,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW19-2025",
+        "spend": 33659,
+        "fti": 14.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 2404,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW20-2025",
+        "spend": 33205,
+        "fti": 21.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 1581,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW21-2025",
+        "spend": 18816,
+        "fti": 8.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 2352,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW22-2025",
+        "spend": 26758,
+        "fti": 6.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 4460,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW23-2025",
+        "spend": 23719,
+        "fti": 6.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 3953,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW24-2025",
+        "spend": 20114,
+        "fti": 6.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 3352,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW25-2025",
+        "spend": 21748,
+        "fti": 3.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 7249,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW26-2025",
+        "spend": 34718,
+        "fti": 13.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 2671,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW27-2025",
+        "spend": 48355,
+        "fti": 22.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 2198,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW28-2025",
+        "spend": 39813,
+        "fti": 31.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 1284,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW29-2025",
+        "spend": 33299,
+        "fti": 4.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 8325,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW30-2025",
+        "spend": 26860,
+        "fti": 4.0,
+        "qualified": null,
+        "hq": null,
+        "cost_per_fti": 6715,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW31-2025",
+        "spend": 34211,
+        "fti": 2.0,
+        "qualified": 1,
+        "hq": 1,
+        "cost_per_fti": 17106,
+        "cost_per_qualified": 34211,
+        "cost_per_hq": 34211
+      },
+      {
+        "week": "CW32-2025",
+        "spend": 38058,
+        "fti": 12.0,
+        "qualified": 3,
+        "hq": 3,
+        "cost_per_fti": 3172,
+        "cost_per_qualified": 12686,
+        "cost_per_hq": 12686
+      },
+      {
+        "week": "CW33-2025",
+        "spend": 54337,
+        "fti": 18.0,
+        "qualified": 1,
+        "hq": 1,
+        "cost_per_fti": 3019,
+        "cost_per_qualified": 54337,
+        "cost_per_hq": 54337
+      },
+      {
+        "week": "CW34-2025",
+        "spend": 77516,
+        "fti": 4.0,
+        "qualified": 4,
+        "hq": 3,
+        "cost_per_fti": 19379,
+        "cost_per_qualified": 19379,
+        "cost_per_hq": 25839
+      },
+      {
+        "week": "CW35-2025",
+        "spend": 55502,
+        "fti": 1.0,
+        "qualified": 5,
+        "hq": 2,
+        "cost_per_fti": 55502,
+        "cost_per_qualified": 11100,
+        "cost_per_hq": 27751
+      },
+      {
+        "week": "CW36-2025",
+        "spend": 59567,
+        "fti": null,
+        "qualified": 1,
+        "hq": 0,
+        "cost_per_fti": null,
+        "cost_per_qualified": 59567,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW37-2025",
+        "spend": 83932,
+        "fti": 2.0,
+        "qualified": 1,
+        "hq": 1,
+        "cost_per_fti": 41966,
+        "cost_per_qualified": 83932,
+        "cost_per_hq": 83932
+      },
+      {
+        "week": "CW38-2025",
+        "spend": 75496,
+        "fti": 11.0,
+        "qualified": 1,
+        "hq": 0,
+        "cost_per_fti": 6863,
+        "cost_per_qualified": 75496,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW39-2025",
+        "spend": 90303,
+        "fti": 3.0,
+        "qualified": 4,
+        "hq": 2,
+        "cost_per_fti": 30101,
+        "cost_per_qualified": 22576,
+        "cost_per_hq": 45152
+      },
+      {
+        "week": "CW40-2025",
+        "spend": 91494,
+        "fti": 6.1,
+        "qualified": 2,
+        "hq": 1,
+        "cost_per_fti": 14999,
+        "cost_per_qualified": 45747,
+        "cost_per_hq": 91494
+      },
+      {
+        "week": "CW41-2025",
+        "spend": 68458,
+        "fti": 1.6,
+        "qualified": 0,
+        "hq": 0,
+        "cost_per_fti": 42786,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW42-2025",
+        "spend": 91709,
+        "fti": 2.0,
+        "qualified": 1,
+        "hq": 1,
+        "cost_per_fti": 45854,
+        "cost_per_qualified": 91709,
+        "cost_per_hq": 91709
+      },
+      {
+        "week": "CW43-2025",
+        "spend": 88889,
+        "fti": 1.6,
+        "qualified": 5,
+        "hq": 5,
+        "cost_per_fti": 55556,
+        "cost_per_qualified": 17778,
+        "cost_per_hq": 17778
+      },
+      {
+        "week": "CW44-2025",
+        "spend": 81108,
+        "fti": 3.0,
+        "qualified": 2,
+        "hq": 2,
+        "cost_per_fti": 27036,
+        "cost_per_qualified": 40554,
+        "cost_per_hq": 40554
+      },
+      {
+        "week": "CW45-2025",
+        "spend": 92494,
+        "fti": 3.0,
+        "qualified": 3,
+        "hq": 2,
+        "cost_per_fti": 30831,
+        "cost_per_qualified": 30831,
+        "cost_per_hq": 46247
+      },
+      {
+        "week": "CW46-2025",
+        "spend": 68616,
+        "fti": 1.0,
+        "qualified": 6,
+        "hq": 5,
+        "cost_per_fti": 68616,
+        "cost_per_qualified": 11436,
+        "cost_per_hq": 13723
+      },
+      {
+        "week": "CW47-2025",
+        "spend": 82838,
+        "fti": 3.6,
+        "qualified": 5,
+        "hq": 3,
+        "cost_per_fti": 23011,
+        "cost_per_qualified": 16568,
+        "cost_per_hq": 27613
+      },
+      {
+        "week": "CW48-2025",
+        "spend": 67825,
+        "fti": 1.0,
+        "qualified": 1,
+        "hq": 1,
+        "cost_per_fti": 67825,
+        "cost_per_qualified": 67825,
+        "cost_per_hq": 67825
+      },
+      {
+        "week": "CW49-2025",
+        "spend": 59467,
+        "fti": 2.0,
+        "qualified": 1,
+        "hq": 1,
+        "cost_per_fti": 29734,
+        "cost_per_qualified": 59467,
+        "cost_per_hq": 59467
+      },
+      {
+        "week": "CW50-2025",
+        "spend": 63190,
+        "fti": 3.0,
+        "qualified": 2,
+        "hq": 2,
+        "cost_per_fti": 21063,
+        "cost_per_qualified": 31595,
+        "cost_per_hq": 31595
+      },
+      {
+        "week": "CW51-2025",
+        "spend": 68205,
+        "fti": 0.6,
+        "qualified": 3,
+        "hq": 3,
+        "cost_per_fti": 113675,
+        "cost_per_qualified": 22735,
+        "cost_per_hq": 22735
+      },
+      {
+        "week": "CW52-2025",
+        "spend": 43077,
+        "fti": 1.0,
+        "qualified": 1,
+        "hq": 0,
+        "cost_per_fti": 43077,
+        "cost_per_qualified": 43077,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW01-2026",
+        "spend": 55273,
+        "fti": 3.5,
+        "qualified": 4,
+        "hq": 3,
+        "cost_per_fti": 15792,
+        "cost_per_qualified": 13818,
+        "cost_per_hq": 18424
+      },
+      {
+        "week": "CW02-2026",
+        "spend": 73361,
+        "fti": 5.6,
+        "qualified": 6,
+        "hq": 3,
+        "cost_per_fti": 13100,
+        "cost_per_qualified": 12227,
+        "cost_per_hq": 24454
+      },
+      {
+        "week": "CW03-2026",
+        "spend": 102820,
+        "fti": 7.0,
+        "qualified": 6,
+        "hq": 2,
+        "cost_per_fti": 14689,
+        "cost_per_qualified": 17137,
+        "cost_per_hq": 51410
+      },
+      {
+        "week": "CW04-2026",
+        "spend": 97738,
+        "fti": 6.6,
+        "qualified": 5,
+        "hq": 3,
+        "cost_per_fti": 14809,
+        "cost_per_qualified": 19548,
+        "cost_per_hq": 32579
+      },
+      {
+        "week": "CW05-2026",
+        "spend": 116431,
+        "fti": null,
+        "qualified": 8,
+        "hq": 4,
+        "cost_per_fti": null,
+        "cost_per_qualified": 14554,
+        "cost_per_hq": 29108
+      },
+      {
+        "week": "CW06-2026",
+        "spend": 96885,
+        "fti": 3.1,
+        "qualified": 8,
+        "hq": 5,
+        "cost_per_fti": 31253,
+        "cost_per_qualified": 12111,
+        "cost_per_hq": 19377
+      },
+      {
+        "week": "CW07-2026",
+        "spend": 127862,
+        "fti": 3.0,
+        "qualified": 3,
+        "hq": 3,
+        "cost_per_fti": 42621,
+        "cost_per_qualified": 42621,
+        "cost_per_hq": 42621
+      },
+      {
+        "week": "CW08-2026",
+        "spend": 81518,
+        "fti": 1.0,
+        "qualified": 2,
+        "hq": 2,
+        "cost_per_fti": 81518,
+        "cost_per_qualified": 40759,
+        "cost_per_hq": 40759
+      },
+      {
+        "week": "CW09-2026",
+        "spend": 43967,
+        "fti": null,
+        "qualified": 5,
+        "hq": 1,
+        "cost_per_fti": null,
+        "cost_per_qualified": 8793,
+        "cost_per_hq": 43967
+      },
+      {
+        "week": "CW10-2026",
+        "spend": 94748,
+        "fti": 2.0,
+        "qualified": 5,
+        "hq": 4,
+        "cost_per_fti": 47374,
+        "cost_per_qualified": 18950,
+        "cost_per_hq": 23687
+      },
+      {
+        "week": "CW11-2026",
+        "spend": 102911,
+        "fti": 1.0,
+        "qualified": 3,
+        "hq": 3,
+        "cost_per_fti": 102911,
+        "cost_per_qualified": 34304,
+        "cost_per_hq": 34304
+      },
+      {
+        "week": "CW12-2026",
+        "spend": 102588,
+        "fti": null,
+        "qualified": 4,
+        "hq": 4,
+        "cost_per_fti": null,
+        "cost_per_qualified": 25647,
+        "cost_per_hq": 25647
+      },
+      {
+        "week": "CW13-2026",
+        "spend": 93942,
+        "fti": 1.0,
+        "qualified": 3,
+        "hq": 2,
+        "cost_per_fti": 93942,
+        "cost_per_qualified": 31314,
+        "cost_per_hq": 46971
+      },
+      {
+        "week": "CW14-2026",
+        "spend": 86686,
+        "fti": null,
+        "qualified": 5,
+        "hq": 4,
+        "cost_per_fti": null,
+        "cost_per_qualified": 17337,
+        "cost_per_hq": 21672
+      },
+      {
+        "week": "CW15-2026",
+        "spend": 75708,
+        "fti": 2.0,
+        "qualified": 2,
+        "hq": 0,
+        "cost_per_fti": 37854,
+        "cost_per_qualified": 37854,
+        "cost_per_hq": null
+      }
+    ],
+    "ROW": [
+      {
+        "week": "CW08-2026",
+        "spend": 13066,
+        "fti": null,
+        "qualified": 0,
+        "hq": 0,
+        "cost_per_fti": null,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW09-2026",
+        "spend": 13579,
+        "fti": null,
+        "qualified": 0,
+        "hq": 0,
+        "cost_per_fti": null,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW10-2026",
+        "spend": 17351,
+        "fti": null,
+        "qualified": 1,
+        "hq": 0,
+        "cost_per_fti": null,
+        "cost_per_qualified": 17351,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW11-2026",
+        "spend": 21022,
+        "fti": null,
+        "qualified": 0,
+        "hq": 0,
+        "cost_per_fti": null,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW12-2026",
+        "spend": 32718,
+        "fti": null,
+        "qualified": 0,
+        "hq": 0,
+        "cost_per_fti": null,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW13-2026",
+        "spend": 36968,
+        "fti": null,
+        "qualified": 1,
+        "hq": 1,
+        "cost_per_fti": null,
+        "cost_per_qualified": 36968,
+        "cost_per_hq": 36968
+      },
+      {
+        "week": "CW14-2026",
+        "spend": 20854,
+        "fti": null,
+        "qualified": 0,
+        "hq": 0,
+        "cost_per_fti": null,
+        "cost_per_qualified": null,
+        "cost_per_hq": null
+      },
+      {
+        "week": "CW15-2026",
+        "spend": 43968,
+        "fti": null,
+        "qualified": 0,
+        "hq": 1,
+        "cost_per_fti": null,
+        "cost_per_qualified": null,
+        "cost_per_hq": 43968
+      }
+    ]
   }
 }
