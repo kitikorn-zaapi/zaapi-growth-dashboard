@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zaapi · Search Diagnosis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:            #ffffff;
+      --bg-subtle:     #f7f7f5;
+      --bg-card:       #ffffff;
+      --border:        #e8e6e1;
+      --border-strong: #d0cec8;
+      --text:          #1a1916;
+      --text-muted:    #7a786f;
+      --text-faint:    #b0ada5;
+      --accent:        #0f9e75;
+      --accent-bg:     #e6f7f1;
+      --up:            #1a7a4a;
+      --up-bg:         #e8f7ee;
+      --down:          #c0392b;
+      --down-bg:       #fdecea;
+      --warn:          #9a6200;
+      --warn-bg:       #fef3dc;
+      --font-sans:     'DM Sans', system-ui, sans-serif;
+      --font-mono:     'DM Mono', 'Courier New', monospace;
+    }
+
+    html { font-size: 15px; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-weight: 400;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 2rem 5rem;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .page-title {
+      font-size: 1.35rem;
+      font-weight: 300;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .nav-link {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-faint);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 5px 10px;
+      align-self: flex-start;
+    }
+    .nav-link:hover { color: var(--text-muted); border-color: var(--border-strong); }
+
+    /* ── Controls ── */
+    .controls-bar {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .control-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-faint);
+      margin-right: 0.25rem;
+    }
+
+    .ctrl-btn {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      padding: 4px 10px;
+      border: 1px solid var(--border-strong);
+      border-radius: 5px;
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: none;
+    }
+
+    .ctrl-btn:hover { background: var(--bg); color: var(--text); }
+
+    .ctrl-btn.is-active {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+
+    /* ── Section ── */
+    .section { margin-bottom: 3rem; }
+
+    .section-title {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 1rem;
+    }
+
+    /* ── Charts ── */
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.1rem 1.1rem;
+    }
+
+    .chart-label {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 240px;
+    }
+
+    /* ── Capacity note ── */
+    .capacity-note {
+      font-size: 0.75rem;
+      color: var(--text-faint);
+      font-family: var(--font-mono);
+      margin-top: 0.6rem;
+    }
+
+    /* ── AI Suggestion card ── */
+    .suggestion-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .suggestion-header {
+      background: var(--bg-subtle);
+      padding: 0.65rem 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .suggestion-header-title {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .confidence-badge {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .conf-high   { background: var(--up-bg);   color: var(--up); }
+    .conf-medium { background: var(--warn-bg);  color: var(--warn); }
+    .conf-low    { background: var(--bg-subtle); color: var(--text-muted); }
+
+    .suggestion-body {
+      padding: 1.1rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .sug-block {}
+
+    .sug-block-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-faint);
+      margin-bottom: 0.35rem;
+    }
+
+    .sug-block-value {
+      font-size: 0.88rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .sug-action {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--accent);
+    }
+
+    /* ── Divider ── */
+    .divider { height: 1px; background: var(--border); margin: 2.5rem 0; }
+
+    /* ── Log table ── */
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    thead th {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      text-align: left;
+      padding: 0 0.75rem 0.6rem;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody tr:hover { background: var(--bg-subtle); }
+
+    tbody td {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    tbody tr:last-child td { border-bottom: none; }
+
+    td.week-col {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    td.signal-col { color: var(--text); }
+
+    td.action-col {
+      font-style: italic;
+      color: var(--text-muted);
+    }
+
+    .result-pill {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 500;
+      padding: 1px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+
+    .result-good    { background: var(--up-bg);   color: var(--up); }
+    .result-mixed   { background: var(--warn-bg);  color: var(--warn); }
+    .result-bad     { background: var(--down-bg);  color: var(--down); }
+    .result-pending { background: var(--bg-subtle); color: var(--text-faint); }
+
+    /* ── Empty states ── */
+    .empty-state {
+      padding: 2rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-faint);
+      font-family: var(--font-mono);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 760px) {
+      .page { padding: 1.5rem 1rem 3rem; }
+      .suggestion-body { grid-template-columns: 1fr; gap: 0.75rem; }
+      .controls-bar { gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <header class="header">
+    <div>
+      <div class="logo">Zaapi · Growth Dashboard</div>
+      <div class="page-title">Search Diagnosis</div>
+    </div>
+    <a class="nav-link" href="index.html">← Overview</a>
+  </header>
+
+  <!-- Controls -->
+  <div class="controls-bar">
+    <div class="control-group" id="region-controls">
+      <span class="control-label">Region</span>
+      <button class="ctrl-btn is-active" data-region="Global">Global</button>
+      <button class="ctrl-btn" data-region="TH">TH</button>
+      <button class="ctrl-btn" data-region="SEA">SEA</button>
+      <button class="ctrl-btn" data-region="ROW">ROW</button>
+    </div>
+    <div class="control-group" id="range-controls">
+      <span class="control-label">Range</span>
+      <button class="ctrl-btn is-active" data-range="L4W">L4W</button>
+      <button class="ctrl-btn" data-range="L8W">L8W</button>
+      <button class="ctrl-btn" data-range="L12W">L12W</button>
+      <button class="ctrl-btn" data-range="MAX">MAX</button>
+    </div>
+  </div>
+
+  <!-- Graph 1: Performance -->
+  <div class="section">
+    <div class="section-title">Performance</div>
+    <div class="chart-card">
+      <div class="chart-label">FTI · HQ+ · Spend (USD)</div>
+      <div class="chart-wrap">
+        <canvas id="perf-chart" role="img" aria-label="Line chart showing FTI, HQ+, and Spend over selected time range">No data.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graph 2: Capacity -->
+  <div class="section">
+    <div class="section-title">Capacity</div>
+    <div class="chart-card">
+      <div class="chart-label">IS % · Lost IS (rank) %</div>
+      <div class="chart-wrap">
+        <canvas id="cap-chart" role="img" aria-label="Line chart showing Impression Share and Lost IS rank">No data.</canvas>
+      </div>
+      <div class="capacity-note" id="cap-note"></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- AI Suggestion -->
+  <div class="section">
+    <div class="section-title">This week's suggestion</div>
+    <div class="suggestion-card">
+      <div class="suggestion-header">
+        <span class="suggestion-header-title">AI Diagnosis</span>
+        <span class="confidence-badge" id="conf-badge">—</span>
+      </div>
+      <div class="suggestion-body">
+        <div class="sug-block">
+          <div class="sug-block-label">Signal</div>
+          <div class="sug-block-value" id="sug-signal">Loading…</div>
+        </div>
+        <div class="sug-block">
+          <div class="sug-block-label">Suggestion</div>
+          <div class="sug-block-value sug-action" id="sug-action">—</div>
+        </div>
+        <div class="sug-block">
+          <div class="sug-block-label">Confidence</div>
+          <div class="sug-block-value" id="sug-confidence">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Weekly Log -->
+  <div class="section">
+    <div class="section-title">Weekly log</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Week</th>
+            <th>Region</th>
+            <th>Signal</th>
+            <th>AI Suggestion</th>
+            <th>Action Taken</th>
+            <th>Result (7d)</th>
+            <th>Learning</th>
+          </tr>
+        </thead>
+        <tbody id="log-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="search.js"></script>
+</body>
+</html>
