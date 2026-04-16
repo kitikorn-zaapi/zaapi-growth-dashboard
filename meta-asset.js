@@ -417,11 +417,11 @@ function renderPatternAnalysis(rows) {
     return;
   }
 
+  const convRows = spendRows.filter((row) => row.fti > 0);
   const benchmarks = {
     avgHook: average(spendRows, (row) => row.hook_rate),
-    avgThumb: average(spendRows, (row) => row.thumb_stop),
-    avgFti: average(spendRows, (row) => row.fti),
-    avgCpa: average(spendRows, (row) => row.cpa)
+    avgFti: convRows.length ? average(convRows, (row) => row.fti) : 0,
+    avgCpa: convRows.length ? average(convRows, (row) => row.cpa) : 0
   };
 
   const axes = [
@@ -440,12 +440,12 @@ function renderAxisBlock(spendRows, axis, benchmarks) {
   const groups = aggregateByAxis(spendRows, axis.key, benchmarks);
   const cards = groups.map((group) => renderPatternCard(group)).join("");
   const ranked = groups
-    .filter((group) => group.adsCount >= 3)
-    .sort((a, b) => (b.avgFti - a.avgFti) || (b.avgHookRate - a.avgHookRate));
+    .filter((group) => group.n >= 3 && group.avgFti !== null)
+    .sort((a, b) => (b.avgFti - a.avgFti) || (b.avgHook - a.avgHook));
 
   const rankingHtml = ranked.length
     ? `<div class="pattern-ranking"><strong>Ranked (n ≥ 3):</strong><ol>${ranked
-      .map((group) => `<li>${escapeHtml(group.name)} · FTI ${formatNumber(group.avgFti)} · Hook ${formatPercent(group.avgHookRate)}</li>`)
+      .map((group) => `<li>${escapeHtml(group.name)} · FTI ${formatNumber(group.avgFti)} · Hook ${formatPercent(group.avgHook)}</li>`)
       .join("")}</ol></div>`
     : '<div class="pattern-ranking">No groups meet ranking threshold (n ≥ 3).</div>';
 
@@ -461,71 +461,111 @@ function renderAxisBlock(spendRows, axis, benchmarks) {
 function aggregateByAxis(rows, axisKey, benchmarks) {
   const groups = new Map();
 
-  rows.forEach((row) => {
-    const rawName = (row[axisKey] || "").trim();
-    const name = rawName || "Unspecified";
-    if (!groups.has(name)) {
-      groups.set(name, { name, rows: [] });
-    }
-    groups.get(name).rows.push(row);
+  rows.forEach(row => {
+    const name = (row[axisKey] || "").trim() || "Unspecified";
+    if (!groups.has(name)) groups.set(name, []);
+    groups.get(name).push(row);
   });
 
-  return Array.from(groups.values())
-    .map((group) => {
-      const tofRows = group.rows.filter((row) => String(row.stage || "").trim() === "Awareness");
-      const bofRows = group.rows.filter((row) => String(row.stage || "").trim() === "Conversion");
-      const adsCount = group.rows.length;
-      const avgHookRate = average(tofRows, (row) => row.hook_rate);
-      const avgThumbStop = average(tofRows, (row) => row.thumb_stop);
-      const avgFti = average(bofRows, (row) => row.fti);
-      const avgCpa = average(bofRows, (row) => row.cpa);
-      const tofStrong = avgHookRate >= benchmarks.avgHook;
-      const bofStrong = avgFti >= benchmarks.avgFti && avgCpa <= benchmarks.avgCpa;
-      let diagnosis = "WEAK";
+  return Array.from(groups.entries()).map(([name, grp]) => {
+    const n = grp.length;
 
-      if (adsCount === 1) {
-        diagnosis = "INSUFFICIENT DATA";
-      } else if (tofStrong && bofStrong) {
-        diagnosis = "STRONG";
-      } else if (tofStrong && !bofStrong) {
-        diagnosis = "HOOK WORKS";
-      } else if (!tofStrong && bofStrong) {
-        diagnosis = "NICHE";
-      }
+    const avgHook = average(grp, r => r.hook_rate);
+    const avgThumb = average(grp, r => r.thumb_stop);
 
+    const convGrp = grp.filter(r => r.fti > 0);
+
+    const avgFti = convGrp.length ? average(convGrp, r => r.fti) : null;
+    const avgCpa = convGrp.length ? average(convGrp, r => r.cpa) : null;
+
+    if (n === 1) {
       return {
-        name: group.name,
-        adsCount,
-        totalSpend: group.rows.reduce((sum, row) => sum + row.spend, 0),
-        avgHookRate,
-        avgThumbStop,
+        name,
+        n,
+        avgHook,
+        avgThumb,
         avgFti,
         avgCpa,
-        confidence: confidenceLabel(adsCount),
-        diagnosis,
-        benchmarkDeltaHook: percentDelta(avgHookRate, benchmarks.avgHook),
-        benchmarkDeltaFti: percentDelta(avgFti, benchmarks.avgFti),
-        benchmarkDeltaCpa: percentDelta(avgCpa, benchmarks.avgCpa)
+        tofSignal: "Data point only",
+        bofSignal: "No reliable signal",
+        diagnosis: "Insufficient data — do not conclude",
+        diagClass: "verdict-neutral",
+        confidence: confidenceLabel(n)
       };
-    })
-    .sort((a, b) => b.adsCount - a.adsCount || b.totalSpend - a.totalSpend);
+    }
+
+    const tofStrong = avgHook >= benchmarks.avgHook;
+    const tofSignal = tofStrong
+      ? `Hook ${avgHook.toFixed(0)}% — above avg (${benchmarks.avgHook.toFixed(0)}%) ✓`
+      : `Hook ${avgHook.toFixed(0)}% — below avg (${benchmarks.avgHook.toFixed(0)}%)`;
+
+    let bofSignal;
+    let bofStrong = false;
+
+    if (!convGrp.length) {
+      bofSignal = "No conversions yet";
+    } else {
+      const ftiVsAvg = benchmarks.avgFti > 0
+        ? ((avgFti - benchmarks.avgFti) / benchmarks.avgFti * 100)
+        : 0;
+      const sign = ftiVsAvg >= 0 ? "+" : "";
+
+      bofStrong = avgFti >= benchmarks.avgFti && avgCpa <= benchmarks.avgCpa;
+      bofSignal = avgFti >= benchmarks.avgFti
+        ? `FTI ${avgFti.toFixed(0)} — above avg ${sign}${ftiVsAvg.toFixed(0)}% ✓`
+        : `FTI ${avgFti.toFixed(0)} — below avg ${sign}${ftiVsAvg.toFixed(0)}%`;
+    }
+
+    let diagnosis;
+    let diagClass;
+
+    if (tofStrong && bofStrong) {
+      diagnosis = "Working — strong TOF and BOF";
+      diagClass = "verdict-strong";
+    } else if (tofStrong && !convGrp.length) {
+      diagnosis = "Strong hook — no conversion data yet";
+      diagClass = "verdict-mixed";
+    } else if (tofStrong && !bofStrong) {
+      diagnosis = "Strong hook — weak conversion";
+      diagClass = "verdict-mixed";
+    } else if (!tofStrong && bofStrong) {
+      diagnosis = "Weak hook — strong conversion (niche)";
+      diagClass = "verdict-mixed";
+    } else {
+      diagnosis = "Weak on both layers";
+      diagClass = "verdict-weak";
+    }
+
+    return {
+      name,
+      n,
+      avgHook,
+      avgThumb,
+      avgFti,
+      avgCpa,
+      tofSignal,
+      bofSignal,
+      diagnosis,
+      diagClass,
+      confidence: confidenceLabel(n)
+    };
+  }).sort((a, b) => b.n - a.n);
 }
 
 function renderPatternCard(group) {
   const confidenceClass = `confidence-${group.confidence.toLowerCase()}`;
-  const diagnosisClass = diagnosisClassName(group.diagnosis);
-  const caution = group.adsCount < 3 ? " ⚠" : "";
+  const caution = group.n < 3 ? " ⚠" : "";
 
   return `
     <article class="pattern-card">
       <div class="pattern-name">${escapeHtml(group.name)}</div>
-      <div class="pattern-meta">n=${group.adsCount} · <span class="${confidenceClass}">${group.confidence} confidence${caution}</span></div>
+      <div class="pattern-meta">n=${group.n} · <span class="${confidenceClass}">${group.confidence} confidence${caution}</span></div>
       <div class="pattern-metrics">
-        <div>TOF: Hook ${formatPercent(group.avgHookRate)} · Thumb ${formatPercent(group.avgThumbStop)}</div>
-        <div>BOF: FTI ${formatNumber(group.avgFti)} · CPA ${formatCurrency(group.avgCpa)}</div>
+        <div>TOF: Hook ${formatPercent(group.avgHook)} · Thumb ${formatPercent(group.avgThumb)}</div>
+        <div>BOF: FTI ${group.avgFti === null ? "—" : formatNumber(group.avgFti)} · CPA ${group.avgCpa === null ? "—" : formatCurrency(group.avgCpa)}</div>
       </div>
-      <div class="pattern-benchmark">vs benchmark: Hook ${formatSignedPercent(group.benchmarkDeltaHook)} · FTI ${formatSignedPercent(group.benchmarkDeltaFti)} · CPA ${formatSignedPercent(group.benchmarkDeltaCpa)}</div>
-      <div class="pattern-verdict ${diagnosisClass}">DIAGNOSIS: ${group.diagnosis}</div>
+      <div class="pattern-benchmark">TOF signal: ${group.tofSignal} · BOF signal: ${group.bofSignal}</div>
+      <div class="pattern-verdict ${group.diagClass}">DIAGNOSIS: ${group.diagnosis}</div>
     </article>
   `;
 }
@@ -583,12 +623,6 @@ function confidenceLabel(adsCount) {
   if (adsCount === 1) return "Low";
   if (adsCount === 2) return "Medium";
   return "High";
-}
-
-function diagnosisClassName(diagnosis) {
-  if (diagnosis === "STRONG") return "verdict-scale";
-  if (diagnosis === "WEAK") return "verdict-kill";
-  return "verdict-fix";
 }
 
 function percentDelta(value, benchmark) {
