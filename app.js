@@ -7,6 +7,8 @@ let spendChart = null;
 let ftiChart = null;
 let outcomeChart = null;
 let efficiencyChart = null;
+let selectedRange = "L4W";
+let selectedRegion = "Global";
 
 function toUSD(thb, rate) {
   return thb / rate;
@@ -225,24 +227,28 @@ function getFilteredHistory(history, range) {
 }
 
 function renderGraphs(data) {
-  const history = Array.isArray(data.history) ? data.history : [];
-  if (!history.length || typeof Chart === "undefined") return;
+  if (typeof Chart === "undefined") return;
   const rate = data.forex_rate || FOREX_DEFAULT;
+  const regionHistoryMap = data.history_by_region || {};
+  const baseHistory = selectedRegion === "Global"
+    ? (Array.isArray(data.history) ? data.history : [])
+    : (Array.isArray(regionHistoryMap[selectedRegion]) ? regionHistoryMap[selectedRegion] : []);
+  const history = getFilteredHistory(baseHistory, selectedRange);
+  const labels = history.map(h => h.week);
 
-  const buildDatasets = {
-    ads: rows => ({
+  const buildDatasets = rows => ({
+    ads: {
       spend: [
         { label: "Spend", data: rows.map(h => typeof h.spend === "number" ? h.spend / rate : null), borderColor: "#2d7ff9", backgroundColor: "#2d7ff9", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 },
-        { label: "Spend Target", data: rows.map(h => typeof h.spend_target === "number" ? h.spend_target / rate : null), borderColor: "#5aa1ff", backgroundColor: "#5aa1ff", borderWidth: 2, borderDash: [5, 4], pointRadius: 1.5, pointHoverRadius: 3, tension: 0.15 },
-        { label: "Spend L4W Avg", data: rows.map(h => typeof h.spend_l4w_avg === "number" ? h.spend_l4w_avg / rate : null), borderColor: "#9cbce8", backgroundColor: "#9cbce8", borderWidth: 2, borderDash: [3, 3], pointRadius: 1.5, pointHoverRadius: 3, tension: 0.15 }
+        { label: "Spend Target", data: rows.map(h => typeof h.spend_target === "number" ? h.spend_target / rate : null), borderColor: "#5aa1ff", backgroundColor: "#5aa1ff", borderWidth: 2, borderDash: [5, 4], pointRadius: 1.5, pointHoverRadius: 3, tension: 0.15 }
       ],
       fti: [
         { label: "FTI", data: rows.map(h => h.fti), borderColor: "#0f9e75", backgroundColor: "#0f9e75", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 },
-        { label: "FTI Google", data: rows.map(h => h.fti_google), borderColor: "#4ac39e", backgroundColor: "#4ac39e", borderWidth: 2, pointRadius: 1.5, pointHoverRadius: 3, tension: 0.15 },
-        { label: "FTI Meta", data: rows.map(h => h.fti_meta), borderColor: "#79d6bb", backgroundColor: "#79d6bb", borderWidth: 2, pointRadius: 1.5, pointHoverRadius: 3, tension: 0.15 }
+        { label: "FTI Google", data: rows.map(h => typeof h.fti_google === "number" ? h.fti_google : null), borderColor: "#4ac39e", backgroundColor: "#4ac39e", borderWidth: 2, pointRadius: 1.5, pointHoverRadius: 3, tension: 0.15 },
+        { label: "FTI Meta", data: rows.map(h => typeof h.fti_meta === "number" ? h.fti_meta : null), borderColor: "#79d6bb", backgroundColor: "#79d6bb", borderWidth: 2, pointRadius: 1.5, pointHoverRadius: 3, tension: 0.15 }
       ]
-    }),
-    business: rows => ({
+    },
+    business: {
       outcome: [
         { label: "Qualified", data: rows.map(h => h.qualified), borderColor: "#ff8a00", backgroundColor: "#ff8a00", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 },
         { label: "HQ+", data: rows.map(h => h.hq), borderColor: "#8d5cf6", backgroundColor: "#8d5cf6", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 }
@@ -252,66 +258,54 @@ function renderGraphs(data) {
         { label: "Cost per Qualified", data: rows.map(h => typeof h.cost_per_qualified === "number" ? h.cost_per_qualified / rate : null), borderColor: "#ff8a00", backgroundColor: "#ff8a00", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 },
         { label: "Cost per HQ+", data: rows.map(h => typeof h.cost_per_hq === "number" ? h.cost_per_hq / rate : null), borderColor: "#8d5cf6", backgroundColor: "#8d5cf6", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 }
       ]
-    })
+    }
+  });
+
+  const datasets = buildDatasets(history);
+
+  if (spendChart) spendChart.destroy();
+  if (ftiChart) ftiChart.destroy();
+  if (outcomeChart) outcomeChart.destroy();
+  if (efficiencyChart) efficiencyChart.destroy();
+
+  spendChart = buildChart(document.getElementById("spend-chart"), labels, datasets.ads.spend, true);
+  ftiChart = buildChart(document.getElementById("fti-chart"), labels, datasets.ads.fti, false);
+  outcomeChart = buildChart(document.getElementById("outcome-chart"), labels, datasets.business.outcome, false);
+  efficiencyChart = buildChart(document.getElementById("efficiency-chart"), labels, datasets.business.efficiency, true);
+}
+
+function setupGraphFilters(data) {
+  const timeButtons = Array.from(document.querySelectorAll("#time-range-controls [data-range]"));
+  const regionButtons = Array.from(document.querySelectorAll("#region-controls [data-region]"));
+
+  const markActive = (buttons, currentValue, key) => {
+    buttons.forEach(btn => {
+      const isActive = btn.dataset[key] === currentValue;
+      btn.classList.toggle("is-active", isActive);
+      btn.setAttribute("aria-pressed", String(isActive));
+    });
   };
 
-  const rows = [
-    {
-      toggleId: "ads-toggle",
-      rangeId: "ads-range",
-      contentId: "ads-graphs",
-      render: filteredHistory => {
-        const labels = filteredHistory.map(h => h.week);
-        const datasets = buildDatasets.ads(filteredHistory);
-        if (spendChart) spendChart.destroy();
-        if (ftiChart) ftiChart.destroy();
-        spendChart = buildChart(document.getElementById("spend-chart"), labels, datasets.spend, true);
-        ftiChart = buildChart(document.getElementById("fti-chart"), labels, datasets.fti, false);
-      }
-    },
-    {
-      toggleId: "business-toggle",
-      rangeId: "business-range",
-      contentId: "business-graphs",
-      render: filteredHistory => {
-        const labels = filteredHistory.map(h => h.week);
-        const datasets = buildDatasets.business(filteredHistory);
-        if (outcomeChart) outcomeChart.destroy();
-        if (efficiencyChart) efficiencyChart.destroy();
-        outcomeChart = buildChart(document.getElementById("outcome-chart"), labels, datasets.outcome, false);
-        efficiencyChart = buildChart(document.getElementById("efficiency-chart"), labels, datasets.efficiency, true);
-      }
-    }
-  ];
+  markActive(timeButtons, selectedRange, "range");
+  markActive(regionButtons, selectedRegion, "region");
 
-  rows.forEach(row => {
-    const toggle = document.getElementById(row.toggleId);
-    const range = document.getElementById(row.rangeId);
-    const content = document.getElementById(row.contentId);
-
-    const rerender = () => row.render(getFilteredHistory(history, range.value));
-    if (toggle.dataset.bound === "true") {
-      if (!content.hasAttribute("hidden")) rerender();
-      return;
-    }
-
-    toggle.dataset.bound = "true";
-    toggle.addEventListener("click", () => {
-      const hidden = content.hasAttribute("hidden");
-      if (hidden) {
-        content.removeAttribute("hidden");
-        toggle.textContent = "Hide";
-        toggle.setAttribute("aria-expanded", "true");
-        rerender();
-      } else {
-        content.setAttribute("hidden", "hidden");
-        toggle.textContent = "Show";
-        toggle.setAttribute("aria-expanded", "false");
-      }
+  timeButtons.forEach(btn => {
+    if (btn.dataset.bound === "true") return;
+    btn.dataset.bound = "true";
+    btn.addEventListener("click", () => {
+      selectedRange = btn.dataset.range || "L4W";
+      markActive(timeButtons, selectedRange, "range");
+      renderGraphs(data);
     });
+  });
 
-    range.addEventListener("change", () => {
-      if (!content.hasAttribute("hidden")) rerender();
+  regionButtons.forEach(btn => {
+    if (btn.dataset.bound === "true") return;
+    btn.dataset.bound = "true";
+    btn.addEventListener("click", () => {
+      selectedRegion = btn.dataset.region || "Global";
+      markActive(regionButtons, selectedRegion, "region");
+      renderGraphs(data);
     });
   });
 }
@@ -334,6 +328,7 @@ async function init() {
   renderRegions(data);
   renderInsights(data);
   renderNextStep(data);
+  setupGraphFilters(data);
   renderGraphs(data);
 
   document.getElementById("forex-rate").value = data.forex_rate || FOREX_DEFAULT;

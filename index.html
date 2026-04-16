@@ -230,6 +230,29 @@
       gap: 0.5rem;
     }
 
+    .graph-top-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .control-label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+    }
+
     .graph-toggle {
       border: 1px solid var(--border-strong);
       background: var(--bg-subtle);
@@ -244,6 +267,7 @@
     }
 
     .graph-toggle:hover { background: #f1f1ef; }
+    .graph-toggle.is-active { background: var(--accent-bg); border-color: #bde9d8; color: #0d7c5d; }
 
     .graph-range {
       border: 1px solid var(--border-strong);
@@ -432,20 +456,27 @@
 
     <section class="section">
       <div class="section-title">Performance graphs</div>
+      <div class="graph-top-controls">
+        <div class="control-group" id="region-controls" role="group" aria-label="Region filter">
+          <span class="control-label">Region</span>
+          <button class="graph-toggle is-active" type="button" data-region="Global" aria-pressed="true">Global</button>
+          <button class="graph-toggle" type="button" data-region="TH" aria-pressed="false">TH</button>
+          <button class="graph-toggle" type="button" data-region="SEA" aria-pressed="false">SEA</button>
+          <button class="graph-toggle" type="button" data-region="ROW" aria-pressed="false">ROW</button>
+        </div>
+        <div class="control-group" id="time-range-controls" role="group" aria-label="Time range filter">
+          <span class="control-label">Range</span>
+          <button class="graph-toggle is-active" type="button" data-range="L4W" aria-pressed="true">L4W</button>
+          <button class="graph-toggle" type="button" data-range="L8W" aria-pressed="false">L8W</button>
+          <button class="graph-toggle" type="button" data-range="L12W" aria-pressed="false">L12W</button>
+          <button class="graph-toggle" type="button" data-range="MAX" aria-pressed="false">MAX</button>
+        </div>
+      </div>
       <div class="graph-row">
         <div class="graph-row-controls">
           <div class="graph-row-title">Row 1 · Ads Layer</div>
-          <div class="graph-controls-right">
-            <select id="ads-range" class="graph-range" aria-label="Ads layer range">
-              <option value="L4W">L4W</option>
-              <option value="L8W">L8W</option>
-              <option value="L12W">L12W</option>
-              <option value="MAX">MAX</option>
-            </select>
-            <button id="ads-toggle" class="graph-toggle" type="button" aria-expanded="false" aria-controls="ads-graphs">Show</button>
-          </div>
         </div>
-        <div id="ads-graphs" class="graph-grid" hidden>
+        <div id="ads-graphs" class="graph-grid">
           <div class="chart-card">
             <div class="chart-title">Graph A · Spend (Budget View)</div>
             <div class="chart-canvas-wrap">
@@ -464,17 +495,8 @@
       <div class="graph-row">
         <div class="graph-row-controls">
           <div class="graph-row-title">Row 2 · Business Layer</div>
-          <div class="graph-controls-right">
-            <select id="business-range" class="graph-range" aria-label="Business layer range">
-              <option value="L4W">L4W</option>
-              <option value="L8W">L8W</option>
-              <option value="L12W">L12W</option>
-              <option value="MAX">MAX</option>
-            </select>
-            <button id="business-toggle" class="graph-toggle" type="button" aria-expanded="false" aria-controls="business-graphs">Show</button>
-          </div>
         </div>
-        <div id="business-graphs" class="graph-grid" hidden>
+        <div id="business-graphs" class="graph-grid">
           <div class="chart-card">
             <div class="chart-title">Graph C · Outcome</div>
             <div class="chart-canvas-wrap">
