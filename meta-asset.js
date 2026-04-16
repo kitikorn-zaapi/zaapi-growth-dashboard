@@ -1,5 +1,6 @@
 const SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSVufnWJeLLw5gPzY35xMd4M3-NPdeEIgnHQHJ5PjuESKootN4ZpuNanI-KMcdphPnqRI6iu80wynFR/pub?gid=526174207&single=true&output=csv";
-const PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(SHEETS_CSV_URL)}`;
+const PROXY_URL = `https://allorigins.win/raw?url=${encodeURIComponent(SHEETS_CSV_URL)}`;
+const FALLBACK_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(SHEETS_CSV_URL)}`;
 
 const NUMERIC_FIELDS = ["spend", "hook_rate", "thumb_stop", "frequency", "ctr", "fti", "cpa"];
 const EXPECTED_COLUMNS = ["ad_code", "status", "region", "prod", "angle", "feature1", "stage", "spend", "hook_rate", "thumb_stop", "frequency", "ctr", "fti", "cpa", "assessment"];
@@ -29,7 +30,15 @@ sortByEl.addEventListener("change", (event) => {
 async function init() {
   try {
     const response = await fetch(PROXY_URL);
-    const csvText = await response.text();
+    let csvText = await response.text();
+    console.log("FETCH RESPONSE:", csvText.slice(0, 200));
+
+    if (!response.ok || !csvText.includes(",")) {
+      const fallbackResponse = await fetch(FALLBACK_PROXY_URL);
+      csvText = await fallbackResponse.text();
+      console.log("FETCH RESPONSE:", csvText.slice(0, 200));
+    }
+
     state.rows = parseCsv(csvText);
     render();
   } catch (error) {
@@ -48,15 +57,19 @@ function parseCsv(csvText) {
     .filter((line) => line.length > 0)
     .map((line) => line.split(",").map((cell) => cell.trim()));
 
+  console.log("ROWS:", rows.length);
+
   if (rows.length < 2) return [];
 
   const rawHeaders = rows[0].map((header) => normalizeKey(header));
+  console.log("HEADERS:", rawHeaders);
+  console.log("FIRST ROW:", rows[1]);
   const headerMap = EXPECTED_COLUMNS.map((column) => {
     const idx = rawHeaders.indexOf(column);
     return { column, idx };
   });
 
-  return rows.slice(1).map((cells) => {
+  const data = rows.slice(1).map((cells) => {
     const row = {};
 
     headerMap.forEach(({ column, idx }) => {
@@ -70,6 +83,9 @@ function parseCsv(csvText) {
     row.status = classifyStatus(row);
     return row;
   });
+
+  console.log("PARSED DATA SAMPLE:", data[0]);
+  return data;
 }
 
 function toNumber(value) {
@@ -105,6 +121,7 @@ function getFilteredAndSortedRows() {
 
 function render() {
   const rows = getFilteredAndSortedRows();
+  console.log("DATA TO RENDER:", rows.length);
   renderLeaderboard(rows);
   renderFatigue(rows);
   renderNextTest(rows);
