@@ -45,10 +45,10 @@ document.addEventListener("click", (event) => {
   const toggleButton = event.target.closest(".img-toggle");
   if (!toggleButton) return;
 
-  const code = toggleButton.dataset.code;
-  if (!code) return;
+  const id = toggleButton.getAttribute("data-id");
+  if (!id) return;
 
-  const el = document.getElementById(`img-${codeToDomId(code)}`);
+  const el = document.getElementById(`preview-${id}`);
   if (!el) return;
 
   el.classList.toggle("hidden");
@@ -59,6 +59,7 @@ document.addEventListener("click", (event) => {
     if (img && !img.getAttribute("src")) {
       img.src = img.dataset.src;
       img.onerror = () => {
+        const code = toggleButton.getAttribute("data-code") || "UNKNOWN";
         img.parentElement.innerHTML = `<div class="placeholder">${escapeHtml(code)}</div>`;
       };
     }
@@ -286,7 +287,7 @@ function renderFatigue(rows) {
 
             return `
               <tr>
-                <td>${renderAdPreview(row.ad_code || "-")}</td>
+                <td>${renderAdPreview(row.ad_code || "-", "s2")}</td>
                 <td>${escapeHtml(row.region || "-")}</td>
                 <td>${row.hook_rate.toFixed(1)}%</td>
                 <td>${row.frequency.toFixed(2)}</td>
@@ -312,7 +313,7 @@ function renderNextTest(rows) {
 
   nextTestEl.innerHTML = `
     <div>
-      ${renderAdPreview(adCode)}
+      ${renderAdPreview(adCode, "s3")}
       <div style="margin-top:8px;">Winner: <strong>${escapeHtml(adCode)}</strong> (${winner.fti.toFixed(2)} FTI, $${winner.cpa.toFixed(2)} CPA)</div>
       <div>→ Suggested next: test new angle</div>
     </div>
@@ -356,7 +357,7 @@ function snapshotItem(row, avgFti, avgCpa, avgHookRate) {
 
   return `
     <article class="snapshot-item">
-      ${renderAdPreview(row.ad_code || "-")}
+      ${renderAdPreview(row.ad_code || "-", "s4")}
       <div class="snapshot-metric">
         <span>FTI: ${row.fti.toFixed(2)}</span>
         <span class="delta ${deltaClass(deltaFti)}">${formatSignedPercent(deltaFti)}</span>
@@ -373,23 +374,23 @@ function snapshotItem(row, avgFti, avgCpa, avgHookRate) {
   `;
 }
 
-function renderAdPreview(adCode) {
+function renderAdPreview(adCode, section) {
   const safeCode = escapeHtml(adCode || "-");
-  const domId = codeToDomId(adCode || "-");
+  const domId = codeToDomId(adCode || "-", section || "section");
 
   return `
     <div class="ad-header">
       <span class="ad-code">${safeCode}</span>
-      <button class="img-toggle" type="button" data-code="${safeCode}" aria-label="Toggle preview for ${safeCode}">▼</button>
+      <button id="toggle-${domId}" class="img-toggle" type="button" data-id="${domId}" data-code="${safeCode}" aria-label="Toggle preview for ${safeCode}">▼</button>
     </div>
-    <div class="img-preview hidden" id="img-${domId}">
+    <div class="img-preview hidden" id="preview-${domId}">
       <img alt="${safeCode}" data-src="/zaapi-growth-dashboard/assets/${encodeURIComponent(adCode || "-")}.webp" loading="lazy" />
     </div>
   `;
 }
 
-function codeToDomId(code) {
-  return String(code || "-").replace(/[^a-zA-Z0-9_-]/g, "-");
+function codeToDomId(ad_code, section) {
+  return `${section}-${ad_code}`.replace(/[^a-zA-Z0-9-_]/g, "");
 }
 
 function deltaClass(deltaValue) {
