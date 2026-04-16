@@ -1,6 +1,6 @@
 const SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSVufnWJeLLw5gPzY35xMd4M3-NPdeEIgnHQHJ5PjuESKootN4ZpuNanI-KMcdphPnqRI6iu80wynFR/pub?gid=526174207&single=true&output=csv";
-const PROXY_URL = `https://allorigins.win/raw?url=${encodeURIComponent(SHEETS_CSV_URL)}`;
-const FALLBACK_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(SHEETS_CSV_URL)}`;
+const PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(SHEETS_CSV_URL)}`;
+const FALLBACK_PROXY_URL = `https://allorigins.win/raw?url=${encodeURIComponent(SHEETS_CSV_URL)}`;
 
 const NUMERIC_FIELDS = ["spend", "hook_rate", "thumb_stop", "frequency", "ctr", "fti", "cpa"];
 const EXPECTED_COLUMNS = ["ad_code", "status", "region", "prod", "angle", "feature1", "stage", "spend", "hook_rate", "thumb_stop", "frequency", "ctr", "fti", "cpa", "assessment"];
@@ -29,14 +29,19 @@ sortByEl.addEventListener("change", (event) => {
 
 async function init() {
   try {
-    const response = await fetch(PROXY_URL);
+    let response = await fetch(PROXY_URL);
     let csvText = await response.text();
     console.log("FETCH RESPONSE:", csvText.slice(0, 200));
 
     if (!response.ok || !csvText.includes(",")) {
       const fallbackResponse = await fetch(FALLBACK_PROXY_URL);
+      response = fallbackResponse;
       csvText = await fallbackResponse.text();
       console.log("FETCH RESPONSE:", csvText.slice(0, 200));
+    }
+
+    if (!response.ok || !csvText.includes(",")) {
+      throw new Error("Invalid CSV response from proxy");
     }
 
     state.rows = parseCsv(csvText);
@@ -55,7 +60,7 @@ function parseCsv(csvText) {
     .split("\n")
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
-    .map((line) => line.split(",").map((cell) => cell.trim()));
+    .map((line) => splitCsvRow(line).map((cell) => cell.replace(/^"|"$/g, "").trim()));
 
   console.log("ROWS:", rows.length);
 
@@ -89,9 +94,13 @@ function parseCsv(csvText) {
 }
 
 function toNumber(value) {
-  const cleaned = String(value).replace(/[^0-9.-]/g, "");
-  const parsed = Number(cleaned);
-  return Number.isFinite(parsed) ? parsed : 0;
+  if (!value) return 0;
+  return parseFloat(
+    String(value)
+      .replace(/[$,%]/g, "")
+      .replace(/,/g, "")
+      .trim()
+  ) || 0;
 }
 
 function normalizeKey(value) {
@@ -99,11 +108,15 @@ function normalizeKey(value) {
 }
 
 function classifyStatus(row) {
+  if (row.spend === 0) return "Pending";
   if (row.hook_rate < 15 || row.ctr < 0.8 || (row.fti === 0 && row.spend > 15)) return "Kill";
   if (row.hook_rate > 35 && row.fti >= 2) return "Scale";
   if (row.fti > 0 && row.fti < 2) return "Watch";
-  if (row.spend === 0) return "Pending";
   return "Live";
+}
+
+function splitCsvRow(row) {
+  return row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
 }
 
 function getFilteredAndSortedRows() {
