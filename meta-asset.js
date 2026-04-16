@@ -28,6 +28,30 @@ sortByEl.addEventListener("change", (event) => {
   render();
 });
 
+document.addEventListener("click", (event) => {
+  const toggleButton = event.target.closest(".img-toggle");
+  if (!toggleButton) return;
+
+  const code = toggleButton.dataset.code;
+  if (!code) return;
+
+  const el = document.getElementById(`img-${codeToDomId(code)}`);
+  if (!el) return;
+
+  el.classList.toggle("hidden");
+  toggleButton.textContent = el.classList.contains("hidden") ? "▼" : "▲";
+
+  if (!el.classList.contains("hidden")) {
+    const img = el.querySelector("img[data-src]");
+    if (img && !img.getAttribute("src")) {
+      img.src = img.dataset.src;
+      img.onerror = () => {
+        img.parentElement.innerHTML = `<div class="placeholder">${escapeHtml(code)}</div>`;
+      };
+    }
+  }
+});
+
 async function init() {
   let csvText = "";
 
@@ -248,7 +272,7 @@ function renderFatigue(rows) {
 
             return `
               <tr>
-                <td>${escapeHtml(row.ad_code || "-")}</td>
+                <td>${renderAdPreview(row.ad_code || "-")}</td>
                 <td>${escapeHtml(row.region || "-")}</td>
                 <td>${row.hook_rate.toFixed(1)}%</td>
                 <td>${row.frequency.toFixed(2)}</td>
@@ -272,7 +296,13 @@ function renderNextTest(rows) {
   const winner = [...candidates].sort((a, b) => b.fti - a.fti)[0];
   const adCode = winner.ad_code || "-";
 
-  nextTestEl.innerHTML = `Winner: <strong>${escapeHtml(adCode)}</strong> (${winner.fti.toFixed(2)} FTI, $${winner.cpa.toFixed(2)} CPA)<br>→ Suggested next: test new angle`;
+  nextTestEl.innerHTML = `
+    <div>
+      ${renderAdPreview(adCode)}
+      <div style="margin-top:8px;">Winner: <strong>${escapeHtml(adCode)}</strong> (${winner.fti.toFixed(2)} FTI, $${winner.cpa.toFixed(2)} CPA)</div>
+      <div>→ Suggested next: test new angle</div>
+    </div>
+  `;
 }
 
 function renderPerformanceSnapshot(rows) {
@@ -312,7 +342,7 @@ function snapshotItem(row, avgFti, avgCpa, avgHookRate) {
 
   return `
     <article class="snapshot-item">
-      <div class="snapshot-ad">${escapeHtml(row.ad_code || "-")}</div>
+      ${renderAdPreview(row.ad_code || "-")}
       <div class="snapshot-metric">
         <span>FTI: ${row.fti.toFixed(2)}</span>
         <span class="delta ${deltaClass(deltaFti)}">${formatSignedPercent(deltaFti)}</span>
@@ -327,6 +357,25 @@ function snapshotItem(row, avgFti, avgCpa, avgHookRate) {
       </div>
     </article>
   `;
+}
+
+function renderAdPreview(adCode) {
+  const safeCode = escapeHtml(adCode || "-");
+  const domId = codeToDomId(adCode || "-");
+
+  return `
+    <div class="ad-header">
+      <span class="ad-code">${safeCode}</span>
+      <button class="img-toggle" type="button" data-code="${safeCode}" aria-label="Toggle preview for ${safeCode}">▼</button>
+    </div>
+    <div class="img-preview hidden" id="img-${domId}">
+      <img alt="${safeCode}" data-src="/zaapi-growth-dashboard/assets/${encodeURIComponent(adCode || "-")}.webp" loading="lazy" />
+    </div>
+  `;
+}
+
+function codeToDomId(code) {
+  return String(code || "-").replace(/[^a-zA-Z0-9_-]/g, "-");
 }
 
 function deltaClass(deltaValue) {
