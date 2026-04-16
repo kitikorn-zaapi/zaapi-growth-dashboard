@@ -170,33 +170,53 @@
       padding: 0.8rem;
     }
 
+    .aspect-ratio,
     .thumb-wrap {
       width: 100%;
-      aspect-ratio: 1.25;
-      border-radius: 6px;
+      aspect-ratio: 9 / 16;
+      background: var(--bg-subtle);
       border: 1px solid var(--border);
       overflow: hidden;
-      background: #efefef;
+      border-radius: 8px;
+      position: relative;
       margin-bottom: 0.7rem;
     }
 
-    .thumb-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
 
+    .placeholder,
     .img-placeholder {
       width: 100%;
       height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #d9d9d9;
-      color: #555;
       font-family: var(--font-mono);
-      font-size: 0.82rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: var(--bg-subtle);
+      text-align: center;
+      padding: 0.4rem;
+    }
+
+    .img-placeholder {
+      color: #555;
+      background: #d9d9d9;
+      font-family: var(--font-mono);
       font-weight: 500;
       letter-spacing: 0.04em;
       text-transform: uppercase;
-      text-align: center;
-      padding: 0.4rem;
+    }
+
+    .asset-card:hover img {
+      transform: scale(1.03);
+      transition: transform 0.2s ease;
     }
 
     .row-top {
@@ -290,6 +310,63 @@
       font-size: 0.95rem;
     }
 
+    .snapshot-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.8rem;
+    }
+
+    .snapshot-col {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-subtle);
+      padding: 0.8rem;
+    }
+
+    .snapshot-title {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-faint);
+      margin-bottom: 0.55rem;
+    }
+
+    .snapshot-item {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      padding: 0.6rem;
+    }
+
+    .snapshot-item + .snapshot-item { margin-top: 0.55rem; }
+
+    .snapshot-ad {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 0.35rem;
+      color: var(--text);
+    }
+
+    .snapshot-metric {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.6rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .delta {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      white-space: nowrap;
+    }
+
+    .delta-positive { color: var(--up); }
+    .delta-negative { color: var(--down); }
+    .delta-neutral { color: var(--text-faint); }
+
     .empty {
       border: 1px dashed var(--border-strong);
       border-radius: 8px;
@@ -300,6 +377,7 @@
 
     @media (max-width: 920px) {
       .header { flex-direction: column; }
+      .snapshot-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -355,6 +433,11 @@
     <section class="section">
       <h2 class="section-title">Section 3 — Next Test Suggestion</h2>
       <div id="next-test" class="next-box"></div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Section 4 — Performance Snapshot</h2>
+      <div id="performance-snapshot"></div>
     </section>
   </main>
 
