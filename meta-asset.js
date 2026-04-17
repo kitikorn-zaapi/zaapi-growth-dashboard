@@ -2,8 +2,62 @@ const SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSVufnWJ
 const PROXY_URL = `https://corsproxy.io/?${encodeURIComponent(SHEETS_CSV_URL)}`;
 const FALLBACK_PROXY_URL = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(SHEETS_CSV_URL)}`;
 
-const NUMERIC_FIELDS = ["spend", "hook_rate", "thumb_stop", "frequency", "cpm", "ctr", "fti", "cpa"];
-const EXPECTED_COLUMNS = ["ad_code", "status", "objective", "region", "prod", "angle", "feature1", "spend", "hook_rate", "thumb_stop", "frequency", "cpm", "ctr", "fti", "cpa", "assessment"];
+const NUMERIC_FIELDS = [
+  "spend",
+  "hook_rate",
+  "thumb_stop",
+  "frequency",
+  "cpm",
+  "ctr",
+  "fti",
+  "cpa",
+  "spend_tof_lw",
+  "hook_rate_lw",
+  "frequency_lw",
+  "cpm_lw",
+  "spend_bof_lw",
+  "fti_lw",
+  "cpa_lw",
+  "spend_tof_pw",
+  "hook_rate_pw",
+  "frequency_pw",
+  "cpm_pw",
+  "spend_bof_pw",
+  "fti_pw",
+  "cpa_pw"
+];
+const EXPECTED_COLUMNS = [
+  "ad_code",
+  "status",
+  "region",
+  "prod",
+  "angle",
+  "feature1",
+  "spend",
+  "hook_rate",
+  "thumb_stop",
+  "frequency",
+  "cpm",
+  "ctr",
+  "fti",
+  "cpa",
+  "assessment",
+  "objective",
+  "spend_tof_lw",
+  "hook_rate_lw",
+  "frequency_lw",
+  "cpm_lw",
+  "spend_bof_lw",
+  "fti_lw",
+  "cpa_lw",
+  "spend_tof_pw",
+  "hook_rate_pw",
+  "frequency_pw",
+  "cpm_pw",
+  "spend_bof_pw",
+  "fti_pw",
+  "cpa_pw"
+];
 
 const state = {
   rows: [],
@@ -209,7 +263,7 @@ function render() {
   const mergedRows = mergeByAdCode(rows);
 
   renderLeaderboard(rows);
-  renderFatigue(mergedRows);
+  renderFatigue(rows);
   renderNextTest(mergedRows);
   renderPerformanceSnapshot(mergedRows);
   renderPatternAnalysis(rows);
@@ -358,7 +412,65 @@ function getLeaderboardRows(rows) {
 }
 
 function renderFatigue(rows) {
-  const fatigueRows = rows.filter((row) => row.frequency > 2.5 || (row.hook_rate < 15 && row.spend > 0));
+  const fatigueRows = rows
+    .map((row) => {
+      const objective = normalizeObjective(row.objective);
+      const isBof = objective === "BOF";
+      const spendLw = isBof ? row.spend_bof_lw : row.spend_tof_lw;
+
+      if (spendLw === 0) {
+        return {
+          row,
+          spendLw,
+          issue: "No spend last week",
+          issueDetail: "No spend last week — data unreliable",
+          spendAlert: true
+        };
+      }
+
+      if (isBof) {
+        const ftiDelta = row.fti_lw - row.fti_pw;
+        const cpaDelta = row.cpa_lw > 0 && row.cpa_pw > 0
+          ? ((row.cpa_lw - row.cpa_pw) / row.cpa_pw) * 100
+          : null;
+        const issues = [];
+
+        if (ftiDelta < 0 && cpaDelta !== null && cpaDelta > 20) {
+          issues.push("BOF deteriorating");
+        }
+
+        if (!issues.length) return null;
+        return {
+          row,
+          spendLw,
+          issue: issues.join(" · "),
+          issueDetail: issues.join(" · "),
+          spendAlert: false
+        };
+      }
+
+      const hookDelta = row.hook_rate_lw - row.hook_rate_pw;
+      const freqDelta = row.frequency_lw - row.frequency_pw;
+      const cpmDelta = row.cpm_lw > 0 && row.cpm_pw > 0
+        ? ((row.cpm_lw - row.cpm_pw) / row.cpm_pw) * 100
+        : null;
+      const issues = [];
+
+      if (hookDelta < -5 && freqDelta > 0.4) issues.push("Confirmed fatigue");
+      if (hookDelta < -5) issues.push("Hook declining");
+      if (freqDelta > 0.4) issues.push("Frequency rising");
+      if (cpmDelta !== null && cpmDelta > 40) issues.push(`CPM rising (+${cpmDelta.toFixed(1)}%)`);
+
+      if (!issues.length) return null;
+      return {
+        row,
+        spendLw,
+        issue: issues.join(" · "),
+        issueDetail: issues.join(" · "),
+        spendAlert: false
+      };
+    })
+    .filter(Boolean);
 
   if (!fatigueRows.length) {
     fatigueEl.innerHTML = '<div class="empty">All clear — no fatigue signals this week.</div>';
@@ -372,24 +484,36 @@ function renderFatigue(rows) {
           <tr>
             <th>Ad Code</th>
             <th>Region</th>
-            <th>Hook Rate</th>
-            <th>Frequency</th>
+            <th>Hook LW</th>
+            <th>Hook PW</th>
+            <th>Freq LW</th>
+            <th>Freq PW</th>
+            <th>Spend LW</th>
             <th>Issue</th>
           </tr>
         </thead>
         <tbody>
-          ${fatigueRows.map((row) => {
-            const issue = row.frequency > 2.5
-              ? "High frequency"
-              : "Low hook rate with spend";
+          ${fatigueRows.map((entry) => {
+            const row = entry.row;
+            const isBof = normalizeObjective(row.objective) === "BOF";
+            const metricLw1 = isBof ? row.fti_lw.toFixed(2) : `${row.hook_rate_lw.toFixed(1)}%`;
+            const metricPw1 = isBof ? row.fti_pw.toFixed(2) : `${row.hook_rate_pw.toFixed(1)}%`;
+            const metricLw2 = isBof ? `$${row.cpa_lw.toFixed(2)}` : row.frequency_lw.toFixed(2);
+            const metricPw2 = isBof ? `$${row.cpa_pw.toFixed(2)}` : row.frequency_pw.toFixed(2);
+            const spendCellClass = entry.spendAlert ? ' class="delta-negative"' : "";
+            const issueText = entry.spendAlert ? "No spend last week" : entry.issue;
+            const titleText = isBof ? "BOF row: columns represent FTI/CPA LW vs PW" : "TOF row: columns represent Hook/Frequency LW vs PW";
 
             return `
               <tr>
                 <td>${renderAdPreview(row.ad_code || "-", "s2")}</td>
                 <td>${escapeHtml(row.region || "-")}</td>
-                <td>${row.hook_rate.toFixed(1)}%</td>
-                <td>${row.frequency.toFixed(2)}</td>
-                <td>${issue}</td>
+                <td title="${titleText}">${metricLw1}</td>
+                <td title="${titleText}">${metricPw1}</td>
+                <td title="${titleText}">${metricLw2}</td>
+                <td title="${titleText}">${metricPw2}</td>
+                <td${spendCellClass}>$${entry.spendLw.toFixed(2)}</td>
+                <td>${issueText}</td>
               </tr>
             `;
           }).join("")}
