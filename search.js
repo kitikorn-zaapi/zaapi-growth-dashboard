@@ -4,13 +4,18 @@
 // ─────────────────────────────────────────────
 
 const FOREX_DEFAULT = 34;
+const SEARCH_IS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSVufnWJeLLw5gPzY35xMd4M3-NPdeEIgnHQHJ5PjuESKootN4ZpuNanI-KMcdphPnqRI6iu80wynFR/pub?gid=1254072844&single=true&output=csv";
+const SEARCH_IS_PROXY_URL = `https://corsproxy.io/?${encodeURIComponent(SEARCH_IS_CSV_URL)}`;
+const SEARCH_IS_FALLBACK_PROXY_URL = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(SEARCH_IS_CSV_URL)}`;
 
 // ── State ─────────────────────────────────────
 let selectedRegion = "Global";
 let selectedRange  = "L4W";
 let appData        = null;
+let searchIsData   = [];
 let perfChart      = null;
 let capChart       = null;
+let capWonChart    = null;
 
 // ── Weekly log (hardcoded, updated manually) ──
 const WEEKLY_LOG = [
@@ -112,6 +117,95 @@ function getHistory(data) {
     if (!base.length) base = Array.isArray(data.history) ? data.history : [];
   }
   return { rows: getFilteredHistory(base, selectedRange), rate };
+}
+
+function splitCsvRow(line) {
+  const result = [];
+  let cur = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        cur += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (ch === "," && !inQuotes) {
+      result.push(cur.trim());
+      cur = "";
+    } else {
+      cur += ch;
+    }
+  }
+
+  result.push(cur.trim());
+  return result;
+}
+
+function normalizeKey(value) {
+  return String(value || "").trim().toLowerCase().replace(/\s+/g, "_");
+}
+
+function parseNumeric(value) {
+  return parseFloat(
+    String(value || "")
+      .replace(/[$,]/g, "")
+      .trim()
+  ) || 0;
+}
+
+function parseSearchIsCsv(csvText) {
+  const lines = String(csvText || "")
+    .split("\n")
+    .map((line) => line.replace(/\r$/, "").trim())
+    .filter((line) => line.length > 0);
+
+  if (lines.length < 2) return [];
+
+  const rows = lines.map((line) => splitCsvRow(line).map((cell) => cell.replace(/^"|"$/g, "").trim()));
+  const headers = rows[0].map(normalizeKey);
+  const idx = (key) => headers.indexOf(key);
+
+  const regionIdx = idx("region");
+  const weekDateIdx = idx("week_date");
+  const lostIsRankIdx = idx("lost_is_rank");
+  const isWonIdx = idx("is_won");
+  const lostIsBudgetIdx = idx("lost_is_budget");
+  const spendIdx = idx("spend");
+  const imprIdx = idx("impr");
+  const clicksIdx = idx("clicks");
+
+  return rows.slice(1).map((cells) => ({
+    region: (cells[regionIdx] || "").trim(),
+    week_date: (cells[weekDateIdx] || "").trim(),
+    lost_is_rank: parseNumeric(cells[lostIsRankIdx]),
+    is_won: parseNumeric(cells[isWonIdx]),
+    lost_is_budget: parseNumeric(cells[lostIsBudgetIdx]),
+    spend: parseNumeric(cells[spendIdx]),
+    impr: parseNumeric(cells[imprIdx]),
+    clicks: parseNumeric(cells[clicksIdx])
+  })).filter((row) => row.region && row.week_date);
+}
+
+async function fetchSearchIsData() {
+  let csvText = "";
+  let res = await fetch(SEARCH_IS_PROXY_URL);
+  csvText = await res.text();
+
+  if (!res.ok || csvText.trim().startsWith("<")) {
+    res = await fetch(SEARCH_IS_FALLBACK_PROXY_URL);
+    csvText = await res.text();
+  }
+
+  if (csvText.trim().startsWith("<") || !csvText.includes(",")) {
+    throw new Error("Both proxies failed — invalid Search IS CSV response");
+  }
+
+  return parseSearchIsCsv(csvText);
 }
 
 // ── Charts ────────────────────────────────────
@@ -267,37 +361,36 @@ function renderPerfChart(rows, rate) {
 // For single region: show just that region's Lost IS trend.
 // Time window is the same as the performance chart.
 
-function getRegionCapacityData(data) {
-  const byRegion = data.history_by_region || {};
+function getRegionCapacityData(metricKey) {
   const allRegions = ["TH", "SEA", "ROW"];
   const regions = selectedRegion === "Global" ? allRegions : [selectedRegion];
 
-  // Collect filtered history per region
+  // Collect and sort history per region from Search IS CSV
   const seriesMap = {};
   regions.forEach(reg => {
-    const base = Array.isArray(byRegion[reg]) ? byRegion[reg] : [];
+    const base = searchIsData
+      .filter((row) => row.region === reg)
+      .sort((a, b) => String(a.week_date).localeCompare(String(b.week_date)));
     seriesMap[reg] = getFilteredHistory(base, selectedRange);
   });
 
   // Build a unified sorted label set across all regions
   const weekSet = new Set();
-  Object.values(seriesMap).forEach(rows => rows.forEach(r => weekSet.add(r.week)));
-  const labels = Array.from(weekSet).sort((a, b) => {
-    const parse = w => { const m = w.match(/CW(\d+)-(\d+)/); return m ? parseInt(m[2]) * 100 + parseInt(m[1]) : 0; };
-    return parse(a) - parse(b);
-  });
+  Object.values(seriesMap).forEach(rows => rows.forEach(r => weekSet.add(r.week_date)));
+  const labels = Array.from(weekSet).sort((a, b) => String(a).localeCompare(String(b)));
 
   // For each region build a value array aligned to labels
   const regionColors = { TH: "#0f9e75", SEA: "#2d7ff9", ROW: "#e24b4a" };
+  const metricLabel = metricKey === "is_won" ? "IS Won %" : "Lost IS rank %";
 
   const datasets = regions.map(reg => {
     const rowMap = {};
-    seriesMap[reg].forEach(r => { rowMap[r.week] = r; });
+    seriesMap[reg].forEach(r => { rowMap[r.week_date] = r; });
     return {
-      label: `${reg} Lost IS rank %`,
+      label: `${reg} ${metricLabel}`,
       data: labels.map(wk => {
         const r = rowMap[wk];
-        return r && typeof r.lost_is_rank === "number" ? r.lost_is_rank : null;
+        return r && typeof r[metricKey] === "number" ? r[metricKey] : null;
       }),
       borderColor: regionColors[reg] || "#888",
       backgroundColor: regionColors[reg] || "#888",
@@ -315,7 +408,9 @@ function getRegionCapacityData(data) {
 
 function renderCapChart(rows) {
   if (capChart) { capChart.destroy(); capChart = null; }
+  if (capWonChart) { capWonChart.destroy(); capWonChart = null; }
   const ctx = document.getElementById("cap-chart");
+  const wonCtx = document.getElementById("cap-chart-won");
   const noteEl = document.getElementById("cap-note");
 
   // Current-week snapshot note
@@ -330,14 +425,18 @@ function renderCapChart(rows) {
     noteEl.textContent = `Current week: ${parts}`;
   }
 
-  const { labels, datasets } = getRegionCapacityData(appData);
+  const { labels, datasets } = getRegionCapacityData("lost_is_rank");
+  const { labels: wonLabels, datasets: wonDatasets } = getRegionCapacityData("is_won");
 
   if (!labels.length) {
-    noteEl.textContent += "  ·  No historical IS data in data.json yet.";
+    noteEl.textContent += "  ·  No historical IS data in Search_IS_performance yet.";
     return;
   }
 
   capChart = buildChart(ctx, labels, datasets, "Lost IS rank %", null);
+  if (wonLabels.length) {
+    capWonChart = buildChart(wonCtx, wonLabels, wonDatasets, "IS Won %", null);
+  }
 }
 
 // ── AI Suggestion (deterministic rule-based) ──
@@ -525,11 +624,15 @@ function refresh(data) {
 async function init() {
   let data;
   try {
-    const res = await fetch("data.json");
-    data = await res.json();
+    const [dataRes, searchRows] = await Promise.all([
+      fetch("data.json"),
+      fetchSearchIsData()
+    ]);
+    data = await dataRes.json();
+    searchIsData = searchRows;
   } catch (e) {
     document.body.innerHTML = `<div style="padding:2rem;font-family:monospace;color:#c00">
-      Failed to load data.json — make sure it's in the same folder as search.html.<br>${e}
+      Failed to load dashboard data (data.json or Search IS CSV).<br>${e}
     </div>`;
     return;
   }
