@@ -62,7 +62,8 @@ const EXPECTED_COLUMNS = [
 const state = {
   rows: [],
   region: "All",
-  sortBy: "fti_desc"
+  sortBy: "fti_desc",
+  allAdsSort: { key: "fti", direction: "desc" }
 };
 
 const leaderboardEl = document.getElementById("leaderboard");
@@ -70,6 +71,7 @@ const fatigueEl = document.getElementById("fatigue");
 const nextTestEl = document.getElementById("next-test");
 const performanceSnapshotEl = document.getElementById("performance-snapshot");
 const patternAnalysisEl = document.getElementById("pattern-analysis");
+const allAdsTableEl = document.getElementById("all-ads-table");
 const regionFilterEl = document.getElementById("region-filter");
 const sortByEl = document.getElementById("sort-by");
 const patternTabs = Array.from(document.querySelectorAll(".pattern-tab"));
@@ -96,19 +98,50 @@ patternTabs.forEach((tab) => {
 });
 
 document.addEventListener("click", (event) => {
-  const fatigueToggleButton = event.target.closest("[data-fatigue-toggle]");
-  if (fatigueToggleButton) {
-    const targetId = fatigueToggleButton.getAttribute("data-target");
+  const genericToggleButton = event.target.closest("[data-target]");
+  if (genericToggleButton && (genericToggleButton.hasAttribute("data-fatigue-toggle") || genericToggleButton.hasAttribute("data-leaderboard-toggle") || genericToggleButton.hasAttribute("data-legend-toggle"))) {
+    const targetId = genericToggleButton.getAttribute("data-target");
     if (!targetId) return;
 
-    const extraRows = document.getElementById(targetId);
-    if (!extraRows) return;
+    const target = document.getElementById(targetId);
+    if (!target) return;
 
-    const hidden = extraRows.classList.toggle("hidden");
-    const moreCount = Number(fatigueToggleButton.getAttribute("data-more-count") || "0");
-    fatigueToggleButton.textContent = hidden
-      ? `Show more (${moreCount} more)`
-      : "Show less";
+    const hidden = target.classList.toggle("hidden");
+    const moreCount = Number(genericToggleButton.getAttribute("data-more-count") || "0");
+
+    if (genericToggleButton.hasAttribute("data-legend-toggle")) {
+      genericToggleButton.textContent = hidden ? "What do these metrics mean?" : "Hide metric definitions";
+    } else {
+      genericToggleButton.textContent = hidden
+        ? `Show more (${moreCount} more)`
+        : "Show less";
+    }
+    return;
+  }
+
+  const allAdsSortButton = event.target.closest("[data-allads-sort]");
+  if (allAdsSortButton) {
+    const key = allAdsSortButton.getAttribute("data-allads-sort");
+    if (!key) return;
+
+    if (state.allAdsSort.key === key) {
+      state.allAdsSort.direction = state.allAdsSort.direction === "asc" ? "desc" : "asc";
+    } else {
+      state.allAdsSort.key = key;
+      state.allAdsSort.direction = "desc";
+    }
+
+    render();
+    return;
+  }
+
+  const assessmentToggle = event.target.closest("[data-assessment-toggle]");
+  if (assessmentToggle) {
+    const isExpanded = assessmentToggle.getAttribute("data-expanded") === "true";
+    assessmentToggle.textContent = isExpanded
+      ? assessmentToggle.getAttribute("data-short") || ""
+      : assessmentToggle.getAttribute("data-full") || "";
+    assessmentToggle.setAttribute("data-expanded", isExpanded ? "false" : "true");
     return;
   }
 
@@ -135,6 +168,7 @@ document.addEventListener("click", (event) => {
     }
   }
 });
+
 
 async function init() {
   let csvText = "";
@@ -293,6 +327,7 @@ function render() {
   renderNextTest(mergedRows);
   renderPerformanceSnapshot(mergedRows);
   renderPatternAnalysis(rows);
+  renderAllAdsTable(rows);
 }
 
 
@@ -341,22 +376,30 @@ function mergeByAdCode(rows) {
 
 function renderLeaderboard(rows) {
   const groupedRows = getLeaderboardRows(rows);
+  const extraGridId = "leaderboard-extra-grid";
+  const toggleBtnId = "leaderboard-toggle-btn";
+  document.getElementById(extraGridId)?.remove();
+  document.getElementById(toggleBtnId)?.remove();
 
   if (!groupedRows.length) {
     leaderboardEl.innerHTML = '<div class="empty">No assets found for this region.</div>';
     return;
   }
 
-  leaderboardEl.innerHTML = groupedRows.map((group) => {
+  const visibleCards = groupedRows.slice(0, 3);
+  const hiddenCards = groupedRows.slice(3);
+  const renderCard = (group) => {
     const adCode = group.ad_code || "UNKNOWN";
     const tofRow = group.tofRow;
     const bofRow = group.bofRow;
     const baseRow = tofRow || bofRow || {};
-    const status = baseRow.status || "Live";
+    const tofStatus = tofRow?.status || "Not launched";
+    const bofStatus = bofRow?.status || "Not launched";
     const assessment = baseRow.assessment || "No assessment";
     const region = baseRow.region || "-";
     const prod = baseRow.prod || "-";
     const angle = baseRow.angle || "-";
+    const shortAssessment = truncateText(assessment, 60);
 
     return `
       <article class="asset-card">
@@ -365,7 +408,10 @@ function renderLeaderboard(rows) {
         </div>
         <div class="row-top">
           <div class="ad-code">${escapeHtml(adCode)}</div>
-          <span class="status status-${status.toLowerCase()}">${status}</span>
+          <div style="display:flex; gap:0.35rem; flex-wrap:wrap; justify-content:flex-end;">
+            <span class="status ${getStatusClass(tofStatus)}">TOF: ${escapeHtml(tofStatus)}</span>
+            <span class="status ${getStatusClass(bofStatus)}">BOF: ${escapeHtml(bofStatus)}</span>
+          </div>
         </div>
         <div class="pills">
           <span class="pill">${escapeHtml(region)}</span>
@@ -387,10 +433,19 @@ function renderLeaderboard(rows) {
           ${metricCell("Spend", `$${group.spend.toFixed(2)}`)}
         </div>
         <div class="verdict">→ ${escapeHtml(getVerdictText(tofRow, bofRow))}</div>
-        <p class="assessment" title="Click to expand/collapse">${escapeHtml(assessment)}</p>
+        <p class="assessment" data-assessment-toggle="true" data-short="${escapeHtml(shortAssessment)}" data-full="${escapeHtml(assessment)}" data-expanded="false" title="Click to expand/collapse">${escapeHtml(shortAssessment)}</p>
       </article>
     `;
-  }).join("");
+  };
+
+  leaderboardEl.innerHTML = visibleCards.map(renderCard).join("");
+
+  if (hiddenCards.length) {
+    leaderboardEl.insertAdjacentHTML(
+      "afterend",
+      `<div id="${extraGridId}" class="leaderboard hidden" style="margin-top:0.8rem;">${hiddenCards.map(renderCard).join("")}</div><button id="${toggleBtnId}" type="button" class="nav-btn" data-leaderboard-toggle="true" data-target="${extraGridId}" data-more-count="${hiddenCards.length}" style="margin-top:0.6rem;">Show more (${hiddenCards.length} more)</button>`
+    );
+  }
 
   leaderboardEl.querySelectorAll(".thumb-wrap img").forEach((img) => {
     const wrapper = img.parentElement;
@@ -400,12 +455,6 @@ function renderLeaderboard(rows) {
     img.addEventListener("error", () => {
       wrapper.innerHTML = `<div class="placeholder">${escapeHtml(adCode)}</div>`;
     }, { once: true });
-  });
-
-  leaderboardEl.querySelectorAll(".assessment").forEach((assessment) => {
-    assessment.addEventListener("click", () => {
-      assessment.classList.toggle("expanded");
-    });
   });
 }
 
@@ -719,6 +768,95 @@ function formatSignedPoints(value) {
 
 function metricCell(label, value) {
   return `<div><div class="metric-label">${label}</div><div class="metric-value">${value}</div></div>`;
+}
+
+
+function renderAllAdsTable(rows) {
+  if (!rows.length) {
+    allAdsTableEl.innerHTML = '<div class="empty">No ads found for this region.</div>';
+    return;
+  }
+
+  const columns = [
+    { key: "ad_code", label: "Ad Code", type: "text" },
+    { key: "objective", label: "Objective", type: "text" },
+    { key: "region", label: "Region", type: "text" },
+    { key: "prod", label: "Prod", type: "text" },
+    { key: "angle", label: "Angle", type: "text" },
+    { key: "feature1", label: "Feature", type: "text" },
+    { key: "status", label: "Status", type: "text" },
+    { key: "spend", label: "Spend", type: "number" },
+    { key: "hook_rate", label: "Hook Rate", type: "number" },
+    { key: "thumb_stop", label: "Thumb Stop", type: "number" },
+    { key: "frequency", label: "Frequency", type: "number" },
+    { key: "cpm", label: "CPM", type: "number" },
+    { key: "ctr", label: "CTR", type: "number" },
+    { key: "fti", label: "FTI", type: "number" },
+    { key: "cpa", label: "CPA", type: "number" },
+    { key: "assessment", label: "Assessment", type: "text" }
+  ];
+
+  const { key: activeSortKey, direction } = state.allAdsSort;
+  const activeColumn = columns.find((column) => column.key === activeSortKey) || columns[13];
+
+  const sortedRows = [...rows].sort((a, b) => {
+    const left = a[activeColumn.key];
+    const right = b[activeColumn.key];
+
+    if (activeColumn.type === "number") {
+      const leftNum = Number(left || 0);
+      const rightNum = Number(right || 0);
+      return direction === "asc" ? leftNum - rightNum : rightNum - leftNum;
+    }
+
+    const leftText = String(left || "").toLowerCase();
+    const rightText = String(right || "").toLowerCase();
+    const compare = leftText.localeCompare(rightText);
+    return direction === "asc" ? compare : -compare;
+  });
+
+  allAdsTableEl.innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            ${columns.map((column) => {
+              const isActive = column.key === activeSortKey;
+              const indicator = isActive ? (direction === "asc" ? " ▲" : " ▼") : "";
+              return `<th><button type="button" data-allads-sort="${column.key}" class="img-toggle" style="font-size:0.7rem; font-family:var(--font-mono); text-transform:uppercase; letter-spacing:0.06em; color:var(--text-faint);">${column.label}${indicator}</button></th>`;
+            }).join("")}
+          </tr>
+        </thead>
+        <tbody>
+          ${sortedRows.map((row, index) => {
+            const assessment = row.assessment || "No assessment";
+            const shortAssessment = truncateText(assessment, 60);
+
+            return `
+              <tr>
+                <td>${renderAdPreview(row.ad_code || "-", `s6-${index}`)}</td>
+                <td>${escapeHtml(row.objective || "-")}</td>
+                <td>${escapeHtml(row.region || "-")}</td>
+                <td>${escapeHtml(row.prod || "-")}</td>
+                <td>${escapeHtml(row.angle || "-")}</td>
+                <td>${escapeHtml(row.feature1 || "-")}</td>
+                <td><span class="status ${getStatusClass(row.status || "Not launched")}">${escapeHtml(row.status || "Not launched")}</span></td>
+                <td>${formatCurrency(row.spend || 0)}</td>
+                <td>${formatPercent(row.hook_rate || 0)}</td>
+                <td>${formatPercent(row.thumb_stop || 0)}</td>
+                <td>${formatNumber(row.frequency || 0)}</td>
+                <td>${formatCurrency(row.cpm || 0)}</td>
+                <td>${formatPercent(row.ctr || 0)}</td>
+                <td>${formatNumber(row.fti || 0)}</td>
+                <td>${formatCurrency(row.cpa || 0)}</td>
+                <td><span class="assessment" data-assessment-toggle="true" data-short="${escapeHtml(shortAssessment)}" data-full="${escapeHtml(assessment)}" data-expanded="false">${escapeHtml(shortAssessment)}</span></td>
+              </tr>
+            `;
+          }).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
 }
 
 function renderPatternAnalysis(rows) {
@@ -1051,6 +1189,21 @@ function formatCurrency(value) {
 
 function formatNumber(value) {
   return value.toFixed(2);
+}
+
+
+function getStatusClass(status) {
+  const normalized = String(status || "").trim().toLowerCase();
+  if (normalized === "kill") return "status-kill";
+  if (normalized === "scale") return "status-scale";
+  if (normalized === "not launched" || normalized === "pending") return "status-pending";
+  return "";
+}
+
+function truncateText(value, maxLength) {
+  const text = String(value || "").trim();
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength)}...`;
 }
 
 function syncPatternTabs() {
