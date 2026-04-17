@@ -206,11 +206,57 @@ function render() {
   const rows = getFilteredAndSortedRows();
   console.log("DATA TO RENDER:", rows.length);
   console.log("REGIONS:", state.rows.slice(0, 10).map((r) => `"${r.region}"`));
+  const mergedRows = mergeByAdCode(rows);
+
   renderLeaderboard(rows);
-  renderFatigue(rows);
-  renderNextTest(rows);
-  renderPerformanceSnapshot(rows);
+  renderFatigue(mergedRows);
+  renderNextTest(mergedRows);
+  renderPerformanceSnapshot(mergedRows);
   renderPatternAnalysis(rows);
+}
+
+
+function mergeByAdCode(rows) {
+  const grouped = new Map();
+
+  rows.forEach((row) => {
+    const adCode = row.ad_code || "UNKNOWN";
+    if (!grouped.has(adCode)) {
+      grouped.set(adCode, { ad_code: adCode, tofRow: null, bofRow: null });
+    }
+
+    const group = grouped.get(adCode);
+    const objective = normalizeObjective(row.objective);
+
+    if (objective === "BOF") {
+      group.bofRow = group.bofRow || row;
+    } else {
+      group.tofRow = group.tofRow || row;
+    }
+  });
+
+  return Array.from(grouped.values()).map((group) => {
+    const tofRow = group.tofRow;
+    const bofRow = group.bofRow;
+    const baseRow = tofRow || bofRow || {};
+
+    return {
+      ad_code: group.ad_code,
+      hook_rate: tofRow?.hook_rate || 0,
+      thumb_stop: tofRow?.thumb_stop || 0,
+      frequency: tofRow?.frequency || 0,
+      cpm: tofRow?.cpm || 0,
+      ctr: bofRow?.ctr || 0,
+      fti: bofRow?.fti || 0,
+      cpa: bofRow?.cpa || 0,
+      spend: (tofRow?.spend || 0) + (bofRow?.spend || 0),
+      region: baseRow.region || "-",
+      prod: baseRow.prod || "-",
+      angle: baseRow.angle || "-",
+      status: baseRow.status || "Live",
+      assessment: baseRow.assessment || "No assessment"
+    };
+  });
 }
 
 function renderLeaderboard(rows) {
