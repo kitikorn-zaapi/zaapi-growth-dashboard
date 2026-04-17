@@ -96,6 +96,22 @@ patternTabs.forEach((tab) => {
 });
 
 document.addEventListener("click", (event) => {
+  const fatigueToggleButton = event.target.closest("[data-fatigue-toggle]");
+  if (fatigueToggleButton) {
+    const targetId = fatigueToggleButton.getAttribute("data-target");
+    if (!targetId) return;
+
+    const extraRows = document.getElementById(targetId);
+    if (!extraRows) return;
+
+    const hidden = extraRows.classList.toggle("hidden");
+    const moreCount = Number(fatigueToggleButton.getAttribute("data-more-count") || "0");
+    fatigueToggleButton.textContent = hidden
+      ? `Show more (${moreCount} more)`
+      : "Show less";
+    return;
+  }
+
   const toggleButton = event.target.closest(".img-toggle");
   if (!toggleButton) return;
 
@@ -210,7 +226,17 @@ function classifyStatus(row) {
   if (!metricEligibleStatuses.has(rawStatus)) return rawStatus || "Pending";
 
   if (row.spend === 0) return "Pending";
-  if (row.hook_rate < 15 || row.ctr < 0.8 || (row.fti === 0 && row.spend > 15)) return "Kill";
+
+  const objective = normalizeObjective(row.objective);
+
+  if (objective === "TOF") {
+    if (row.hook_rate > 0 && row.hook_rate < 15) return "Kill";
+  } else if (objective === "BOF") {
+    if (row.fti === 0 && row.spend > 50) return "Kill";
+  } else {
+    if (row.hook_rate < 15 || row.ctr < 0.8 || (row.fti === 0 && row.spend > 15)) return "Kill";
+  }
+
   if (row.hook_rate > 35 && row.fti >= 2) return "Scale";
   if (row.fti > 0 && row.fti < 2) return "Watch";
   return "Live";
@@ -360,6 +386,7 @@ function renderLeaderboard(rows) {
           ${metricCell("CPA", bofRow ? `$${bofRow.cpa.toFixed(2)}` : "—")}
           ${metricCell("Spend", `$${group.spend.toFixed(2)}`)}
         </div>
+        <div class="verdict">→ ${escapeHtml(getVerdictText(tofRow, bofRow))}</div>
         <p class="assessment" title="Click to expand/collapse">${escapeHtml(assessment)}</p>
       </article>
     `;
@@ -380,6 +407,20 @@ function renderLeaderboard(rows) {
       assessment.classList.toggle("expanded");
     });
   });
+}
+
+function getVerdictText(tofRow, bofRow) {
+  const tofStatus = tofRow?.status || "Not launched";
+  const bofStatus = bofRow?.status || "Not launched";
+
+  if (tofStatus === "Kill" && bofStatus === "Kill") return "Kill both layers";
+  if (tofStatus === "Kill" && bofStatus === "Scale") return "Kill TOF · Scale BOF";
+  if (tofStatus === "Kill" && !bofRow) return "Kill TOF · BOF not launched";
+  if (tofStatus === "Scale" && !bofRow) return "Scale TOF · Launch BOF";
+  if (tofStatus === "Scale" && bofStatus === "Scale") return "Scale both layers";
+  if (tofStatus === "Live" && bofStatus === "Kill") return "Hold TOF · Kill BOF";
+
+  return `TOF: ${tofStatus} · BOF: ${bofStatus}`;
 }
 
 function getLeaderboardRows(rows) {
@@ -413,20 +454,16 @@ function getLeaderboardRows(rows) {
 
 function renderFatigue(rows) {
   const fatigueRows = rows
+    .filter((row) => {
+      const objective = normalizeObjective(row.objective);
+      const isBof = objective === "BOF";
+      const spendLw = isBof ? row.spend_bof_lw : row.spend_tof_lw;
+      return spendLw > 0;
+    })
     .map((row) => {
       const objective = normalizeObjective(row.objective);
       const isBof = objective === "BOF";
       const spendLw = isBof ? row.spend_bof_lw : row.spend_tof_lw;
-
-      if (spendLw === 0) {
-        return {
-          row,
-          spendLw,
-          issue: "No spend last week",
-          issueDetail: "No spend last week — data unreliable",
-          spendAlert: true
-        };
-      }
 
       if (isBof) {
         const ftiDelta = row.fti_lw - row.fti_pw;
@@ -444,8 +481,7 @@ function renderFatigue(rows) {
           row,
           spendLw,
           issue: issues.join(" · "),
-          issueDetail: issues.join(" · "),
-          spendAlert: false
+          issueDetail: issues.join(" · ")
         };
       }
 
@@ -466,60 +502,112 @@ function renderFatigue(rows) {
         row,
         spendLw,
         issue: issues.join(" · "),
-        issueDetail: issues.join(" · "),
-        spendAlert: false
+        issueDetail: issues.join(" · ")
       };
     })
     .filter(Boolean);
 
-  if (!fatigueRows.length) {
+  const sortedFatigueRows = [...fatigueRows].sort((a, b) => getFatigueSeverityScore(b) - getFatigueSeverityScore(a));
+  const tofFatigueRows = sortedFatigueRows.filter((entry) => normalizeObjective(entry.row.objective) === "TOF");
+  const bofFatigueRows = sortedFatigueRows.filter((entry) => normalizeObjective(entry.row.objective) === "BOF");
+
+  if (!tofFatigueRows.length && !bofFatigueRows.length) {
     fatigueEl.innerHTML = '<div class="empty">All clear — no fatigue signals this week.</div>';
     return;
   }
 
   fatigueEl.innerHTML = `
+    <h3 class="axis-title">TOF Fatigue</h3>
+    ${renderFatigueTable("tof", tofFatigueRows)}
+    <h3 class="axis-title" style="margin-top: 1rem;">BOF Fatigue</h3>
+    ${renderFatigueTable("bof", bofFatigueRows)}
+  `;
+}
+
+function getFatigueSeverityScore(entry) {
+  const issue = String(entry.issue || "");
+  const severityKeywords = [
+    "Confirmed fatigue",
+    "Hook declining",
+    "Frequency rising",
+    "CPM rising",
+    "BOF deteriorating"
+  ];
+
+  for (let i = 0; i < severityKeywords.length; i++) {
+    if (issue.includes(severityKeywords[i])) {
+      return severityKeywords.length - i;
+    }
+  }
+
+  return 0;
+}
+
+function renderFatigueTable(type, fatigueEntries) {
+  if (!fatigueEntries.length) {
+    return `<div class="empty">No ${type.toUpperCase()} fatigue signals this week.</div>`;
+  }
+
+  const visibleRows = fatigueEntries.slice(0, 3);
+  const hiddenRows = fatigueEntries.slice(3);
+  const columns = type === "bof"
+    ? ["FTI LW", "FTI PW", "CPA LW", "CPA PW"]
+    : ["Hook LW", "Hook PW", "Freq LW", "Freq PW"];
+  const moreId = `${type}-fatigue-more`;
+
+  return `
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
             <th>Ad Code</th>
             <th>Region</th>
-            <th>Hook LW</th>
-            <th>Hook PW</th>
-            <th>Freq LW</th>
-            <th>Freq PW</th>
+            <th>${columns[0]}</th>
+            <th>${columns[1]}</th>
+            <th>${columns[2]}</th>
+            <th>${columns[3]}</th>
             <th>Spend LW</th>
             <th>Issue</th>
           </tr>
         </thead>
         <tbody>
-          ${fatigueRows.map((entry) => {
-            const row = entry.row;
-            const isBof = normalizeObjective(row.objective) === "BOF";
-            const metricLw1 = isBof ? row.fti_lw.toFixed(2) : `${row.hook_rate_lw.toFixed(1)}%`;
-            const metricPw1 = isBof ? row.fti_pw.toFixed(2) : `${row.hook_rate_pw.toFixed(1)}%`;
-            const metricLw2 = isBof ? `$${row.cpa_lw.toFixed(2)}` : row.frequency_lw.toFixed(2);
-            const metricPw2 = isBof ? `$${row.cpa_pw.toFixed(2)}` : row.frequency_pw.toFixed(2);
-            const spendCellClass = entry.spendAlert ? ' class="delta-negative"' : "";
-            const issueText = entry.spendAlert ? "No spend last week" : entry.issue;
-            const titleText = isBof ? "BOF row: columns represent FTI/CPA LW vs PW" : "TOF row: columns represent Hook/Frequency LW vs PW";
-
-            return `
-              <tr>
-                <td>${renderAdPreview(row.ad_code || "-", "s2")}</td>
-                <td>${escapeHtml(row.region || "-")}</td>
-                <td title="${titleText}">${metricLw1}</td>
-                <td title="${titleText}">${metricPw1}</td>
-                <td title="${titleText}">${metricLw2}</td>
-                <td title="${titleText}">${metricPw2}</td>
-                <td${spendCellClass}>$${entry.spendLw.toFixed(2)}</td>
-                <td>${issueText}</td>
-              </tr>
-            `;
-          }).join("")}
+          ${visibleRows.map((entry) => fatigueTableRow(entry, type)).join("")}
         </tbody>
+        ${hiddenRows.length ? `
+          <tbody id="${moreId}" class="hidden">
+            ${hiddenRows.map((entry) => fatigueTableRow(entry, type)).join("")}
+          </tbody>
+        ` : ""}
       </table>
     </div>
+    ${hiddenRows.length
+      ? `<button type="button" class="nav-btn" data-fatigue-toggle="true" data-target="${moreId}" data-more-count="${hiddenRows.length}" style="margin-top:0.6rem;">Show more (${hiddenRows.length} more)</button>`
+      : ""}
+  `;
+}
+
+function fatigueTableRow(entry, type) {
+  const row = entry.row;
+  const isBof = type === "bof";
+  const metricLw1 = isBof ? row.fti_lw.toFixed(2) : `${row.hook_rate_lw.toFixed(1)}%`;
+  const metricPw1 = isBof ? row.fti_pw.toFixed(2) : `${row.hook_rate_pw.toFixed(1)}%`;
+  const metricLw2 = isBof ? `$${row.cpa_lw.toFixed(2)}` : row.frequency_lw.toFixed(2);
+  const metricPw2 = isBof ? `$${row.cpa_pw.toFixed(2)}` : row.frequency_pw.toFixed(2);
+  const titleText = isBof
+    ? "BOF row: columns represent FTI/CPA LW vs PW"
+    : "TOF row: columns represent Hook/Frequency LW vs PW";
+
+  return `
+    <tr>
+      <td>${renderAdPreview(row.ad_code || "-", "s2")}</td>
+      <td>${escapeHtml(row.region || "-")}</td>
+      <td title="${titleText}">${metricLw1}</td>
+      <td title="${titleText}">${metricPw1}</td>
+      <td title="${titleText}">${metricLw2}</td>
+      <td title="${titleText}">${metricPw2}</td>
+      <td>$${entry.spendLw.toFixed(2)}</td>
+      <td>${entry.issue}</td>
+    </tr>
   `;
 }
 
