@@ -42,11 +42,90 @@
     </label>
   </section>
 
+  <!-- Reference / glossary (collapsible) -->
+  <details class="bg-slate-900 border border-slate-800 rounded p-3">
+    <summary class="cursor-pointer text-sm font-semibold text-slate-200">
+      📖 Reference · what do the angles, metrics, and AI verdicts mean?
+    </summary>
+    <div class="mt-3 grid gap-4 md:grid-cols-3 text-xs">
+
+      <div>
+        <h3 class="font-semibold text-slate-200 mb-2 border-b border-slate-800 pb-1">Angles</h3>
+        <dl class="space-y-2">
+          <dt class="font-semibold text-slate-100">Value Bomb (VB)</dt>
+          <dd class="text-slate-400 leading-snug">Leads with the outcome or pain — "stop losing customers to slow replies" → Zaapi fixes it. Works when the audience feels the pain acutely.</dd>
+          <dt class="font-semibold text-slate-100">Testimonial (TS)</dt>
+          <dd class="text-slate-400 leading-snug">Real or paid customer showing results. Named user, specific numbers. Works when social proof is the trust barrier.</dd>
+          <dt class="font-semibold text-slate-100">Storytelling (ST)</dt>
+          <dd class="text-slate-400 leading-snug">First-person arc. "We used to struggle, then we found Zaapi." Works for longer-consideration purchases.</dd>
+          <dt class="font-semibold text-slate-100">Educational (ED)</dt>
+          <dd class="text-slate-400 leading-snug">UI walkthrough, how-it-works. Best when the buyer is evaluating features, not pains.</dd>
+        </dl>
+
+        <h3 class="font-semibold text-slate-200 mb-2 border-b border-slate-800 pb-1 mt-4">Production</h3>
+        <dl class="space-y-2">
+          <dt class="font-semibold text-slate-100">AI</dt>
+          <dd class="text-slate-400 leading-snug">AI-generated talking head + overlays. Fastest to test hypotheses before committing real production budget.</dd>
+          <dt class="font-semibold text-slate-100">IH (In-house)</dt>
+          <dd class="text-slate-400 leading-snug">Shot by Zaapi team. Controlled brief, known cost.</dd>
+          <dt class="font-semibold text-slate-100">UG (UGC)</dt>
+          <dd class="text-slate-400 leading-snug">Creator films in their own setting. Organic feel — high trust.</dd>
+          <dt class="font-semibold text-slate-100">KOL</dt>
+          <dd class="text-slate-400 leading-snug">Hired presenter/influencer. Their style, Zaapi's brief.</dd>
+          <dt class="font-semibold text-slate-100">MG</dt>
+          <dd class="text-slate-400 leading-snug">Motion graphics / animated. Highest production cost — use only after angle is proven.</dd>
+        </dl>
+      </div>
+
+      <div>
+        <h3 class="font-semibold text-slate-200 mb-2 border-b border-slate-800 pb-1">Metrics</h3>
+        <dl class="space-y-2">
+          <dt class="font-semibold text-emerald-300">Hook Rate · higher is better ↑</dt>
+          <dd class="text-slate-400 leading-snug">% of impressions that watched ≥3 sec. The single most important TOF signal — did the creative stop the scroll? High = creative is landing.</dd>
+          <dt class="font-semibold text-emerald-300">Thumb-Stop · higher is better ↑</dt>
+          <dd class="text-slate-400 leading-snug">Sister metric to Hook — did viewers physically stop scrolling? High = strong visual pull.</dd>
+          <dt class="font-semibold text-red-300">CPM · lower is better ↓</dt>
+          <dd class="text-slate-400 leading-snug">Cost per 1,000 impressions. Rising CPM = audience saturating OR auction getting competitive. Low = not overpaying for reach.</dd>
+          <dt class="font-semibold text-red-300">Frequency · lower for TOF, fine for BOF ↓</dt>
+          <dd class="text-slate-400 leading-snug">How many times each user saw the ad. Above 3 = fatigue zone on TOF. Retargeting (BOF) frequency can be higher by design.</dd>
+          <dt class="font-semibold text-emerald-300">FTI · higher is better ↑</dt>
+          <dd class="text-slate-400 leading-snug">First Time Integrated — registered + connected 1 channel. The conversion that matters. Higher = more pipeline.</dd>
+          <dt class="font-semibold text-red-300">CPA · lower is better ↓</dt>
+          <dd class="text-slate-400 leading-snug">Cost per FTI. Compare to plan CAC ($550 TH / $739 SEA / $1,800 ROW). Below plan = efficient, above plan = leak.</dd>
+        </dl>
+      </div>
+
+      <div>
+        <h3 class="font-semibold text-slate-200 mb-2 border-b border-slate-800 pb-1">AI Verdicts</h3>
+        <dl class="space-y-2">
+          <dt class="font-semibold text-red-300">🛑 KILL</dt>
+          <dd class="text-slate-400 leading-snug">Hook &lt; 15%. Creative doesn't land — new targeting won't save a bad ad. Turn it off.</dd>
+          <dt class="font-semibold text-emerald-300">📈 SCALE</dt>
+          <dd class="text-slate-400 leading-snug">TOF: Hook &gt; 35% + Freq &lt; 2.5. BOF: FTI ≥ 2. Pour more budget in.</dd>
+          <dt class="font-semibold text-purple-300">🎯 NEW TARGET</dt>
+          <dd class="text-slate-400 leading-snug">Creative works (hook OK) but no conversions. Audience is wrong — test a new persona or segment.</dd>
+          <dt class="font-semibold text-cyan-300">📡 NEW CHANNEL</dt>
+          <dd class="text-slate-400 leading-snug">CPM or CPA up &gt;50% WoW. Audience right, placement getting expensive — test IG Reels, Stories, or turn off Audience Network.</dd>
+          <dt class="font-semibold text-yellow-300">♻️ REFRESH</dt>
+          <dd class="text-slate-400 leading-snug">Frequency &gt; 3 and no FTI. Audience saturated — rotate creative (same angle, new edit).</dd>
+          <dt class="font-semibold text-orange-300">👀 WATCH</dt>
+          <dd class="text-slate-400 leading-snug">Borderline hook (25–35%) OR hook dropped &gt;10pp WoW. Need more data or prepare replacement.</dd>
+          <dt class="font-semibold text-slate-300">⏸ PAUSED</dt>
+          <dd class="text-slate-400 leading-snug">Ad ran historically but zero spend last week. Check lifetime metrics below to decide if worth relaunching.</dd>
+          <dt class="font-semibold text-slate-400">⏳ NO DATA</dt>
+          <dd class="text-slate-400 leading-snug">Never ran meaningfully (&lt;$10 LW, no lifetime). Wait for data.</dd>
+          <dt class="font-semibold text-slate-300">✅ CONTINUE</dt>
+          <dd class="text-slate-400 leading-snug">Healthy — no action needed, keep running.</dd>
+        </dl>
+      </div>
+    </div>
+  </details>
+
   <div id="loading" class="text-sm text-slate-300">Loading data from Google Sheets...</div>
 
   <section id="content" class="hidden space-y-4">
 
-    <!-- Segment Analysis: which Angle / Production / Region is working? -->
+    <!-- Segment Analysis -->
     <article class="bg-slate-900 border border-slate-800 rounded p-3">
       <div class="flex items-center justify-between mb-2">
         <h2 class="font-semibold">Segment Analysis · what's working</h2>
