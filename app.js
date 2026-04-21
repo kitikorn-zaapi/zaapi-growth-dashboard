@@ -224,24 +224,33 @@ async function initOverview() {
         .map(r => marketCard(r, selected.regions[r], currency, rate))
         .join('');
 
-      // Action log panel
+      // Action log panel — reads NEW schema: action, confidence, expected_primary_metric/value
       const latestActions = (actionLog || []).filter(a =>
         ZaapiDataService.fmtCW(F(a, ['CW', 'cw'])) === cw
       );
-      const topThree = latestActions
-        .map(a => F(a, ['action_suggested', 'suggestion']))
-        .filter(Boolean)
-        .slice(0, 3);
-      const nextStep = latestActions.find(a =>
-        String(F(a, ['priority'])).toLowerCase() === 'high' &&
-        String(F(a, ['status'])).toLowerCase() === 'pending'
-      );
+
+      // Sort by confidence desc, show top 3 pending actions
+      const pendingActions = latestActions
+        .filter(a => String(F(a, ['status'])).toLowerCase() === 'pending')
+        .sort((a, b) => N(F(b, ['confidence'])) - N(F(a, ['confidence'])));
+
+      const topThree = pendingActions.slice(0, 3).map(a => {
+        const action = F(a, ['action']);
+        const conf = Math.round(N(F(a, ['confidence'])) * 100);
+        const region = F(a, ['region']);
+        const verdict = F(a, ['verdict']);
+        return `<b>[${region} · ${verdict}]</b> ${action} <span class="text-slate-500">(${conf}%)</span>`;
+      });
+
+      const nextStep = pendingActions[0];  // highest confidence pending = next step
 
       document.getElementById('reallocation').innerHTML = [
-        topThree.length ? `Insights:<br>${topThree.map(i => `• ${i}`).join('<br>')}` : 'Insights: —',
+        topThree.length
+          ? `This week's actions:<br>${topThree.map(i => `• ${i}`).join('<br>')}`
+          : 'No pending actions logged for this week.',
         nextStep
-          ? `<br>Next step: ${F(nextStep, ['action_suggested', 'suggestion'])}`
-          : '<br>Next step: No high-priority pending action.',
+          ? `<br><br>Next step: <b>${F(nextStep, ['action'])}</b> — expected ${F(nextStep, ['expected_primary_metric'])} = ${F(nextStep, ['expected_primary_value'])} by ${F(nextStep, ['expected_by_CW'])}`
+          : '',
       ].join('');
 
       document.getElementById('look-links').innerHTML = [
