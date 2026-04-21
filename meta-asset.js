@@ -1,214 +1,266 @@
 // meta-asset.js — Asset Layer (Layer 3)
-// Joins creative_log (manual-input axes) with raw_fb (manual-input daily
-// performance from Meta Ads Manager exports) to produce per-ad_code scorecards.
+// Reads creative_log (IMPORTRANGE'd from the accumulator tab of the source sheet).
+//
+// Schema note: values arrive as pre-formatted strings like "$1,767.39" and "75.88%".
+// Native currency is USD. User can toggle to THB with an editable forex rate (default 34).
 
-let rows = [];          // creative_log joined + enriched
+let rows = [];
 let usdRate = 34;
-let sortKey = 'hook_rate';
-let lookbackDays = 14;  // window for performance aggregation
+let currency = 'USD';   // default matches source data
+let objectiveFilter = 'All';
+let sortKey = 'hook_rate_lw';
+let sortDir = 'desc';
 
 const F = (row, keys, fallback = '') => ZaapiDataService.pick(row, keys, fallback);
-const N = (v) => ZaapiDataService.toNumber(v);
 
-function money(thb, ccy) {
-  return ccy === 'USD' ? `$${(N(thb) / usdRate).toFixed(0)}` : `฿${N(thb).toLocaleString()}`;
+// --- parsers for pre-formatted strings ------------------------------------
+// "$1,767.39" -> 1767.39 ; "75.88%" -> 75.88 ; blank/— -> NaN
+function parseNum(v) {
+  if (v === undefined || v === null) return NaN;
+  const s = String(v).trim();
+  if (!s || s === '—' || s === '-') return NaN;
+  const cleaned = s.replace(/[$฿,\s%]/g, '');
+  const n = parseFloat(cleaned);
+  return Number.isFinite(n) ? n : NaN;
+}
+const num = (v, fallback = 0) => (Number.isFinite(parseNum(v)) ? parseNum(v) : fallback);
+
+// --- display formatters ----------------------------------------------------
+function fmtMoney(usd) {
+  if (!Number.isFinite(usd)) return '—';
+  if (currency === 'USD') return `$${usd.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+  return `฿${(usd * usdRate).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+}
+function fmtPct(v) {
+  return Number.isFinite(v) ? `${v.toFixed(1)}%` : '—';
+}
+function fmtFreq(v) {
+  return Number.isFinite(v) ? v.toFixed(2) : '—';
+}
+function fmtNum(v, digits = 1) {
+  return Number.isFinite(v) ? v.toFixed(digits) : '—';
 }
 
-// --- kill / scale / fatigue logic from creative framework ------------------
-function killSignal(r) {
-  if (N(r.hook_rate) > 0 && N(r.hook_rate) < 15) return true;       // hook < 15%
-  if (N(r.spend_thb) > 500 && N(r.fti) === 0)    return true;       // no FTI after meaningful spend
-  return false;
-}
-function scaleSignal(r) {
-  return N(r.hook_rate) > 35 && N(r.fti) >= 2;                      // hook > 35% + 2+ FTI
-}
-function fatigueSignal(r) {
-  return N(r.frequency) > 3 && N(r.fti) === 0;                      // freq > 3 no FTI
+// --- WoW delta with arrow --------------------------------------------------
+// direction: 'higher_better' (FTI, hook rate) vs 'lower_better' (CPA, CPM, frequency)
+function deltaHTML(lw, pw, direction = 'higher_better', unit = 'pct_abs') {
+  if (!Number.isFinite(lw) || !Number.isFinite(pw) || pw === 0) return '';
+  const diff = lw - pw;
+  const sign = diff > 0 ? '↑' : diff < 0 ? '↓' : '→';
+  const good = direction === 'higher_better' ? diff > 0 : diff < 0;
+  const color = diff === 0 ? 'text-slate-500' : good ? 'text-emerald-400' : 'text-red-400';
+  let display;
+  if (unit === 'pct_abs') display = `${Math.abs(diff).toFixed(1)}pp`;
+  else if (unit === 'pct_rel') display = `${((Math.abs(diff) / pw) * 100).toFixed(0)}%`;
+  else display = Math.abs(diff).toFixed(2);
+  return `<span class="${color} text-xs ml-1">${sign} ${display}</span>`;
 }
 
+// --- kill / scale / fatigue based on lw values -----------------------------
+function killFlag(r)    { return r.hook_rate_lw > 0 && r.hook_rate_lw < 15; }
+function scaleFlag(r)   { return r.hook_rate_lw > 35 && r.fti_lw >= 2; }
+function fatigueFlag(r) { return r.frequency_lw > 3 && !(r.fti_lw > 0); }
 function signalClass(r) {
-  if (killSignal(r))    return 'border-red-500';
-  if (scaleSignal(r))   return 'border-emerald-500';
-  if (fatigueSignal(r)) return 'border-yellow-500';
+  if (killFlag(r))    return 'border-red-500';
+  if (scaleFlag(r))   return 'border-emerald-500';
+  if (fatigueFlag(r)) return 'border-yellow-500';
   return 'border-slate-700';
 }
 
-// --- aggregate raw_fb by ad_code over the lookback window ------------------
-// raw_fb columns (from the Meta Ads Manager export shape):
-//   Ad name | Reach | Impressions | Result Type | Results | Spend |
-//   Clicks | 2s Video Plays | 3s Video Plays | Region | Day | Ad Code | Funnel | Week
-function aggregateRawFb(rawFb, lookbackDays) {
-  if (!rawFb.length) return new Map();
+// --- parse creative_log row ------------------------------------------------
+function parseRow(raw) {
+  return {
+    ad_code:     F(raw, ['ad_code', 'Ad Code']),
+    status:      F(raw, ['status', 'Status'], 'Live'),
+    region:      F(raw, ['region', 'Region']),
+    prod:        F(raw, ['prod', 'Production']),
+    angle:       F(raw, ['angle', 'Angle']),
+    feature1:    F(raw, ['feature1', 'Feature 1']),
+    objective:   F(raw, ['Objective', 'objective', 'funnel']),
+    assessment:  F(raw, ['assessment', 'Claude Notes']),
 
-  const msDay = 86400000;
-  const cutoff = new Date(Date.now() - lookbackDays * msDay);
+    // lifetime / to-date
+    spend:       num(F(raw, ['spend'])),
+    hook_rate:   num(F(raw, ['hook_rate'])),
+    thumb_stop:  num(F(raw, ['thumb_stop'])),
+    frequency:   num(F(raw, ['frequency'])),
+    cpm:         num(F(raw, ['CPM', 'cpm'])),
+    ctr:         num(F(raw, ['ctr'])),
+    fti:         num(F(raw, ['fti'])),
+    cpa:         num(F(raw, ['cpa'])),
 
-  const perfByCode = new Map();
-  rawFb.forEach((r) => {
-    const dayStr = F(r, ['Day', 'day', 'date']);
-    if (!dayStr) return;
-    const d = new Date(dayStr);
-    if (isNaN(d.getTime()) || d < cutoff) return;
+    // last week
+    spend_tof_lw: num(F(raw, ['spend_tof_lw'])),
+    spend_bof_lw: num(F(raw, ['spend_bof_lw'])),
+    hook_rate_lw: num(F(raw, ['hook_rate_lw'])),
+    frequency_lw: num(F(raw, ['frequency_lw'])),
+    cpm_lw:       num(F(raw, ['CPM_lw', 'cpm_lw'])),
+    fti_lw:       num(F(raw, ['fti_lw'])),
+    cpa_lw:       num(F(raw, ['cpa_lw'])),
 
-    const code = F(r, ['Ad Code', 'ad_code']);
-    if (!code || code === '(not in log)') return;
-
-    if (!perfByCode.has(code)) {
-      perfByCode.set(code, {
-        spend: 0, impressions: 0, clicks: 0, reach_sum: 0,
-        v2s: 0, v3s: 0, fti: 0, leads: 0, days: new Set(),
-      });
-    }
-    const agg = perfByCode.get(code);
-
-    // Result Type determines which Results bucket to add to
-    const resultType = String(F(r, ['Result Type'])).toLowerCase();
-    const results = N(F(r, ['Results']));
-
-    // spend/impr/clicks rows can repeat per result type — we only want to sum
-    // spend once per (code, day), so use a days set to dedupe
-    const dayKey = `${code}::${dayStr}`;
-    if (!agg.days.has(dayKey)) {
-      agg.days.add(dayKey);
-      agg.spend       += N(F(r, ['Spend', 'spend']));
-      agg.impressions += N(F(r, ['Impressions', 'impressions']));
-      agg.clicks      += N(F(r, ['Clicks', 'clicks']));
-      agg.reach_sum   += N(F(r, ['Reach', 'reach']));
-      agg.v2s         += N(F(r, ['2s Video Plays']));
-      agg.v3s         += N(F(r, ['3s Video Plays']));
-    }
-
-    if (resultType.includes('chat_account_integrated_first_time')) {
-      agg.fti += results;
-    } else if (resultType.includes('lead')) {
-      agg.leads += results;
-    }
-  });
-
-  // derive rate metrics
-  const out = new Map();
-  perfByCode.forEach((p, code) => {
-    out.set(code, {
-      spend_thb:   p.spend,
-      impressions: p.impressions,
-      clicks:      p.clicks,
-      reach:       p.reach_sum,  // not strictly right (unique would be better) but best we have
-      hook_rate:   p.impressions ? (p.v3s / p.impressions) * 100 : 0,
-      thumb_stop:  p.impressions ? (p.v2s / p.impressions) * 100 : 0,
-      thruplay:    0,   // not available in raw_fb
-      frequency:   p.reach_sum ? p.impressions / p.reach_sum : 0,
-      fti:         p.fti,
-      cpa_thb:     p.fti ? p.spend / p.fti : 0,
-      leads:       p.leads,
-    });
-  });
-  return out;
-}
-
-// --- enrich creative_log with performance ----------------------------------
-function enrichCreativeLog(creativeLog, perfByCode) {
-  return creativeLog.map((r) => {
-    const code = F(r, ['Ad Code', 'ad_code']);
-    const perf = perfByCode.get(code) || {};
-    return {
-      ad_code:       code,
-      ad_name:       F(r, ['Meta Ads Name', 'ad_name']),
-      region:        F(r, ['Region', 'region']),
-      language:      F(r, ['Language', 'language']),
-      prod:          F(r, ['Production', 'prod']),
-      angle:         F(r, ['Angle', 'angle']),
-      feature1:      F(r, ['Feature 1', 'feature_1']),
-      feature2:      F(r, ['Feature 2', 'feature_2']),
-      funnel_stage:  F(r, ['Funnel Stage', 'Funnel', 'funnel']),
-      status:        F(r, ['Status', 'status'], 'Live'),
-      assessment:    F(r, ['Verdict', 'assessment']),
-      notes:         F(r, ['Claude Notes', 'notes']),
-      // performance
-      ...perf,
-    };
-  });
-}
-
-// --- render ----------------------------------------------------------------
-function render() {
-  const funnel = document.getElementById('funnel').value;
-  const ccy = document.getElementById('currency').value;
-
-  // Map "Awareness" creative_log Funnel Stage → TOF, "Conversion"/"Retargeting" → BOF
-  const funnelMatch = (r) => {
-    if (funnel === 'All') return true;
-    const fs = String(r.funnel_stage).toLowerCase();
-    if (funnel === 'TOF') return fs.includes('awareness') || fs === 'tof';
-    if (funnel === 'BOF') return fs.includes('conversion') || fs.includes('retargeting') || fs === 'bof' || fs === 'mof';
-    return true;
+    // prior week
+    spend_tof_pw: num(F(raw, ['spend_tof_pw'])),
+    spend_bof_pw: num(F(raw, ['spend_bof_pw'])),
+    hook_rate_pw: num(F(raw, ['hook_rate_pw'])),
+    frequency_pw: num(F(raw, ['frequency_pw'])),
+    cpm_pw:       num(F(raw, ['CPM_pw', 'cpm_pw'])),
+    fti_pw:       num(F(raw, ['fti_pw'])),
+    cpa_pw:       num(F(raw, ['cpa_pw'])),
   };
+}
 
-  const filtered = rows.filter(funnelMatch);
+// --- card for one ad -------------------------------------------------------
+// Each ad appears twice in source data: one row per Objective (TOF / BOF).
+// TOF rows populate hook/CPM; BOF rows populate FTI/CPA. Show only what's relevant.
+function renderCard(r) {
+  const objective = (r.objective || '').toUpperCase();
+  const isBOF = objective === 'BOF';
+  const spendLW = isBOF ? r.spend_bof_lw : r.spend_tof_lw;
+  const spendPW = isBOF ? r.spend_bof_pw : r.spend_tof_pw;
 
-  document.getElementById('cards').innerHTML = filtered.map((r) => `
+  const hookDelta  = deltaHTML(r.hook_rate_lw, r.hook_rate_pw, 'higher_better', 'pct_abs');
+  const freqDelta  = deltaHTML(r.frequency_lw, r.frequency_pw, 'lower_better', 'abs');
+  const cpmDelta   = deltaHTML(r.cpm_lw, r.cpm_pw, 'lower_better', 'pct_rel');
+  const spendDelta = deltaHTML(spendLW, spendPW, 'higher_better', 'pct_rel');
+  const ftiDelta   = deltaHTML(r.fti_lw, r.fti_pw, 'higher_better', 'abs');
+  const cpaDelta   = deltaHTML(r.cpa_lw, r.cpa_pw, 'lower_better', 'pct_rel');
+
+  const statusColor = String(r.status).toLowerCase() === 'kill'
+    ? 'bg-red-900 text-red-200'
+    : 'bg-emerald-900 text-emerald-200';
+  const objBadgeColor = isBOF ? 'bg-purple-900 text-purple-200' : 'bg-sky-900 text-sky-200';
+
+  // Objective-specific metric blocks
+  const tofBlock = `
+    <div class="text-sm">Hook: <b>${fmtPct(r.hook_rate_lw)}</b>${hookDelta}</div>
+    <div class="text-sm">Thumb-Stop: <b>${fmtPct(r.thumb_stop)}</b> <span class="text-slate-500 text-xs">(lifetime)</span></div>
+    <div class="text-sm">CPM: <b>${fmtMoney(r.cpm_lw)}</b>${cpmDelta}</div>
+  `;
+  const bofBlock = `
+    <div class="text-sm">FTI: <b>${fmtNum(r.fti_lw)}</b>${ftiDelta}</div>
+    <div class="text-sm">CPA: <b>${r.fti_lw > 0 ? fmtMoney(r.cpa_lw) : '—'}</b>${cpaDelta}</div>
+  `;
+
+  return `
     <article class="bg-slate-900 border ${signalClass(r)} rounded p-3 space-y-1">
-      <div class="flex justify-between items-start">
-        <b class="text-sm">${r.ad_code}</b>
-        <span class="text-xs px-2 py-0.5 rounded ${
-          String(r.status).toLowerCase() === 'kill' ? 'bg-red-900 text-red-200' : 'bg-emerald-900 text-emerald-200'
-        }">${r.status || 'Live'}</span>
+      <div class="flex justify-between items-start gap-2">
+        <b class="text-sm truncate">${r.ad_code}</b>
+        <div class="flex gap-1 flex-shrink-0">
+          ${objective ? `<span class="text-xs px-1.5 py-0.5 rounded ${objBadgeColor}">${objective}</span>` : ''}
+          <span class="text-xs px-1.5 py-0.5 rounded ${statusColor}">${r.status || 'Live'}</span>
+        </div>
       </div>
       <div class="text-xs text-slate-400">${r.region} · ${r.prod} · ${r.angle}</div>
-      <div class="text-xs text-slate-500">${r.feature1}${r.feature2 ? ' + ' + r.feature2 : ''}</div>
-      <div class="text-sm pt-1">Hook Rate: <b>${N(r.hook_rate).toFixed(1)}%</b> · Thumb-Stop: <b>${N(r.thumb_stop).toFixed(1)}%</b></div>
-      <div class="text-sm">Frequency: ${N(r.frequency).toFixed(2)} · Reach: ${N(r.reach).toLocaleString()}</div>
-      <div class="text-sm">FTI: <b>${N(r.fti).toFixed(1)}</b> · CPA: <b>${r.fti ? money(r.cpa_thb, ccy) : '—'}</b> · Spend: ${money(r.spend_thb, ccy)}</div>
-      ${r.assessment ? `<div class="text-xs text-slate-400 border-t border-slate-800 pt-2 mt-1">${r.assessment}</div>` : ''}
-    </article>`).join('') || '<div class="text-sm text-slate-500">No ads match the current filters. Check that creative_log and raw_fb tabs are populated.</div>';
+      <div class="text-xs text-slate-500">${r.feature1 || ''}</div>
 
-  // Sortable summary table
-  const sorted = [...filtered].sort((a, b) => N(b[sortKey]) - N(a[sortKey]));
+      <div class="border-t border-slate-800 pt-2 mt-1 space-y-0.5">
+        <div class="text-[10px] uppercase tracking-wide text-slate-500 mb-1">Last Week (vs prior week)</div>
+        ${isBOF ? bofBlock : tofBlock}
+        <div class="text-sm">Frequency: <b>${fmtFreq(r.frequency_lw)}</b>${freqDelta}</div>
+        <div class="text-sm">Spend (${objective || '—'}): <b>${fmtMoney(spendLW)}</b>${spendDelta}</div>
+      </div>
+
+      ${r.assessment ? `<div class="text-xs text-slate-400 border-t border-slate-800 pt-2 mt-1">${r.assessment}</div>` : ''}
+    </article>`;
+}
+
+// --- summary table ---------------------------------------------------------
+function renderSummary(filtered) {
+  const sorted = [...filtered].sort((a, b) => {
+    const av = a[sortKey], bv = b[sortKey];
+    if (!Number.isFinite(av) && !Number.isFinite(bv)) return 0;
+    if (!Number.isFinite(av)) return 1;
+    if (!Number.isFinite(bv)) return -1;
+    return sortDir === 'desc' ? bv - av : av - bv;
+  });
+
+  const cols = [
+    { key: '',             label: 'Ad Code' },
+    { key: '',             label: 'Obj' },
+    { key: '',             label: 'Region' },
+    { key: 'hook_rate_lw', label: 'Hook LW' },
+    { key: 'frequency_lw', label: 'Freq LW' },
+    { key: 'cpm_lw',       label: 'CPM LW' },
+    { key: 'fti_lw',       label: 'FTI LW' },
+    { key: 'cpa_lw',       label: 'CPA LW' },
+    { key: 'spend',        label: 'Spend (total)' },
+  ];
   const head = `<tr class="text-slate-400">${
-    ['Ad Code', 'Region', 'Hook Rate', 'Thumb-Stop', 'Freq', 'FTI', 'CPA', 'Spend']
-      .map((h, i) => {
-        const k = ['', '', 'hook_rate', 'thumb_stop', 'frequency', 'fti', 'cpa_thb', 'spend_thb'][i];
-        return `<th data-k="${k}" class="text-left px-2 py-1 border-b border-slate-700 ${k ? 'cursor-pointer' : ''}">${h}${sortKey === k ? ' ↓' : ''}</th>`;
-      }).join('')
+    cols.map(c => {
+      const arrow = sortKey === c.key ? (sortDir === 'desc' ? ' ↓' : ' ↑') : '';
+      return `<th data-k="${c.key}" class="text-left px-2 py-1 border-b border-slate-700 ${c.key ? 'cursor-pointer hover:text-white' : ''}">${c.label}${arrow}</th>`;
+    }).join('')
   }</tr>`;
-  const body = sorted.map((r) => `<tr>
+
+  const body = sorted.map(r => `<tr>
     <td class="px-2 py-1 border-b border-slate-800">${r.ad_code}</td>
+    <td class="px-2 py-1 border-b border-slate-800">${r.objective || '—'}</td>
     <td class="px-2 py-1 border-b border-slate-800">${r.region}</td>
-    <td class="px-2 py-1 border-b border-slate-800">${N(r.hook_rate).toFixed(1)}%</td>
-    <td class="px-2 py-1 border-b border-slate-800">${N(r.thumb_stop).toFixed(1)}%</td>
-    <td class="px-2 py-1 border-b border-slate-800">${N(r.frequency).toFixed(2)}</td>
-    <td class="px-2 py-1 border-b border-slate-800">${N(r.fti).toFixed(1)}</td>
-    <td class="px-2 py-1 border-b border-slate-800">${r.fti ? money(r.cpa_thb, ccy) : '—'}</td>
-    <td class="px-2 py-1 border-b border-slate-800">${money(r.spend_thb, ccy)}</td>
+    <td class="px-2 py-1 border-b border-slate-800">${fmtPct(r.hook_rate_lw)}</td>
+    <td class="px-2 py-1 border-b border-slate-800">${fmtFreq(r.frequency_lw)}</td>
+    <td class="px-2 py-1 border-b border-slate-800">${fmtMoney(r.cpm_lw)}</td>
+    <td class="px-2 py-1 border-b border-slate-800">${fmtNum(r.fti_lw)}</td>
+    <td class="px-2 py-1 border-b border-slate-800">${r.fti_lw > 0 ? fmtMoney(r.cpa_lw) : '—'}</td>
+    <td class="px-2 py-1 border-b border-slate-800">${fmtMoney(r.spend)}</td>
   </tr>`).join('');
 
   const table = document.getElementById('summary');
   table.innerHTML = head + body;
-  table.querySelectorAll('th[data-k]').forEach((th) =>
-    th.addEventListener('click', () => { if (th.dataset.k) { sortKey = th.dataset.k; render(); } })
+  table.querySelectorAll('th[data-k]').forEach(th =>
+    th.addEventListener('click', () => {
+      const k = th.dataset.k;
+      if (!k) return;
+      if (sortKey === k) sortDir = sortDir === 'desc' ? 'asc' : 'desc';
+      else { sortKey = k; sortDir = 'desc'; }
+      render();
+    })
   );
 }
 
+// --- render orchestrator ---------------------------------------------------
+function render() {
+  const filtered = rows.filter(r =>
+    objectiveFilter === 'All' ? true : String(r.objective).toUpperCase() === objectiveFilter
+  );
+  document.getElementById('cards').innerHTML = filtered.length
+    ? filtered.map(renderCard).join('')
+    : '<div class="text-sm text-slate-500 col-span-full">No ads match the current filters.</div>';
+  renderSummary(filtered);
+}
+
+// --- init ------------------------------------------------------------------
 async function initMeta() {
   const loading = document.getElementById('loading');
+
   try {
-    const [creativeLog, rawFb] = await Promise.all([
-      ZaapiDataService.fetchTab('creative_log').catch(() => []),
-      ZaapiDataService.fetchTab('raw_fb').catch(() => []),
-    ]);
+    const raw = await ZaapiDataService.fetchTab('creative_log');
+    rows = raw.map(parseRow).filter(r => r.ad_code);
+
     const config = await ZaapiDataService.getConfig().catch(() => ({}));
-    usdRate = N(config.usd_thb_rate) || 34;
+    usdRate = ZaapiDataService.toNumber(config.usd_thb_rate, 34);
 
-    const perfByCode = aggregateRawFb(rawFb, lookbackDays);
-    rows = enrichCreativeLog(creativeLog, perfByCode);
+    const ccyEl = document.getElementById('currency');
+    const rateEl = document.getElementById('usd-rate');
+    const funnelEl = document.getElementById('funnel');
 
-    document.getElementById('usd-rate').value = usdRate;
-    document.getElementById('usd-rate').addEventListener('change', (e) => {
-      usdRate = N(e.target.value) || usdRate;
-      render();
-    });
-    document.getElementById('currency').addEventListener('change', render);
-    document.getElementById('funnel').addEventListener('change', render);
+    if (ccyEl) {
+      ccyEl.value = 'USD';          // default to source currency
+      currency = 'USD';
+      ccyEl.addEventListener('change', () => { currency = ccyEl.value; render(); });
+    }
+    if (rateEl) {
+      rateEl.value = usdRate;
+      rateEl.addEventListener('change', (e) => {
+        usdRate = ZaapiDataService.toNumber(e.target.value, usdRate) || usdRate;
+        if (currency === 'THB') render();
+      });
+    }
+    if (funnelEl) {
+      funnelEl.addEventListener('change', () => {
+        objectiveFilter = funnelEl.value;
+        render();
+      });
+    }
 
     render();
     loading.classList.add('hidden');
