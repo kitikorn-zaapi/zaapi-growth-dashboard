@@ -1,13 +1,36 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Zaapi Dashboard · Action Log</title><script src="https://cdn.tailwindcss.com"></script></head>
-<body class="bg-slate-950 text-slate-100 min-h-screen"><main class="max-w-7xl mx-auto p-4 md:p-6 space-y-4">
-<header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"><h1 class="text-xl font-semibold">Actions + Outcomes</h1><nav id="shared-nav" class="flex gap-2 flex-wrap"></nav></header>
-<section class="bg-slate-900 border border-slate-800 rounded p-3 grid grid-cols-2 md:grid-cols-4 gap-2">
-<select id="f-cw" class="bg-slate-950 border border-slate-700 rounded p-2 text-sm"><option value="">All CW</option></select>
-<select id="f-region" class="bg-slate-950 border border-slate-700 rounded p-2 text-sm"><option value="">All Region</option></select>
-<select id="f-status" class="bg-slate-950 border border-slate-700 rounded p-2 text-sm"><option value="">All Status</option></select>
-<select id="f-type" class="bg-slate-950 border border-slate-700 rounded p-2 text-sm"><option value="">All Type</option></select>
-</section>
-<div id="loading" class="text-sm text-slate-300">Loading data from Google Sheets...</div>
-<section id="content" class="hidden bg-slate-900 border border-slate-800 rounded p-3 overflow-auto"><table class="w-full text-sm" id="table"></table></section>
-</main><script src="data-service.js"></script><script src="shared-nav.js"></script><script src="action-log.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zaapi Dashboard · Action Log</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+<main class="max-w-7xl mx-auto p-4 md:p-6 space-y-4">
+  <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <div>
+      <h1 class="text-xl font-semibold">Actions + Outcomes</h1>
+      <div id="summary-counts" class="text-xs text-slate-400 mt-1 flex gap-3"></div>
+    </div>
+    <nav id="shared-nav" class="flex gap-2 flex-wrap"></nav>
+  </header>
+
+  <section class="bg-slate-900 border border-slate-800 rounded p-3 grid grid-cols-2 md:grid-cols-4 gap-2">
+    <select id="f-cw"      class="bg-slate-950 border border-slate-700 rounded p-2 text-sm"><option value="">All CW</option></select>
+    <select id="f-region"  class="bg-slate-950 border border-slate-700 rounded p-2 text-sm"><option value="">All Region</option></select>
+    <select id="f-status"  class="bg-slate-950 border border-slate-700 rounded p-2 text-sm"><option value="">All Status</option></select>
+    <select id="f-verdict" class="bg-slate-950 border border-slate-700 rounded p-2 text-sm"><option value="">All Verdict</option></select>
+  </section>
+
+  <div id="loading" class="text-sm text-slate-300">Loading data from Google Sheets...</div>
+
+  <section id="content" class="hidden bg-slate-900 border border-slate-800 rounded p-3 overflow-auto">
+    <table class="w-full text-sm" id="table"></table>
+  </section>
+</main>
+<script src="data-service.js"></script>
+<script src="shared-nav.js"></script>
+<script src="action-log.js"></script>
+</body>
+</html>
