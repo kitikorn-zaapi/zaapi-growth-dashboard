@@ -18,15 +18,13 @@
     </div>
   </header>
 
-  <!-- Controls -->
   <section class="bg-slate-900 border border-slate-800 rounded p-3 flex flex-wrap gap-3 items-end">
     <label class="text-sm">Week
       <select id="week-select" class="ml-2 bg-slate-950 border border-slate-700 rounded p-1"></select>
     </label>
     <label class="text-sm">Currency
       <select id="currency-toggle" class="ml-2 bg-slate-950 border border-slate-700 rounded p-1">
-        <option>THB</option>
-        <option>USD</option>
+        <option>THB</option><option>USD</option>
       </select>
     </label>
   </section>
@@ -35,7 +33,6 @@
 
   <section id="content" class="hidden space-y-4">
 
-    <!-- Top-line health -->
     <article class="bg-slate-900 border border-slate-800 rounded p-3">
       <div class="flex flex-wrap items-center gap-4">
         <div>
@@ -53,22 +50,17 @@
       </div>
     </article>
 
-    <!-- Market grid (per-region cards with 🧠 Analyze button) -->
     <div id="market-grid" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
 
-    <!-- Trend -->
+    <!-- ═══ AI Suggestions Panel — this week + last 2 weeks outcomes ═══ -->
+    <div id="ai-suggestions-panel"></div>
+
     <article class="bg-slate-900 border border-slate-800 rounded p-3">
       <div class="flex items-center justify-between mb-2">
         <h2 class="font-semibold">FTI trend (last 8 weeks + prediction)</h2>
         <div id="trend-label" class="text-xs text-slate-400"></div>
       </div>
       <canvas id="fti-trend" height="80"></canvas>
-    </article>
-
-    <!-- Insights / action summary from action_log -->
-    <article class="bg-slate-900 border border-slate-800 rounded p-3">
-      <h2 class="font-semibold mb-2">From action_log</h2>
-      <div id="reallocation" class="text-sm"></div>
     </article>
 
     <article class="bg-slate-900 border border-slate-800 rounded p-3">
@@ -81,6 +73,7 @@
 <script src="data-service.js"></script>
 <script src="shared-nav.js"></script>
 <script src="ai-analyzer.js"></script>
+<script src="ai-suggestions-panel.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
