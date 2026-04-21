@@ -8,55 +8,79 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen">
-  <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-4">
-    <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-      <h1 class="text-xl font-semibold">Overview (Layer 1)</h1>
+<main class="max-w-7xl mx-auto p-4 md:p-6 space-y-4">
+
+  <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <h1 class="text-xl font-semibold">Overview (Layer 1)</h1>
+    <div class="flex items-center gap-2">
+      <button onclick="openAISettings()" class="text-xs px-2 py-1.5 bg-slate-900 border border-slate-700 text-slate-300 rounded hover:border-slate-500" title="Set Anthropic API key">⚙ API key</button>
       <nav id="shared-nav" class="flex gap-2 flex-wrap"></nav>
-    </header>
+    </div>
+  </header>
 
-    <section class="bg-slate-900 border border-slate-800 rounded p-3 grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
-      <label class="text-sm">Week
-        <select id="week-select" class="mt-1 w-full bg-slate-950 border border-slate-700 rounded p-2"></select>
-      </label>
-      <label class="text-sm">Spend unit
-        <select id="currency-toggle" class="mt-1 w-full bg-slate-950 border border-slate-700 rounded p-2">
-          <option value="THB">THB</option>
-          <option value="USD">USD</option>
-        </select>
-      </label>
-      <div class="text-sm"><div class="text-slate-400">FTI actual vs target</div><div id="fti-target" class="font-semibold">—</div></div>
-      <div class="text-sm"><div class="text-slate-400">Health signal</div><div id="global-health" class="font-semibold">—</div></div>
-    </section>
+  <!-- Controls -->
+  <section class="bg-slate-900 border border-slate-800 rounded p-3 flex flex-wrap gap-3 items-end">
+    <label class="text-sm">Week
+      <select id="week-select" class="ml-2 bg-slate-950 border border-slate-700 rounded p-1"></select>
+    </label>
+    <label class="text-sm">Currency
+      <select id="currency-toggle" class="ml-2 bg-slate-950 border border-slate-700 rounded p-1">
+        <option>THB</option>
+        <option>USD</option>
+      </select>
+    </label>
+  </section>
 
-    <div id="loading" class="text-sm text-slate-300">Loading data from Google Sheets...</div>
+  <div id="loading" class="text-sm text-slate-300">Loading data from Google Sheets...</div>
 
-    <section id="content" class="hidden space-y-4">
-      <article class="bg-indigo-950/60 border border-indigo-700 rounded p-4">
-        <h2 class="text-xs uppercase text-indigo-300 tracking-wide mb-1">AI Summary</h2>
-        <p id="ai-summary" class="text-base leading-relaxed"></p>
-      </article>
+  <section id="content" class="hidden space-y-4">
 
-      <article class="bg-slate-900 border border-slate-800 rounded p-4">
-        <h2 class="text-sm font-semibold mb-2">AI Forecast</h2>
-        <canvas id="fti-trend" height="70"></canvas>
-        <p id="trend-label" class="text-sm mt-2 text-slate-300"></p>
-      </article>
+    <!-- Top-line health -->
+    <article class="bg-slate-900 border border-slate-800 rounded p-3">
+      <div class="flex flex-wrap items-center gap-4">
+        <div>
+          <div class="text-xs text-slate-500 uppercase tracking-wide">Global health</div>
+          <div id="global-health" class="text-lg font-semibold"></div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-500 uppercase tracking-wide">FTI vs target</div>
+          <div id="fti-target" class="text-lg font-semibold"></div>
+        </div>
+        <div class="flex-1">
+          <div class="text-xs text-slate-500 uppercase tracking-wide">Summary</div>
+          <div id="ai-summary" class="text-sm"></div>
+        </div>
+      </div>
+    </article>
 
-      <section class="grid grid-cols-1 lg:grid-cols-3 gap-3" id="market-grid"></section>
+    <!-- Market grid (per-region cards with 🧠 Analyze button) -->
+    <div id="market-grid" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
 
-      <section class="bg-slate-900 border border-slate-800 rounded p-4">
-        <h2 class="text-sm font-semibold mb-1">Budget reallocation panel</h2>
-        <p id="reallocation" class="text-sm text-slate-300"></p>
-      </section>
+    <!-- Trend -->
+    <article class="bg-slate-900 border border-slate-800 rounded p-3">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="font-semibold">FTI trend (last 8 weeks + prediction)</h2>
+        <div id="trend-label" class="text-xs text-slate-400"></div>
+      </div>
+      <canvas id="fti-trend" height="80"></canvas>
+    </article>
 
-      <section class="bg-slate-900 border border-slate-800 rounded p-4">
-        <h2 class="text-sm font-semibold mb-2">Where to look</h2>
-        <div id="look-links" class="text-sm flex flex-wrap gap-2"></div>
-      </section>
-    </section>
-  </main>
-  <script src="data-service.js"></script>
-  <script src="shared-nav.js"></script>
-  <script src="app.js"></script>
+    <!-- Insights / action summary from action_log -->
+    <article class="bg-slate-900 border border-slate-800 rounded p-3">
+      <h2 class="font-semibold mb-2">From action_log</h2>
+      <div id="reallocation" class="text-sm"></div>
+    </article>
+
+    <article class="bg-slate-900 border border-slate-800 rounded p-3">
+      <h2 class="font-semibold mb-2">Look deeper</h2>
+      <div id="look-links" class="text-sm"></div>
+    </article>
+  </section>
+</main>
+
+<script src="data-service.js"></script>
+<script src="shared-nav.js"></script>
+<script src="ai-analyzer.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
