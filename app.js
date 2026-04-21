@@ -1,6 +1,6 @@
 // app.js — Overview (Layer 1)
 // Reads from: raw_google_daily, raw_meta_daily, raw_google_conversions_daily,
-//             targets (optional), config (optional), action_log
+//             targets (optional), config (optional), action_log, learning_accum
 
 let trendChart;
 const F = (row, keys, fallback = '') => ZaapiDataService.pick(row, keys, fallback);
@@ -38,10 +38,8 @@ function sortCWs(cws) {
 }
 
 // --- aggregation -----------------------------------------------------------
-// Aggregates additive daily rows to (CW, region) → {spend, clicks, impr, fti}
 function aggregateWeekly(googleDaily, metaDaily, convDaily) {
-  const agg = new Map();  // key: `${CW}::${region}` → tallies
-
+  const agg = new Map();
   const bump = (cw, region, field, val) => {
     const k = `${cw}::${region || ''}`;
     if (!agg.has(k)) agg.set(k, { cw, region: region || '', spend: 0, clicks: 0, impressions: 0, fti: 0 });
@@ -55,7 +53,6 @@ function aggregateWeekly(googleDaily, metaDaily, convDaily) {
     bump(cw, region, 'clicks',      F(r, ['clicks']));
     bump(cw, region, 'impressions', F(r, ['impressions']));
   });
-
   (metaDaily || []).forEach((r) => {
     const cw = ZaapiDataService.fmtCW(F(r, ['CW', 'cw']));
     const region = F(r, ['region', 'market']);
@@ -63,8 +60,6 @@ function aggregateWeekly(googleDaily, metaDaily, convDaily) {
     bump(cw, region, 'clicks',      F(r, ['clicks']));
     bump(cw, region, 'impressions', F(r, ['impressions']));
   });
-
-  // FTI from Google Search conversions (only first_time_integrated rows)
   (convDaily || []).forEach((r) => {
     const action = String(F(r, ['conversion_action', 'conversionActionName'])).toLowerCase();
     if (!action.includes('first_time_integrated')) return;
@@ -72,7 +67,6 @@ function aggregateWeekly(googleDaily, metaDaily, convDaily) {
     const region = F(r, ['region', 'market']);
     bump(cw, region, 'fti', F(r, ['conversions']));
   });
-
   return [...agg.values()];
 }
 
@@ -111,24 +105,56 @@ function renderTrend(history) {
 }
 
 // --- cards -----------------------------------------------------------------
-function marketCard(title, data, currency, rate) {
+function marketCard(title, data, currency, rate, actionLog, learningAccum, currentCW) {
   if (!data) {
     return `<article class="bg-slate-900 border border-slate-800 rounded p-3">
-      <div class="flex justify-between items-center mb-2">
-        <h3 class="font-semibold">${title}</h3>
-      </div>
+      <div class="flex justify-between items-center mb-2"><h3 class="font-semibold">${title}</h3></div>
       <div class="text-sm text-slate-500">No data this week</div>
     </article>`;
   }
+
+  // Count pending + last-week outcomes for this region (inline summary on the card)
+  const regionActions = (actionLog || []).filter((a) => String(F(a, ['region'])).toUpperCase() === title.toUpperCase());
+  const cwNum = parseInt(String(currentCW).replace(/\D/g, ''), 10) || 0;
+  const pendingThisWeek = regionActions.filter((a) => {
+    const acw = parseInt(String(F(a, ['CW', 'cw'])).replace(/\D/g, ''), 10) || 0;
+    return acw === cwNum && String(F(a, ['status'])).toLowerCase() === 'pending';
+  }).length;
+
+  const outcomeMap = new Map();
+  (learningAccum || []).forEach((r) => {
+    const link = F(r, ['linked_action_id']);
+    if (link) outcomeMap.set(link, r);
+  });
+  const lastWeekResults = regionActions.filter((a) => {
+    const acw = parseInt(String(F(a, ['CW', 'cw'])).replace(/\D/g, ''), 10) || 0;
+    return acw === cwNum - 1;
+  });
+  const lwWorked = lastWeekResults.filter((a) => {
+    const o = outcomeMap.get(F(a, ['id']));
+    return o && String(F(o, ['verdict'])).toLowerCase() === 'worked';
+  }).length;
+  const lwMissed = lastWeekResults.filter((a) => {
+    const o = outcomeMap.get(F(a, ['id']));
+    return o && String(F(o, ['verdict'])).toLowerCase() === 'missed';
+  }).length;
+
+  const pendingBadge = pendingThisWeek > 0
+    ? `<span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-950/60 border border-amber-900 text-amber-300">⏳ ${pendingThisWeek} pending</span>`
+    : '';
+  const lwBadge = lastWeekResults.length > 0
+    ? `<span class="text-[10px] opacity-70">LW: ${lwWorked > 0 ? `<span class="text-emerald-300">${lwWorked}✓</span>` : ''}${lwMissed > 0 ? ` <span class="text-red-300">${lwMissed}✗</span>` : ''}${(lwWorked + lwMissed === 0) ? `<span class="text-slate-500">${lastWeekResults.length} pending outcome</span>` : ''}</span>`
+    : '';
+
   return `<article class="bg-slate-900 border border-slate-800 rounded p-3">
-    <div class="flex justify-between items-center mb-2">
+    <div class="flex justify-between items-center mb-2 gap-2 flex-wrap">
       <h3 class="font-semibold">${title}</h3>
-      <button
-        class="text-xs px-2 py-1 bg-indigo-900/40 border border-indigo-700 text-indigo-300 rounded hover:bg-indigo-800/40"
-        onclick="analyzeRegion('${title}')"
-        title="Run AI analysis for this region">
-        🧠 Analyze
-      </button>
+      <div class="flex items-center gap-2">
+        ${pendingBadge}
+        ${lwBadge}
+        <button class="text-xs px-2 py-1 bg-indigo-900/40 border border-indigo-700 text-indigo-300 rounded hover:bg-indigo-800/40"
+          onclick="analyzeRegion('${title}')" title="Run AI analysis for this region">🧠 Analyze</button>
+      </div>
     </div>
     <div class="text-sm space-y-1">
       <div>Spend: <b>${fmtMoney(data.spend, currency, rate)}</b></div>
@@ -136,26 +162,18 @@ function marketCard(title, data, currency, rate) {
       <div>Clicks: <b>${N(data.clicks).toLocaleString()}</b></div>
       <div>Impressions: <b>${N(data.impressions).toLocaleString()}</b></div>
     </div>
-    <!-- AI analysis output goes here after click -->
     <div id="ai-panel-${title}" class="hidden mt-3 pt-3 border-t border-slate-800 space-y-2"></div>
   </article>`;
 }
 
 // --- main ------------------------------------------------------------------
-// Global state for the 🧠 Analyze button (needs access outside initOverview scope)
-window.__zaapi = {
-  history: [],
-  actionLog: [],
-  learningAccum: [],
-  latestCW: null,
-};
+window.__zaapi = { history: [], actionLog: [], learningAccum: [], latestCW: null };
 
 async function initOverview() {
   const loading = document.getElementById('loading');
   const content = document.getElementById('content');
 
   try {
-    // Load core tabs; targets/config are optional
     const [googleDaily, metaDaily, convDaily, actionLog, learningAccum] = await Promise.all([
       ZaapiDataService.fetchTab('raw_google_daily').catch(() => []),
       ZaapiDataService.fetchTab('raw_meta_daily').catch(() => []),
@@ -176,14 +194,11 @@ async function initOverview() {
     }
 
     const latestCW = history[history.length - 1].cw;
-
-    // Stash for 🧠 Analyze button
     window.__zaapi.history = history;
     window.__zaapi.actionLog = actionLog;
     window.__zaapi.learningAccum = learningAccum;
     window.__zaapi.latestCW = latestCW;
 
-    // Populate week selector
     const weekSelect = document.getElementById('week-select');
     weekSelect.innerHTML = history.map(h => `<option>${h.cw}</option>`).join('');
     weekSelect.value = latestCW;
@@ -204,59 +219,42 @@ async function initOverview() {
         ? `${selected.fti.toFixed(1)} / ${ftiTarget} FTI`
         : `${selected.fti.toFixed(1)} FTI (no target set)`;
 
-      // Health: compare FTI to target if available, else just show OK
       let health = 'OK';
       if (ftiTarget) {
         const ratio = selected.fti / ftiTarget;
         health = ratio >= 1 ? 'On track' : ratio >= 0.7 ? 'Watch (yellow)' : 'Behind (red)';
       }
       document.getElementById('global-health').textContent = `${healthEmoji(health)} ${health}`;
-
       document.getElementById('ai-summary').textContent =
         `${cw}: Spend ${fmtMoney(selected.spend, currency, rate)}, FTI ${selected.fti.toFixed(1)}` +
         (ftiTarget ? ` against target of ${ftiTarget}.` : '.');
 
       renderTrend(history);
 
-      // Market grid: TH / SEA / ROW with sub-regions collapsed into parent
       const regions = ['TH', 'SEA', 'ROW'];
       document.getElementById('market-grid').innerHTML = regions
-        .map(r => marketCard(r, selected.regions[r], currency, rate))
+        .map(r => marketCard(r, selected.regions[r], currency, rate, actionLog, learningAccum, cw))
         .join('');
 
-      // Action log panel — reads NEW schema: action, confidence, expected_primary_metric/value
-      const latestActions = (actionLog || []).filter(a =>
-        ZaapiDataService.fmtCW(F(a, ['CW', 'cw'])) === cw
-      );
-
-      // Sort by confidence desc, show top 3 pending actions
-      const pendingActions = latestActions
-        .filter(a => String(F(a, ['status'])).toLowerCase() === 'pending')
-        .sort((a, b) => N(F(b, ['confidence'])) - N(F(a, ['confidence'])));
-
-      const topThree = pendingActions.slice(0, 3).map(a => {
-        const action = F(a, ['action']);
-        const conf = Math.round(N(F(a, ['confidence'])) * 100);
-        const region = F(a, ['region']);
-        const verdict = F(a, ['verdict']);
-        return `<b>[${region} · ${verdict}]</b> ${action} <span class="text-slate-500">(${conf}%)</span>`;
-      });
-
-      const nextStep = pendingActions[0];  // highest confidence pending = next step
-
-      document.getElementById('reallocation').innerHTML = [
-        topThree.length
-          ? `This week's actions:<br>${topThree.map(i => `• ${i}`).join('<br>')}`
-          : 'No pending actions logged for this week.',
-        nextStep
-          ? `<br><br>Next step: <b>${F(nextStep, ['action'])}</b> — expected ${F(nextStep, ['expected_primary_metric'])} = ${F(nextStep, ['expected_primary_value'])} by ${F(nextStep, ['expected_by_CW'])}`
-          : '',
-      ].join('');
+      // ═══ AI Suggestions panel — shows all layers, all regions for selected CW ═══
+      const panelEl = document.getElementById('ai-suggestions-panel');
+      if (panelEl && window.AISuggestionsPanel) {
+        window.AISuggestionsPanel.render(panelEl, {
+          actionLog,
+          learningAccum,
+          currentCW: cw,
+          layers: null,
+          region: null,
+          lookbackWeeks: 2,
+          title: '🤖 AI Suggestions + Last 2 Weeks Results',
+        });
+      }
 
       document.getElementById('look-links').innerHTML = [
-        '<a class="underline" href="search.html">Search page</a>',
-        '<a class="underline" href="meta-asset.html">Meta Asset page</a>',
-        '<a class="underline" href="action-log.html">Action Log</a>',
+        '<a class="underline" href="search.html">Campaign page</a>',
+        '<a class="underline" href="meta-asset.html">Asset page</a>',
+        '<a class="underline" href="action-log.html">Action Log (full history)</a>',
+        '<a class="underline" href="learning-accum.html">Learning Log</a>',
       ].join('<span class="text-slate-500 mx-2">|</span>');
     };
 
@@ -274,7 +272,7 @@ async function initOverview() {
 document.addEventListener('DOMContentLoaded', initOverview);
 
 // ─────────────────────────────────────────────────────────────────────────
-// 🧠 AI Analysis — called from the per-region "Analyze" button
+// 🧠 AI Analysis per-region (unchanged)
 // ─────────────────────────────────────────────────────────────────────────
 window.analyzeRegion = async function (region) {
   const panel = document.getElementById(`ai-panel-${region}`);
@@ -282,10 +280,7 @@ window.analyzeRegion = async function (region) {
 
   if (!window.AIAnalyzer.hasAPIKey()) {
     panel.classList.remove('hidden');
-    panel.innerHTML = `
-      <div class="text-xs text-amber-300 bg-amber-950/40 border border-amber-900 rounded p-2">
-        Set your Anthropic API key first — click ⚙ in the header. Stored only in your browser's localStorage.
-      </div>`;
+    panel.innerHTML = `<div class="text-xs text-amber-300 bg-amber-950/40 border border-amber-900 rounded p-2">Set your Anthropic API key first — click ⚙ in the header.</div>`;
     return;
   }
 
@@ -294,26 +289,16 @@ window.analyzeRegion = async function (region) {
 
   try {
     const { history, actionLog, learningAccum, latestCW } = window.__zaapi;
-
-    // Current week metrics for this region only
     const currentWeek = history[history.length - 1];
     const currentMetrics = currentWeek?.regions?.[region] || null;
-
-    // Region-only 6wk history
     const regionHistory = history.map(h => ({
       cw: h.cw,
       ...(h.regions?.[region] || { spend: 0, fti: 0, clicks: 0, impressions: 0 }),
     }));
-
     const { systemPrompt, userPrompt } = window.AIAnalyzer.buildPrompt({
-      region,
-      cw: latestCW,
-      currentMetrics,
-      history: regionHistory,
-      pastActions: actionLog,
-      pastOutcomes: learningAccum,
+      region, cw: latestCW, currentMetrics, history: regionHistory,
+      pastActions: actionLog, pastOutcomes: learningAccum,
     });
-
     const result = await window.AIAnalyzer.callClaude({ systemPrompt, userPrompt });
     window.AIAnalyzer.renderAnalysis(panel, result, { region, CW: latestCW });
   } catch (err) {
@@ -321,17 +306,11 @@ window.analyzeRegion = async function (region) {
   }
 };
 
-// ─────────────────────────────────────────────────────────────────────────
-// ⚙ Settings — API key management
-// ─────────────────────────────────────────────────────────────────────────
 window.openAISettings = function () {
   const existing = window.AIAnalyzer.getAPIKey();
   const masked = existing ? existing.slice(0, 8) + '...' + existing.slice(-4) : '(not set)';
-  const newKey = prompt(
-    `Enter your Anthropic API key.\n\nCurrent: ${masked}\n\nStored in browser localStorage only. Leave blank to clear.`,
-    existing
-  );
-  if (newKey === null) return;  // cancelled
+  const newKey = prompt(`Enter your Anthropic API key.\n\nCurrent: ${masked}\n\nStored in browser localStorage only. Leave blank to clear.`, existing);
+  if (newKey === null) return;
   window.AIAnalyzer.setAPIKey(newKey.trim());
   alert(newKey.trim() ? 'API key saved.' : 'API key cleared.');
 };
