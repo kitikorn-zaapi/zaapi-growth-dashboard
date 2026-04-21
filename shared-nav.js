@@ -1,12 +1,10 @@
-// shared-nav.js — shared navigation bar across all pages
-// Pulls latest CW from raw_google_daily (falls back to raw_meta_daily).
-
+// shared-nav.js — navigation bar across all pages
 async function renderSharedNav() {
   const pages = [
-    { href: 'index.html', label: 'Overview' },
-    { href: 'search.html', label: 'Search' },
-    { href: 'meta-asset.html', label: 'Meta Asset' },
-    { href: 'action-log.html', label: 'Action Log' },
+    { href: 'index.html',          label: 'Overview' },
+    { href: 'search.html',         label: 'Campaign' },     // renamed from Search
+    { href: 'meta-asset.html',     label: 'Asset' },        // renamed from Meta Asset
+    { href: 'action-log.html',     label: 'Action Log' },
     { href: 'learning-accum.html', label: 'Learning' },
   ];
 
@@ -14,25 +12,20 @@ async function renderSharedNav() {
   const nav = document.getElementById('shared-nav');
   if (!nav) return;
 
-  // Try raw_google_daily first, fall back to raw_meta_daily, then show —
   let latestCW = '—';
   try {
     let source = await ZaapiDataService.fetchTab('raw_google_daily').catch(() => []);
     if (!source.length) source = await ZaapiDataService.fetchTab('raw_meta_daily').catch(() => []);
-
     const cws = [...new Set(source.map(r =>
       ZaapiDataService.fmtCW(ZaapiDataService.pick(r, ['CW', 'cw']))
     ))].filter(Boolean);
-
     if (cws.length) {
       const sorted = cws.sort((a, b) =>
         parseInt(a.replace(/\D/g, ''), 10) - parseInt(b.replace(/\D/g, ''), 10)
       );
       latestCW = sorted[sorted.length - 1];
     }
-  } catch (e) {
-    latestCW = '—';
-  }
+  } catch (e) { latestCW = '—'; }
 
   nav.innerHTML = pages
     .map((p) => {
