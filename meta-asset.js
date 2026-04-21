@@ -7,6 +7,7 @@ let usdRate = 34;
 let currency = 'USD';
 let filterFunnel = 'All';
 let filterRegion = 'All';
+let filterStatus = 'All';
 let segmentDim = 'angle';
 let sortKey = 'hook_rate_lw';
 let sortDir = 'desc';
@@ -139,8 +140,12 @@ function suggestion(r) {
     if (Number.isFinite(ftiLw) && ftiLw >= 2) {
       return { icon: '📈', label: 'SCALE', reason: `${ftiLw.toFixed(1)} FTI at ${fmtMoney(r.cpa_lw)} CPA — scale BOF`, cls: C.scale };
     }
+    // 0 FTI + meaningful spend: NEW TARGET (decisive) or WATCH (inconclusive)
     if (Number.isFinite(ftiLw) && ftiLw === 0 && spendLw >= 50) {
       return { icon: '🎯', label: 'NEW TARGET', reason: `${fmtMoney(spendLw)} spend, 0 FTI — test new audience`, cls: C.target };
+    }
+    if (Number.isFinite(ftiLw) && ftiLw === 0 && spendLw >= 10) {
+      return { icon: '👀', label: 'WATCH', reason: `${fmtMoney(spendLw)} spend, 0 FTI — under $50 threshold, need more spend to judge`, cls: C.watch };
     }
     if (Number.isFinite(freqLw) && freqLw > 3 && !(ftiLw > 0)) {
       return { icon: '♻️', label: 'REFRESH', reason: `Freq ${freqLw.toFixed(1)} — rotate creative`, cls: C.refresh };
@@ -234,20 +239,19 @@ function renderCard(r) {
     <div class="text-sm ${lwValueCls}">Frequency: <b>${lwFreq}</b>${freqDelta}</div>
     <div class="text-sm ${lwValueCls}">Spend: <b>${fmtMoney(spendLW)}</b>${spendDelta}</div>`;
 
-  // Lifetime block — always shown if data exists
+  // Lifetime block — labeled per-objective so the two cards are clearly distinct
   const hasLifetime = Number.isFinite(r.spend) && r.spend > 0;
   const lifetimeTOF = `
     <div class="text-sm">Hook: <b>${fmtPct(r.hook_rate)}</b></div>
     <div class="text-sm">Thumb-Stop: <b>${fmtPct(r.thumb_stop)}</b></div>
     <div class="text-sm">CPM: <b>${fmtMoney(r.cpm)}</b></div>
     <div class="text-sm">Frequency: <b>${fmtFreq(r.frequency)}</b></div>
-    <div class="text-sm">Total Spend: <b>${fmtMoney(r.spend)}</b></div>`;
+    <div class="text-sm text-slate-500">Total ad spend (all objectives): <b>${fmtMoney(r.spend)}</b></div>`;
   const lifetimeBOF = `
     <div class="text-sm">FTI: <b>${fmtNum(r.fti)}</b></div>
     <div class="text-sm">CPA: <b>${r.fti > 0 ? fmtMoney(r.cpa) : '—'}</b></div>
-    <div class="text-sm">Thumb-Stop: <b>${fmtPct(r.thumb_stop)}</b></div>
     <div class="text-sm">Frequency: <b>${fmtFreq(r.frequency)}</b></div>
-    <div class="text-sm">Total Spend: <b>${fmtMoney(r.spend)}</b></div>`;
+    <div class="text-sm text-slate-500">Total ad spend (all objectives): <b>${fmtMoney(r.spend)}</b></div>`;
 
   const imgUrl = `${assetBase}${r.ad_code}.webp`;
   const cid = cardId(r);
@@ -291,10 +295,10 @@ function renderCard(r) {
         ${isBOF ? lwBlockBOF : lwBlockTOF}
       </div>
 
-      <!-- LIFETIME section -->
+      <!-- LIFETIME section — labeled per objective -->
       ${hasLifetime ? `
       <div class="border-t border-slate-800 pt-2">
-        <div class="text-[10px] uppercase tracking-wide text-slate-500 mb-1">Lifetime (since launch)</div>
+        <div class="text-[10px] uppercase tracking-wide text-slate-500 mb-1">Lifetime — ${objective} performance</div>
         ${isBOF ? lifetimeBOF : lifetimeTOF}
       </div>` : ''}
 
@@ -479,6 +483,13 @@ function render() {
   const filtered = rows.filter(r => {
     if (filterFunnel !== 'All' && String(r.objective).toUpperCase() !== filterFunnel) return false;
     if (filterRegion !== 'All' && String(r.region).toUpperCase() !== filterRegion) return false;
+    if (filterStatus !== 'All') {
+      const paused = isPausedInObjective(r);
+      const killed = String(r.status).toLowerCase() === 'kill';
+      if (filterStatus === 'Paused' && !paused) return false;
+      if (filterStatus === 'Kill'   && !killed) return false;
+      if (filterStatus === 'Live'   && (paused || killed)) return false;
+    }
     return true;
   });
 
@@ -505,12 +516,14 @@ async function initMeta() {
     const rateEl   = document.getElementById('usd-rate');
     const funnelEl = document.getElementById('funnel');
     const regionEl = document.getElementById('region');
+    const statusEl = document.getElementById('status');
     const segEl    = document.getElementById('segment-dim');
 
     if (ccyEl)    { ccyEl.value = 'USD'; currency = 'USD'; ccyEl.addEventListener('change', () => { currency = ccyEl.value; render(); }); }
     if (rateEl)   { rateEl.value = usdRate; rateEl.addEventListener('change', (e) => { usdRate = ZaapiDataService.toNumber(e.target.value, usdRate) || usdRate; if (currency === 'THB') render(); }); }
     if (funnelEl) funnelEl.addEventListener('change', () => { filterFunnel = funnelEl.value; render(); });
     if (regionEl) regionEl.addEventListener('change', () => { filterRegion = regionEl.value; render(); });
+    if (statusEl) statusEl.addEventListener('change', () => { filterStatus = statusEl.value; render(); });
     if (segEl)    segEl.addEventListener('change',    () => { segmentDim  = segEl.value;    render(); });
 
     render();
