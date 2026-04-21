@@ -114,33 +114,54 @@ function renderTrend(history) {
 function marketCard(title, data, currency, rate) {
   if (!data) {
     return `<article class="bg-slate-900 border border-slate-800 rounded p-3">
-      <h3 class="font-semibold mb-2">${title}</h3>
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="font-semibold">${title}</h3>
+      </div>
       <div class="text-sm text-slate-500">No data this week</div>
     </article>`;
   }
   return `<article class="bg-slate-900 border border-slate-800 rounded p-3">
-    <h3 class="font-semibold mb-2">${title}</h3>
+    <div class="flex justify-between items-center mb-2">
+      <h3 class="font-semibold">${title}</h3>
+      <button
+        class="text-xs px-2 py-1 bg-indigo-900/40 border border-indigo-700 text-indigo-300 rounded hover:bg-indigo-800/40"
+        onclick="analyzeRegion('${title}')"
+        title="Run AI analysis for this region">
+        🧠 Analyze
+      </button>
+    </div>
     <div class="text-sm space-y-1">
       <div>Spend: <b>${fmtMoney(data.spend, currency, rate)}</b></div>
       <div>FTI: <b>${N(data.fti).toFixed(1)}</b></div>
       <div>Clicks: <b>${N(data.clicks).toLocaleString()}</b></div>
       <div>Impressions: <b>${N(data.impressions).toLocaleString()}</b></div>
     </div>
+    <!-- AI analysis output goes here after click -->
+    <div id="ai-panel-${title}" class="hidden mt-3 pt-3 border-t border-slate-800 space-y-2"></div>
   </article>`;
 }
 
 // --- main ------------------------------------------------------------------
+// Global state for the 🧠 Analyze button (needs access outside initOverview scope)
+window.__zaapi = {
+  history: [],
+  actionLog: [],
+  learningAccum: [],
+  latestCW: null,
+};
+
 async function initOverview() {
   const loading = document.getElementById('loading');
   const content = document.getElementById('content');
 
   try {
     // Load core tabs; targets/config are optional
-    const [googleDaily, metaDaily, convDaily, actionLog] = await Promise.all([
+    const [googleDaily, metaDaily, convDaily, actionLog, learningAccum] = await Promise.all([
       ZaapiDataService.fetchTab('raw_google_daily').catch(() => []),
       ZaapiDataService.fetchTab('raw_meta_daily').catch(() => []),
       ZaapiDataService.fetchTab('raw_google_conversions_daily').catch(() => []),
       ZaapiDataService.fetchTab('action_log').catch(() => []),
+      ZaapiDataService.fetchTab('learning_accum').catch(() => []),
     ]);
     const targets = await ZaapiDataService.fetchTab('targets').catch(() => []);
     const config = await ZaapiDataService.getConfig().catch(() => ({}));
@@ -155,6 +176,12 @@ async function initOverview() {
     }
 
     const latestCW = history[history.length - 1].cw;
+
+    // Stash for 🧠 Analyze button
+    window.__zaapi.history = history;
+    window.__zaapi.actionLog = actionLog;
+    window.__zaapi.learningAccum = learningAccum;
+    window.__zaapi.latestCW = latestCW;
 
     // Populate week selector
     const weekSelect = document.getElementById('week-select');
@@ -236,3 +263,66 @@ async function initOverview() {
 }
 
 document.addEventListener('DOMContentLoaded', initOverview);
+
+// ─────────────────────────────────────────────────────────────────────────
+// 🧠 AI Analysis — called from the per-region "Analyze" button
+// ─────────────────────────────────────────────────────────────────────────
+window.analyzeRegion = async function (region) {
+  const panel = document.getElementById(`ai-panel-${region}`);
+  if (!panel) return;
+
+  if (!window.AIAnalyzer.hasAPIKey()) {
+    panel.classList.remove('hidden');
+    panel.innerHTML = `
+      <div class="text-xs text-amber-300 bg-amber-950/40 border border-amber-900 rounded p-2">
+        Set your Anthropic API key first — click ⚙ in the header. Stored only in your browser's localStorage.
+      </div>`;
+    return;
+  }
+
+  panel.classList.remove('hidden');
+  panel.innerHTML = '<div class="text-xs text-slate-400 animate-pulse">🧠 Analyzing... (~5-10 sec)</div>';
+
+  try {
+    const { history, actionLog, learningAccum, latestCW } = window.__zaapi;
+
+    // Current week metrics for this region only
+    const currentWeek = history[history.length - 1];
+    const currentMetrics = currentWeek?.regions?.[region] || null;
+
+    // Region-only 6wk history
+    const regionHistory = history.map(h => ({
+      cw: h.cw,
+      ...(h.regions?.[region] || { spend: 0, fti: 0, clicks: 0, impressions: 0 }),
+    }));
+
+    const { systemPrompt, userPrompt } = window.AIAnalyzer.buildPrompt({
+      region,
+      cw: latestCW,
+      currentMetrics,
+      history: regionHistory,
+      pastActions: actionLog,
+      pastOutcomes: learningAccum,
+    });
+
+    const result = await window.AIAnalyzer.callClaude({ systemPrompt, userPrompt });
+    window.AIAnalyzer.renderAnalysis(panel, result, { region, CW: latestCW });
+  } catch (err) {
+    panel.innerHTML = `<div class="text-xs text-red-400 bg-red-950/40 border border-red-900 rounded p-2">❌ ${err.message}</div>`;
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────
+// ⚙ Settings — API key management
+// ─────────────────────────────────────────────────────────────────────────
+window.openAISettings = function () {
+  const existing = window.AIAnalyzer.getAPIKey();
+  const masked = existing ? existing.slice(0, 8) + '...' + existing.slice(-4) : '(not set)';
+  const newKey = prompt(
+    `Enter your Anthropic API key.\n\nCurrent: ${masked}\n\nStored in browser localStorage only. Leave blank to clear.`,
+    existing
+  );
+  if (newKey === null) return;  // cancelled
+  window.AIAnalyzer.setAPIKey(newKey.trim());
+  alert(newKey.trim() ? 'API key saved.' : 'API key cleared.');
+};
