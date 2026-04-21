@@ -138,51 +138,50 @@ function suggestion(r) {
 
   if (isBOF) {
     if (Number.isFinite(ftiLw) && ftiLw >= 2) {
-      return { icon: '📈', label: 'SCALE', reason: `${ftiLw.toFixed(1)} FTI at ${fmtMoney(r.cpa_lw)} CPA — scale BOF`, cls: C.scale };
+      return { icon: '📈', label: 'SCALE', reason: `${ftiLw.toFixed(1)} FTI at ${fmtMoney(r.cpa_lw)} CPA — pour more BOF budget`, cls: C.scale };
     }
-    // 0 FTI + meaningful spend: NEW TARGET (decisive) or WATCH (inconclusive)
     if (Number.isFinite(ftiLw) && ftiLw === 0 && spendLw >= 50) {
-      return { icon: '🎯', label: 'NEW TARGET', reason: `${fmtMoney(spendLw)} spend, 0 FTI — test new audience`, cls: C.target };
+      return { icon: '🎯', label: 'NEW TARGETING', reason: `${fmtMoney(spendLw)} spent with 0 FTI — creative works, audience doesn't. Test new persona.`, cls: C.target };
     }
     if (Number.isFinite(ftiLw) && ftiLw === 0 && spendLw >= 10) {
-      return { icon: '👀', label: 'WATCH', reason: `${fmtMoney(spendLw)} spend, 0 FTI — under $50 threshold, need more spend to judge`, cls: C.watch };
+      return { icon: '👀', label: 'WATCH', reason: `${fmtMoney(spendLw)} spent with 0 FTI — under $50, need more budget to judge`, cls: C.watch };
     }
     if (Number.isFinite(freqLw) && freqLw > 3 && !(ftiLw > 0)) {
-      return { icon: '♻️', label: 'REFRESH', reason: `Freq ${freqLw.toFixed(1)} — rotate creative`, cls: C.refresh };
+      return { icon: '♻️', label: 'REFRESH CREATIVE', reason: `Freq ${freqLw.toFixed(1)} — audience saturated, rotate in a new edit`, cls: C.refresh };
     }
     if (Number.isFinite(r.cpa_lw) && Number.isFinite(r.cpa_pw) && r.cpa_pw > 0 && r.cpa_lw > r.cpa_pw * 1.5) {
-      return { icon: '📡', label: 'NEW CHANNEL', reason: `CPA up ${((r.cpa_lw / r.cpa_pw - 1) * 100).toFixed(0)}% WoW — try new placement`, cls: C.channel };
+      return { icon: '📡', label: 'NEW CHANNEL', reason: `CPA up ${((r.cpa_lw / r.cpa_pw - 1) * 100).toFixed(0)}% WoW — try different placement (IG Reels / Stories)`, cls: C.channel };
     }
-    return { icon: '✅', label: 'CONTINUE', reason: 'Healthy — maintain', cls: C.cont };
+    return { icon: '✅', label: 'CONTINUE', reason: 'Healthy — maintain current setup', cls: C.cont };
   }
 
   // TOF
   if (Number.isFinite(hookLw) && hookLw > 35 && (!Number.isFinite(freqLw) || freqLw < 2.5)) {
-    return { icon: '📈', label: 'SCALE', reason: `Hook ${hookLw.toFixed(0)}% + freq ${fmtFreq(freqLw)} — scale TOF`, cls: C.scale };
+    return { icon: '📈', label: 'SCALE', reason: `Hook ${hookLw.toFixed(0)}% + freq ${fmtFreq(freqLw)} — proven winner, pour TOF budget`, cls: C.scale };
   }
   if (Number.isFinite(freqLw) && freqLw > 3) {
-    return { icon: '♻️', label: 'REFRESH', reason: `Freq ${freqLw.toFixed(1)} — audience saturated`, cls: C.refresh };
+    return { icon: '♻️', label: 'REFRESH CREATIVE', reason: `Freq ${freqLw.toFixed(1)} — audience saturated, rotate in a new edit`, cls: C.refresh };
   }
   if (Number.isFinite(hookLw) && Number.isFinite(hookPw) && (hookPw - hookLw) > 10) {
-    return { icon: '📉', label: 'WATCH', reason: `Hook dropped ${(hookPw - hookLw).toFixed(0)}pp WoW — creative tiring`, cls: C.watch };
+    return { icon: '📉', label: 'WATCH', reason: `Hook dropped ${(hookPw - hookLw).toFixed(0)}pp WoW — creative tiring, prep replacement`, cls: C.watch };
   }
   if (Number.isFinite(cpmLw) && Number.isFinite(cpmPw) && cpmPw > 0 && cpmLw > cpmPw * 1.5) {
-    return { icon: '📡', label: 'NEW CHANNEL', reason: `CPM up ${((cpmLw / cpmPw - 1) * 100).toFixed(0)}% WoW — test new placement`, cls: C.channel };
+    return { icon: '📡', label: 'NEW CHANNEL', reason: `CPM up ${((cpmLw / cpmPw - 1) * 100).toFixed(0)}% WoW — try different placement`, cls: C.channel };
   }
   if (Number.isFinite(hookLw) && hookLw >= 25 && hookLw <= 35) {
     return { icon: '👀', label: 'WATCH', reason: `Hook ${hookLw.toFixed(0)}% — borderline, need more data`, cls: C.watch };
   }
-  return { icon: '✅', label: 'CONTINUE', reason: 'Healthy — maintain', cls: C.cont };
+  return { icon: '✅', label: 'CONTINUE', reason: 'Healthy — maintain current setup', cls: C.cont };
 }
 
 function borderForSuggestion(s) {
-  if (s.label === 'KILL')        return 'border-red-500';
-  if (s.label === 'SCALE')       return 'border-emerald-500';
-  if (s.label === 'REFRESH')     return 'border-yellow-500';
-  if (s.label === 'NEW TARGET')  return 'border-purple-500';
-  if (s.label === 'NEW CHANNEL') return 'border-cyan-500';
-  if (s.label === 'WATCH')       return 'border-orange-500';
-  if (s.label === 'PAUSED')      return 'border-slate-600';
+  if (s.label === 'KILL')              return 'border-red-500';
+  if (s.label === 'SCALE')             return 'border-emerald-500';
+  if (s.label === 'REFRESH CREATIVE')  return 'border-yellow-500';
+  if (s.label === 'NEW TARGETING')     return 'border-purple-500';
+  if (s.label === 'NEW CHANNEL')       return 'border-cyan-500';
+  if (s.label === 'WATCH')             return 'border-orange-500';
+  if (s.label === 'PAUSED')            return 'border-slate-600';
   return 'border-slate-700';
 }
 
@@ -421,9 +420,28 @@ function renderSegmentTable(filteredRows) {
 }
 
 // --- summary table ---------------------------------------------------------
+// Click 👁 in a row → scroll to the matching card + open its image.
+window.toggleFromTable = function (adCode, objective) {
+  const cid = `card-${adCode}-${(objective || 'NA').toLowerCase()}`.replace(/[^a-zA-Z0-9-]/g, '-');
+  const card = document.getElementById(cid);
+  if (!card) return;
+  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const imgUrl = `${assetBase}${adCode}.webp`;
+  window.toggleAsset(cid, imgUrl, adCode);
+  // brief highlight so user can see which card opened
+  card.classList.add('ring-2', 'ring-sky-400');
+  setTimeout(() => card.classList.remove('ring-2', 'ring-sky-400'), 2000);
+};
+
 function renderSummary(filtered) {
   const sorted = [...filtered].sort((a, b) => {
     const av = a[sortKey], bv = b[sortKey];
+    // String sort for ad_code
+    if (sortKey === 'ad_code') {
+      const sa = String(av || ''), sb = String(bv || '');
+      return sortDir === 'desc' ? sb.localeCompare(sa) : sa.localeCompare(sb);
+    }
+    // Numeric sort for everything else
     if (!Number.isFinite(av) && !Number.isFinite(bv)) return 0;
     if (!Number.isFinite(av)) return 1;
     if (!Number.isFinite(bv)) return -1;
@@ -431,7 +449,8 @@ function renderSummary(filtered) {
   });
 
   const cols = [
-    { key: '',             label: 'Ad Code' },
+    { key: '',             label: '' },           // image toggle column
+    { key: 'ad_code',      label: 'Ad Code' },    // now sortable alphabetically
     { key: '',             label: 'Obj' },
     { key: '',             label: 'Region' },
     { key: '',             label: 'Suggestion' },
@@ -452,7 +471,13 @@ function renderSummary(filtered) {
   const body = sorted.map(r => {
     const sug = suggestion(r);
     return `<tr>
-      <td class="px-2 py-1 border-b border-slate-800">${r.ad_code}</td>
+      <td class="px-2 py-1 border-b border-slate-800">
+        <button
+          class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs flex items-center justify-center"
+          onclick="toggleFromTable('${r.ad_code}', '${r.objective || ''}')"
+          title="View creative">👁</button>
+      </td>
+      <td class="px-2 py-1 border-b border-slate-800 font-mono">${r.ad_code}</td>
       <td class="px-2 py-1 border-b border-slate-800">${r.objective || '—'}</td>
       <td class="px-2 py-1 border-b border-slate-800">${r.region}</td>
       <td class="px-2 py-1 border-b border-slate-800"><span class="px-1.5 py-0.5 rounded text-xs ${sug.cls}">${sug.icon} ${sug.label}</span></td>
@@ -472,10 +497,49 @@ function renderSummary(filtered) {
       const k = th.dataset.k;
       if (!k) return;
       if (sortKey === k) sortDir = sortDir === 'desc' ? 'asc' : 'desc';
-      else { sortKey = k; sortDir = 'desc'; }
+      else { sortKey = k; sortDir = (k === 'ad_code') ? 'asc' : 'desc'; }
       render();
     })
   );
+}
+
+// --- ACTION SUMMARY --------------------------------------------------------
+// Groups ads by verdict into buckets: Kill / Scale / New Targeting / New Channel / Refresh / Watch.
+// Each bucket shows count + clickable ad codes that scroll to the card.
+function renderActionSummary(filteredRows) {
+  const buckets = [
+    { label: 'KILL',              icon: '🛑', title: 'Kill',             color: 'bg-red-950/40 border-red-900 text-red-200' },
+    { label: 'SCALE',             icon: '📈', title: 'Scale',            color: 'bg-emerald-950/40 border-emerald-900 text-emerald-200' },
+    { label: 'NEW TARGETING',     icon: '🎯', title: 'Try New Targeting', color: 'bg-purple-950/40 border-purple-900 text-purple-200' },
+    { label: 'NEW CHANNEL',       icon: '📡', title: 'Try New Channel',   color: 'bg-cyan-950/40 border-cyan-900 text-cyan-200' },
+    { label: 'REFRESH CREATIVE',  icon: '♻️', title: 'Refresh Creative', color: 'bg-yellow-950/40 border-yellow-900 text-yellow-200' },
+    { label: 'WATCH',             icon: '👀', title: 'Watch',            color: 'bg-orange-950/40 border-orange-900 text-orange-200' },
+  ];
+
+  const rowsWithSug = filteredRows.map(r => ({ r, sug: suggestion(r) }));
+
+  const html = buckets.map(b => {
+    const hits = rowsWithSug.filter(x => x.sug.label === b.label);
+    const items = hits.map(({ r }) => {
+      const objTag = r.objective ? `<span class="text-[10px] opacity-60">${r.objective}</span>` : '';
+      return `<button
+        class="block w-full text-left text-[11px] font-mono px-1.5 py-0.5 rounded hover:bg-black/30 truncate"
+        onclick="toggleFromTable('${r.ad_code}', '${r.objective || ''}')"
+        title="Click to view creative">${r.ad_code} ${objTag}</button>`;
+    }).join('');
+    return `
+      <div class="border ${b.color} rounded p-2 flex flex-col gap-1 min-h-[120px]">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold">${b.icon} ${b.title}</span>
+          <span class="text-xs font-mono opacity-70">${hits.length}</span>
+        </div>
+        <div class="flex flex-col gap-0.5 mt-1">
+          ${items || '<span class="text-[11px] opacity-40 italic">nothing</span>'}
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('action-summary').innerHTML = html;
 }
 
 // --- render ----------------------------------------------------------------
@@ -497,6 +561,7 @@ function render() {
     ? filtered.map(renderCard).join('')
     : '<div class="text-sm text-slate-500 col-span-full">No ads match the current filters.</div>';
 
+  renderActionSummary(filtered);
   renderSegmentTable(filtered);
   renderSummary(filtered);
 }
