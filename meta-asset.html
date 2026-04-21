@@ -132,9 +132,12 @@
 
   <section id="content" class="hidden space-y-4">
 
-    <!-- AI Action Summary: what to do this week, grouped by verdict -->
+    <!-- ═══ AI Suggestions Panel (asset layer) — this week + last 2 weeks outcomes ═══ -->
+    <div id="ai-suggestions-panel"></div>
+
+    <!-- AI Action Summary: what to do this week, grouped by verdict (threshold-based, per-ad) -->
     <article class="bg-slate-900 border border-slate-800 rounded p-3">
-      <h2 class="font-semibold mb-2">🤖 This Week's Action List</h2>
+      <h2 class="font-semibold mb-2">🤖 Threshold-based Action List (per ad)</h2>
       <div id="action-summary" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2"></div>
     </article>
 
@@ -169,6 +172,7 @@
 
 <script src="data-service.js"></script>
 <script src="shared-nav.js"></script>
+<script src="ai-suggestions-panel.js"></script>
 <script src="meta-asset.js"></script>
 </body>
 </html>
