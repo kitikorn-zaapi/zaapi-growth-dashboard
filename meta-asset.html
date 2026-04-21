@@ -49,6 +49,21 @@
     </label>
   </section>
 
+  <!-- ═══ NEW v4: Vic Bullets Export bar ═══ -->
+  <section class="bg-indigo-950/40 border border-indigo-900 rounded p-3 flex flex-wrap items-center gap-3">
+    <div class="flex flex-col">
+      <span class="text-sm font-semibold text-indigo-200">🧾 Vic Bullets Export</span>
+      <span class="text-[11px] text-indigo-300/70">One-click copy: top + dead + replacements per region</span>
+    </div>
+    <div class="ml-auto flex flex-wrap gap-2">
+      <button data-region="TH"  class="vic-export-btn text-xs px-3 py-1.5 bg-indigo-900/60 border border-indigo-700 text-indigo-200 rounded hover:bg-indigo-800/60">🇹🇭 TH</button>
+      <button data-region="SEA" class="vic-export-btn text-xs px-3 py-1.5 bg-indigo-900/60 border border-indigo-700 text-indigo-200 rounded hover:bg-indigo-800/60">🌏 SEA</button>
+      <button data-region="ROW" class="vic-export-btn text-xs px-3 py-1.5 bg-indigo-900/60 border border-indigo-700 text-indigo-200 rounded hover:bg-indigo-800/60">🌍 ROW</button>
+      <button data-region="ALL" class="vic-export-btn text-xs px-3 py-1.5 bg-indigo-900/60 border border-indigo-700 text-indigo-200 rounded hover:bg-indigo-800/60">All</button>
+    </div>
+    <span id="vic-export-toast" class="hidden text-xs text-emerald-300 w-full text-right"></span>
+  </section>
+
   <!-- Reference / glossary (collapsible) -->
   <details class="bg-slate-900 border border-slate-800 rounded p-3">
     <summary class="cursor-pointer text-sm font-semibold text-slate-200">
@@ -106,7 +121,10 @@
         <h3 class="font-semibold text-slate-200 mb-2 border-b border-slate-800 pb-1">AI Verdicts</h3>
         <dl class="space-y-2">
           <dt class="font-semibold text-red-300">🛑 KILL</dt>
-          <dd class="text-slate-400 leading-snug">Hook &lt; 15%. Creative doesn't land — new targeting won't save a bad ad. Turn it off.</dd>
+          <dd class="text-slate-400 leading-snug">Hook &lt; 15% (never worked) OR fatigue score ≥5 (was working, now collapsed). Turn it off.</dd>
+          <!-- ═══ NEW v4: SATURATING entry ═══ -->
+          <dt class="font-semibold text-orange-200">🔥 SATURATING</dt>
+          <dd class="text-slate-400 leading-snug">Winner fatiguing. Fires only on ads with lifetime FTI &gt; 0 that now show multi-signal decay (fatigue score 3–4): freq ≥3 + FTI ↓, FTI decay ≥30% at flat spend, CPA drift ≥50%, or FTI collapse to 0. <b>Refresh now or lose it.</b> Card shows replacement candidates inherited from same-region winners.</dd>
           <dt class="font-semibold text-emerald-300">📈 SCALE</dt>
           <dd class="text-slate-400 leading-snug">TOF: Hook &gt; 35% + Freq &lt; 2.5. BOF: FTI ≥ 2. Proven winner — pour more budget in.</dd>
           <dt class="font-semibold text-purple-300">🎯 NEW TARGETING</dt>
@@ -114,11 +132,11 @@
           <dt class="font-semibold text-cyan-300">📡 NEW CHANNEL</dt>
           <dd class="text-slate-400 leading-snug">CPM or CPA up &gt;50% WoW. Audience right, placement getting expensive — test IG Reels, Stories, or turn off Audience Network.</dd>
           <dt class="font-semibold text-yellow-300">♻️ REFRESH CREATIVE</dt>
-          <dd class="text-slate-400 leading-snug">Frequency &gt; 3 and no FTI. Audience saturated — rotate a fresh edit of the same angle.</dd>
+          <dd class="text-slate-400 leading-snug">Frequency &gt; 3 and no FTI (ad fatigued without ever converting). Rotate a fresh edit of the same angle. Distinct from SATURATING, which fires on ads that <i>did</i> convert historically.</dd>
           <dt class="font-semibold text-orange-300">👀 WATCH</dt>
-          <dd class="text-slate-400 leading-snug">TOF: borderline hook (25–35%) or hook dropped &gt;10pp WoW. BOF: $10–$50 spend with 0 FTI — inconclusive, not enough budget yet to declare the audience wrong.</dd>
+          <dd class="text-slate-400 leading-snug">TOF: borderline hook (25–35%) or hook dropped &gt;10pp WoW. BOF: $10–$50 spend with 0 FTI — inconclusive, not enough budget yet.</dd>
           <dt class="font-semibold text-slate-300">⏸ PAUSED</dt>
-          <dd class="text-slate-400 leading-snug">Ad ran historically but zero spend last week. Check lifetime metrics below to decide if worth relaunching.</dd>
+          <dd class="text-slate-400 leading-snug">Ran historically but zero spend last week. Check lifetime metrics to decide if worth relaunching.</dd>
           <dt class="font-semibold text-slate-400">⏳ NO DATA</dt>
           <dd class="text-slate-400 leading-snug">Never ran meaningfully (&lt;$10 LW, no lifetime). Wait for data.</dd>
           <dt class="font-semibold text-slate-300">✅ CONTINUE</dt>
@@ -132,13 +150,13 @@
 
   <section id="content" class="hidden space-y-4">
 
-    <!-- ═══ AI Suggestions Panel (asset layer) — this week + last 2 weeks outcomes ═══ -->
+    <!-- ═══ AI Suggestions Panel (asset layer) ═══ -->
     <div id="ai-suggestions-panel"></div>
 
-    <!-- AI Action Summary: what to do this week, grouped by verdict (threshold-based, per-ad) -->
+    <!-- AI Action Summary: per-ad verdicts grouped by action type -->
     <article class="bg-slate-900 border border-slate-800 rounded p-3">
       <h2 class="font-semibold mb-2">🤖 Threshold-based Action List (per ad)</h2>
-      <div id="action-summary" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2"></div>
+      <div id="action-summary" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2"></div>
     </article>
 
     <!-- Segment Analysis -->
