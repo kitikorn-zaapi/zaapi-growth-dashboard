@@ -1,0 +1,3 @@
+{
+  "_comment": "Deprecated fallback only. Live data now loads from Hub Google Sheet via data-service.js."
+}

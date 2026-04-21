@@ -1,19 +1,15 @@
-const SHEET_ID = "1o9WPWpJtaHAQB6dB1tfsQJtKIuk1ea38-jQuJIOPLa8";
-const BASE_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=`;
+// data-service.js — single source of truth reader
+const SHEET_ID = '1o9WPWpJtaHAQB6dB1tfsQJtKIuk1ea38-jQuJIOPLa8';
+const _cache = {};
 
-const sessionCache = {
-  tabs: new Map(),
-  config: null
-};
-
-function buildSheetUrl(tabName) {
-  return `${BASE_URL}${encodeURIComponent(tabName)}`;
+function sheetUrl(tabName) {
+  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tabName)}`;
 }
 
 function parseCSV(text) {
   const rows = [];
   let row = [];
-  let cell = "";
+  let cell = '';
   let i = 0;
   let inQuotes = false;
 
@@ -34,7 +30,7 @@ function parseCSV(text) {
 
     if (ch === ',' && !inQuotes) {
       row.push(cell.trim());
-      cell = "";
+      cell = '';
       i += 1;
       continue;
     }
@@ -42,8 +38,8 @@ function parseCSV(text) {
     if ((ch === '\n' || ch === '\r') && !inQuotes) {
       if (ch === '\r' && next === '\n') i += 1;
       row.push(cell.trim());
-      cell = "";
-      if (row.some((v) => v !== "")) rows.push(row);
+      cell = '';
+      if (row.some((v) => v !== '')) rows.push(row);
       row = [];
       i += 1;
       continue;
@@ -55,44 +51,52 @@ function parseCSV(text) {
 
   if (cell.length || row.length) {
     row.push(cell.trim());
-    if (row.some((v) => v !== "")) rows.push(row);
+    if (row.some((v) => v !== '')) rows.push(row);
   }
 
   if (!rows.length) return [];
 
-  const headers = rows[0].map((h) => String(h || "").trim());
+  const headers = rows[0].map((h) => String(h || '').trim());
   return rows.slice(1).map((r) => {
     const obj = {};
     headers.forEach((h, idx) => {
-      obj[h] = (r[idx] || "").trim();
+      obj[h] = (r[idx] || '').trim();
     });
     return obj;
   });
 }
 
 function toNumber(value, fallback = 0) {
-  const parsed = parseFloat(String(value ?? "").replace(/[$,%฿,]/g, "").trim());
+  const parsed = parseFloat(String(value ?? '').replace(/[$,%฿,]/g, '').trim());
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+function pick(obj, keys, fallback = '') {
+  for (const key of keys) {
+    const value = obj?.[key];
+    if (value !== undefined && value !== null && String(value).trim() !== '') return value;
+  }
+  return fallback;
+}
+
 function fmtCW(cwValue) {
-  const raw = String(cwValue || "").trim();
-  if (!raw) return "—";
+  const raw = String(cwValue || '').trim();
+  if (!raw) return '—';
   if (/^CW\d+$/i.test(raw)) return raw.toUpperCase();
   if (/^\d+$/.test(raw)) return `CW${raw}`;
   return raw;
 }
 
 async function fetchTab(tabName) {
-  if (sessionCache.tabs.has(tabName)) return sessionCache.tabs.get(tabName);
+  if (_cache[tabName]) return _cache[tabName];
 
-  const promise = fetch(buildSheetUrl(tabName)).then(async (res) => {
+  _cache[tabName] = fetch(sheetUrl(tabName)).then(async (res) => {
     if (!res.ok) throw new Error(`Failed to load tab ${tabName}`);
-    return parseCSV(await res.text());
+    const text = await res.text();
+    return parseCSV(text);
   });
 
-  sessionCache.tabs.set(tabName, promise);
-  return promise;
+  return _cache[tabName];
 }
 
 async function fetchTabs(tabNames) {
@@ -100,32 +104,36 @@ async function fetchTabs(tabNames) {
   return Object.fromEntries(pairs);
 }
 
-async function fetchConfig() {
-  if (sessionCache.config) return sessionCache.config;
-  const rows = await fetchTab("config");
+async function getConfig() {
+  const rows = await fetchTab('config');
   const map = {};
-
-  rows.forEach((row) => {
-    const key = (row.key || row.Key || "").trim();
-    const value = row.value ?? row.Value ?? "";
+  rows.forEach((r) => {
+    const key = String(pick(r, ['key', 'Key'])).trim();
+    const value = pick(r, ['value', 'Value']);
     if (key) map[key] = String(value).trim();
   });
-
-  sessionCache.config = map;
   return map;
 }
 
+async function fetchConfig() {
+  return getConfig();
+}
+
 async function getUsdThbRate() {
-  const config = await fetchConfig();
+  const config = await getConfig();
   return toNumber(config.usd_thb_rate, 34);
 }
 
 window.ZaapiDataService = {
   SHEET_ID,
+  sheetUrl,
+  parseCSV,
+  toNumber,
+  pick,
+  fmtCW,
   fetchTab,
   fetchTabs,
+  getConfig,
   fetchConfig,
-  getUsdThbRate,
-  toNumber,
-  fmtCW
+  getUsdThbRate
 };
