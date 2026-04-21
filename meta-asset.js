@@ -1,11 +1,6 @@
 // meta-asset.js — Asset Layer (Layer 3)
-// Features:
-//   - Currency toggle (USD/THB) with editable forex rate
-//   - Funnel filter (All/TOF/BOF) — maps to Objective column
-//   - Region filter (All/TH/SEA/ROW)
-//   - Segment Analysis panel — aggregate perf by Angle / Production / Region / Feature
-//   - AI suggestion per card (Kill / Scale / New Target / Refresh / Continue / Watch)
-//   - Image toggle per card (webp from ./assets/{ad_code}.webp)
+// v3 adds: PAUSED state detection, clear LW vs Lifetime sections on every card.
+// Reads creative_log (IMPORTRANGE'd from the accumulator tab of the source sheet).
 
 let rows = [];
 let usdRate = 34;
@@ -53,7 +48,7 @@ function deltaHTML(lw, pw, dir = 'higher_better', unit = 'pct_abs') {
   return `<span class="${color} text-xs ml-1">${sign} ${display}</span>`;
 }
 
-// --- parse creative_log row ------------------------------------------------
+// --- parse row -------------------------------------------------------------
 function parseRow(raw) {
   return {
     ad_code:     F(raw, ['ad_code', 'Ad Code']),
@@ -65,6 +60,7 @@ function parseRow(raw) {
     objective:   F(raw, ['Objective', 'objective', 'funnel']),
     assessment:  F(raw, ['assessment', 'Claude Notes']),
 
+    // lifetime
     spend:        num(F(raw, ['spend'])),
     hook_rate:    num(F(raw, ['hook_rate'])),
     thumb_stop:   num(F(raw, ['thumb_stop'])),
@@ -73,6 +69,7 @@ function parseRow(raw) {
     fti:          num(F(raw, ['fti'])),
     cpa:          num(F(raw, ['cpa'])),
 
+    // last week
     spend_tof_lw: num(F(raw, ['spend_tof_lw'])),
     spend_bof_lw: num(F(raw, ['spend_bof_lw'])),
     hook_rate_lw: num(F(raw, ['hook_rate_lw'])),
@@ -81,6 +78,7 @@ function parseRow(raw) {
     fti_lw:       num(F(raw, ['fti_lw'])),
     cpa_lw:       num(F(raw, ['cpa_lw'])),
 
+    // prior week
     spend_tof_pw: num(F(raw, ['spend_tof_pw'])),
     spend_bof_pw: num(F(raw, ['spend_bof_pw'])),
     hook_rate_pw: num(F(raw, ['hook_rate_pw'])),
@@ -91,8 +89,17 @@ function parseRow(raw) {
   };
 }
 
+// --- paused detection ------------------------------------------------------
+// Paused = zero spend last week (in this objective) but positive lifetime spend.
+function isPausedInObjective(r) {
+  const isBOF = (r.objective || '').toUpperCase() === 'BOF';
+  const spendLW = isBOF ? r.spend_bof_lw : r.spend_tof_lw;
+  const lwZero = !Number.isFinite(spendLW) || spendLW === 0;
+  const hasLifetime = Number.isFinite(r.spend) && r.spend > 0;
+  return lwZero && hasLifetime;
+}
+
 // --- AI suggestion per row -------------------------------------------------
-// Returns { icon, label, reason, cls } — cls is the Tailwind class chain for the badge.
 function suggestion(r) {
   const isBOF   = (r.objective || '').toUpperCase() === 'BOF';
   const hookLw  = r.hook_rate_lw;
@@ -110,24 +117,27 @@ function suggestion(r) {
     channel: 'bg-cyan-950/60 border-cyan-900 text-cyan-300',
     refresh: 'bg-yellow-950/60 border-yellow-900 text-yellow-300',
     watch:   'bg-orange-950/60 border-orange-900 text-orange-300',
+    paused:  'bg-slate-800/80 border-slate-600 text-slate-300',
     nodata:  'bg-slate-900/60 border-slate-700 text-slate-400',
     cont:    'bg-slate-900/60 border-slate-700 text-slate-300',
   };
 
-  // 0) no data
-  if (!Number.isFinite(spendLw) || spendLw < 10) {
-    return { icon: '⏳', label: 'NO DATA', reason: 'Spend too low last week to judge', cls: C.nodata };
+  // 0) Paused: had lifetime spend, zero LW spend
+  if (isPausedInObjective(r)) {
+    return { icon: '⏸', label: 'PAUSED', reason: 'Zero spend last week — check lifetime metrics below', cls: C.paused };
   }
-
-  // 1) kill (applies to both) — hook collapsed
+  // 1) No data: no meaningful spend ever
+  if (!Number.isFinite(spendLw) || spendLw < 10) {
+    return { icon: '⏳', label: 'NO DATA', reason: 'Spend too low to judge yet', cls: C.nodata };
+  }
+  // 2) Kill: hook collapsed
   if (Number.isFinite(hookLw) && hookLw > 0 && hookLw < 15) {
     return { icon: '🛑', label: 'KILL', reason: `Hook ${hookLw.toFixed(0)}% < 15% — creative isn't landing`, cls: C.kill };
   }
 
   if (isBOF) {
-    // BOF logic — centers on FTI + CPA
     if (Number.isFinite(ftiLw) && ftiLw >= 2) {
-      return { icon: '📈', label: 'SCALE', reason: `${ftiLw.toFixed(1)} FTI at ${fmtMoney(r.cpa_lw)} CPA — scale BOF budget`, cls: C.scale };
+      return { icon: '📈', label: 'SCALE', reason: `${ftiLw.toFixed(1)} FTI at ${fmtMoney(r.cpa_lw)} CPA — scale BOF`, cls: C.scale };
     }
     if (Number.isFinite(ftiLw) && ftiLw === 0 && spendLw >= 50) {
       return { icon: '🎯', label: 'NEW TARGET', reason: `${fmtMoney(spendLw)} spend, 0 FTI — test new audience`, cls: C.target };
@@ -136,12 +146,12 @@ function suggestion(r) {
       return { icon: '♻️', label: 'REFRESH', reason: `Freq ${freqLw.toFixed(1)} — rotate creative`, cls: C.refresh };
     }
     if (Number.isFinite(r.cpa_lw) && Number.isFinite(r.cpa_pw) && r.cpa_pw > 0 && r.cpa_lw > r.cpa_pw * 1.5) {
-      return { icon: '📡', label: 'NEW CHANNEL', reason: `CPA up ${((r.cpa_lw / r.cpa_pw - 1) * 100).toFixed(0)}% WoW — try different placement`, cls: C.channel };
+      return { icon: '📡', label: 'NEW CHANNEL', reason: `CPA up ${((r.cpa_lw / r.cpa_pw - 1) * 100).toFixed(0)}% WoW — try new placement`, cls: C.channel };
     }
     return { icon: '✅', label: 'CONTINUE', reason: 'Healthy — maintain', cls: C.cont };
   }
 
-  // TOF logic — centers on Hook + CPM + Frequency
+  // TOF
   if (Number.isFinite(hookLw) && hookLw > 35 && (!Number.isFinite(freqLw) || freqLw < 2.5)) {
     return { icon: '📈', label: 'SCALE', reason: `Hook ${hookLw.toFixed(0)}% + freq ${fmtFreq(freqLw)} — scale TOF`, cls: C.scale };
   }
@@ -152,7 +162,7 @@ function suggestion(r) {
     return { icon: '📉', label: 'WATCH', reason: `Hook dropped ${(hookPw - hookLw).toFixed(0)}pp WoW — creative tiring`, cls: C.watch };
   }
   if (Number.isFinite(cpmLw) && Number.isFinite(cpmPw) && cpmPw > 0 && cpmLw > cpmPw * 1.5) {
-    return { icon: '📡', label: 'NEW CHANNEL', reason: `CPM up ${((cpmLw / cpmPw - 1) * 100).toFixed(0)}% WoW — test different placement`, cls: C.channel };
+    return { icon: '📡', label: 'NEW CHANNEL', reason: `CPM up ${((cpmLw / cpmPw - 1) * 100).toFixed(0)}% WoW — test new placement`, cls: C.channel };
   }
   if (Number.isFinite(hookLw) && hookLw >= 25 && hookLw <= 35) {
     return { icon: '👀', label: 'WATCH', reason: `Hook ${hookLw.toFixed(0)}% — borderline, need more data`, cls: C.watch };
@@ -160,7 +170,6 @@ function suggestion(r) {
   return { icon: '✅', label: 'CONTINUE', reason: 'Healthy — maintain', cls: C.cont };
 }
 
-// --- border color based on signal ------------------------------------------
 function borderForSuggestion(s) {
   if (s.label === 'KILL')        return 'border-red-500';
   if (s.label === 'SCALE')       return 'border-emerald-500';
@@ -168,6 +177,7 @@ function borderForSuggestion(s) {
   if (s.label === 'NEW TARGET')  return 'border-purple-500';
   if (s.label === 'NEW CHANNEL') return 'border-cyan-500';
   if (s.label === 'WATCH')       return 'border-orange-500';
+  if (s.label === 'PAUSED')      return 'border-slate-600';
   return 'border-slate-700';
 }
 
@@ -181,52 +191,85 @@ function renderCard(r) {
   const isBOF = objective === 'BOF';
   const spendLW = isBOF ? r.spend_bof_lw : r.spend_tof_lw;
   const spendPW = isBOF ? r.spend_bof_pw : r.spend_tof_pw;
+  const paused = isPausedInObjective(r);
 
-  const hookDelta  = deltaHTML(r.hook_rate_lw, r.hook_rate_pw, 'higher_better', 'pct_abs');
-  const freqDelta  = deltaHTML(r.frequency_lw, r.frequency_pw, 'lower_better', 'abs');
-  const cpmDelta   = deltaHTML(r.cpm_lw, r.cpm_pw, 'lower_better', 'pct_rel');
-  const spendDelta = deltaHTML(spendLW, spendPW, 'higher_better', 'pct_rel');
-  const ftiDelta   = deltaHTML(r.fti_lw, r.fti_pw, 'higher_better', 'abs');
-  const cpaDelta   = deltaHTML(r.cpa_lw, r.cpa_pw, 'lower_better', 'pct_rel');
+  // Deltas (suppressed when paused — no meaningful WoW on zero)
+  const hookDelta  = paused ? '' : deltaHTML(r.hook_rate_lw, r.hook_rate_pw, 'higher_better', 'pct_abs');
+  const freqDelta  = paused ? '' : deltaHTML(r.frequency_lw, r.frequency_pw, 'lower_better', 'abs');
+  const cpmDelta   = paused ? '' : deltaHTML(r.cpm_lw, r.cpm_pw, 'lower_better', 'pct_rel');
+  const spendDelta = paused ? '' : deltaHTML(spendLW, spendPW, 'higher_better', 'pct_rel');
+  const ftiDelta   = paused ? '' : deltaHTML(r.fti_lw, r.fti_pw, 'higher_better', 'abs');
+  const cpaDelta   = paused ? '' : deltaHTML(r.cpa_lw, r.cpa_pw, 'lower_better', 'pct_rel');
 
   const sug = suggestion(r);
   const border = borderForSuggestion(sug);
 
-  const statusColor = String(r.status).toLowerCase() === 'kill'
-    ? 'bg-red-900 text-red-200' : 'bg-emerald-900 text-emerald-200';
+  // Status badge: show PAUSED over Live when paused, otherwise show Live/Kill from status
+  let statusBadge;
+  if (paused) {
+    statusBadge = `<span class="text-xs px-1.5 py-0.5 rounded bg-slate-700 text-slate-300">⏸ PAUSED</span>`;
+  } else {
+    const statusColor = String(r.status).toLowerCase() === 'kill'
+      ? 'bg-red-900 text-red-200' : 'bg-emerald-900 text-emerald-200';
+    statusBadge = `<span class="text-xs px-1.5 py-0.5 rounded ${statusColor}">${r.status || 'Live'}</span>`;
+  }
   const objBadgeColor = isBOF ? 'bg-purple-900 text-purple-200' : 'bg-sky-900 text-sky-200';
 
-  const tofBlock = `
-    <div class="text-sm">Hook: <b>${fmtPct(r.hook_rate_lw)}</b>${hookDelta}</div>
-    <div class="text-sm">Thumb-Stop: <b>${fmtPct(r.thumb_stop)}</b> <span class="text-slate-500 text-xs">(lifetime)</span></div>
-    <div class="text-sm">CPM: <b>${fmtMoney(r.cpm_lw)}</b>${cpmDelta}</div>`;
-  const bofBlock = `
-    <div class="text-sm">FTI: <b>${fmtNum(r.fti_lw)}</b>${ftiDelta}</div>
-    <div class="text-sm">CPA: <b>${r.fti_lw > 0 ? fmtMoney(r.cpa_lw) : '—'}</b>${cpaDelta}</div>`;
+  // LW block — dimmed when paused, "—" values
+  const lwValueCls = paused ? 'text-slate-600' : '';
+  const lwHook  = paused ? '—' : fmtPct(r.hook_rate_lw);
+  const lwCpm   = paused ? '—' : fmtMoney(r.cpm_lw);
+  const lwFreq  = paused ? '—' : fmtFreq(r.frequency_lw);
+  const lwFti   = paused ? '—' : fmtNum(r.fti_lw);
+  const lwCpa   = (paused || !(r.fti_lw > 0)) ? '—' : fmtMoney(r.cpa_lw);
+
+  const lwBlockTOF = `
+    <div class="text-sm ${lwValueCls}">Hook: <b>${lwHook}</b>${hookDelta}</div>
+    <div class="text-sm ${lwValueCls}">CPM: <b>${lwCpm}</b>${cpmDelta}</div>
+    <div class="text-sm ${lwValueCls}">Frequency: <b>${lwFreq}</b>${freqDelta}</div>
+    <div class="text-sm ${lwValueCls}">Spend: <b>${fmtMoney(spendLW)}</b>${spendDelta}</div>`;
+  const lwBlockBOF = `
+    <div class="text-sm ${lwValueCls}">FTI: <b>${lwFti}</b>${ftiDelta}</div>
+    <div class="text-sm ${lwValueCls}">CPA: <b>${lwCpa}</b>${cpaDelta}</div>
+    <div class="text-sm ${lwValueCls}">Frequency: <b>${lwFreq}</b>${freqDelta}</div>
+    <div class="text-sm ${lwValueCls}">Spend: <b>${fmtMoney(spendLW)}</b>${spendDelta}</div>`;
+
+  // Lifetime block — always shown if data exists
+  const hasLifetime = Number.isFinite(r.spend) && r.spend > 0;
+  const lifetimeTOF = `
+    <div class="text-sm">Hook: <b>${fmtPct(r.hook_rate)}</b></div>
+    <div class="text-sm">Thumb-Stop: <b>${fmtPct(r.thumb_stop)}</b></div>
+    <div class="text-sm">CPM: <b>${fmtMoney(r.cpm)}</b></div>
+    <div class="text-sm">Frequency: <b>${fmtFreq(r.frequency)}</b></div>
+    <div class="text-sm">Total Spend: <b>${fmtMoney(r.spend)}</b></div>`;
+  const lifetimeBOF = `
+    <div class="text-sm">FTI: <b>${fmtNum(r.fti)}</b></div>
+    <div class="text-sm">CPA: <b>${r.fti > 0 ? fmtMoney(r.cpa) : '—'}</b></div>
+    <div class="text-sm">Thumb-Stop: <b>${fmtPct(r.thumb_stop)}</b></div>
+    <div class="text-sm">Frequency: <b>${fmtFreq(r.frequency)}</b></div>
+    <div class="text-sm">Total Spend: <b>${fmtMoney(r.spend)}</b></div>`;
 
   const imgUrl = `${assetBase}${r.ad_code}.webp`;
   const cid = cardId(r);
 
   return `
-    <article id="${cid}" class="bg-slate-900 border ${border} rounded p-3 space-y-1" data-ad-code="${r.ad_code}">
+    <article id="${cid}" class="bg-slate-900 border ${border} rounded p-3 space-y-2" data-ad-code="${r.ad_code}">
       <div class="flex justify-between items-start gap-2">
         <div class="flex items-center gap-2 min-w-0">
           <button
-            class="flex-shrink-0 w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs flex items-center justify-center transition-colors"
+            class="flex-shrink-0 w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs flex items-center justify-center"
             onclick="toggleAsset('${cid}', '${imgUrl.replace(/'/g, "\\'")}', '${r.ad_code}')"
-            title="View creative"
-            aria-label="View creative"
-          >👁</button>
+            title="View creative" aria-label="View creative">👁</button>
           <b class="text-sm truncate">${r.ad_code}</b>
         </div>
         <div class="flex gap-1 flex-shrink-0">
           ${objective ? `<span class="text-xs px-1.5 py-0.5 rounded ${objBadgeColor}">${objective}</span>` : ''}
-          <span class="text-xs px-1.5 py-0.5 rounded ${statusColor}">${r.status || 'Live'}</span>
+          ${statusBadge}
         </div>
       </div>
 
       <!-- AI suggestion strip -->
-      <div class="border ${sug.cls} rounded px-2 py-1.5 flex items-start gap-2 text-xs" title="${sug.reason.replace(/"/g, '&quot;')}">
+      <div class="border ${sug.cls} rounded px-2 py-1.5 flex items-start gap-2 text-xs">
         <span class="flex-shrink-0">${sug.icon}</span>
         <div class="min-w-0">
           <div class="font-bold">${sug.label}</div>
@@ -234,20 +277,28 @@ function renderCard(r) {
         </div>
       </div>
 
-      <!-- asset preview slot (hidden until toggled) -->
+      <!-- asset preview slot -->
       <div class="asset-slot hidden" data-loaded="false"></div>
 
       <div class="text-xs text-slate-400">${r.region} · ${r.prod} · ${r.angle}</div>
       <div class="text-xs text-slate-500">${r.feature1 || ''}</div>
 
-      <div class="border-t border-slate-800 pt-2 mt-1 space-y-0.5">
-        <div class="text-[10px] uppercase tracking-wide text-slate-500 mb-1">Last Week (vs prior week)</div>
-        ${isBOF ? bofBlock : tofBlock}
-        <div class="text-sm">Frequency: <b>${fmtFreq(r.frequency_lw)}</b>${freqDelta}</div>
-        <div class="text-sm">Spend (${objective || '—'}): <b>${fmtMoney(spendLW)}</b>${spendDelta}</div>
+      <!-- LAST WEEK section -->
+      <div class="border-t border-slate-800 pt-2">
+        <div class="text-[10px] uppercase tracking-wide text-slate-500 mb-1 flex items-center justify-between">
+          <span>Last Week ${paused ? '· paused' : '(vs prior week)'}</span>
+        </div>
+        ${isBOF ? lwBlockBOF : lwBlockTOF}
       </div>
 
-      ${r.assessment ? `<div class="text-xs text-slate-400 border-t border-slate-800 pt-2 mt-1">${r.assessment}</div>` : ''}
+      <!-- LIFETIME section -->
+      ${hasLifetime ? `
+      <div class="border-t border-slate-800 pt-2">
+        <div class="text-[10px] uppercase tracking-wide text-slate-500 mb-1">Lifetime (since launch)</div>
+        ${isBOF ? lifetimeBOF : lifetimeTOF}
+      </div>` : ''}
+
+      ${r.assessment ? `<div class="text-xs text-slate-400 border-t border-slate-800 pt-2">${r.assessment}</div>` : ''}
     </article>`;
 }
 
@@ -270,7 +321,6 @@ window.toggleAsset = function (cardElId, imgUrl, adCode) {
 };
 
 // --- SEGMENT ANALYSIS ------------------------------------------------------
-// Dedupe to one entry per ad_code: take TOF metrics from TOF row, BOF metrics from BOF row.
 function buildAdMap(filteredRows) {
   const byCode = new Map();
   filteredRows.forEach(r => {
@@ -284,15 +334,12 @@ function buildAdMap(filteredRows) {
     const a = byCode.get(r.ad_code);
     const obj = (r.objective || '').toUpperCase();
     if (obj === 'TOF') {
-      a.hook_rate_lw  = r.hook_rate_lw;
-      a.thumb_stop    = r.thumb_stop;
-      a.cpm_lw        = r.cpm_lw;
-      a.frequency_lw  = r.frequency_lw;
-      a.spend_tof_lw  = r.spend_tof_lw;
+      a.hook_rate_lw  = r.hook_rate_lw; a.thumb_stop = r.thumb_stop;
+      a.cpm_lw = r.cpm_lw; a.frequency_lw = r.frequency_lw;
+      a.spend_tof_lw = r.spend_tof_lw;
     } else if (obj === 'BOF') {
-      a.fti_lw        = r.fti_lw;
-      a.cpa_lw        = r.cpa_lw;
-      a.spend_bof_lw  = r.spend_bof_lw;
+      a.fti_lw = r.fti_lw; a.cpa_lw = r.cpa_lw;
+      a.spend_bof_lw = r.spend_bof_lw;
     }
   });
   return [...byCode.values()];
@@ -313,10 +360,8 @@ function computeSegments(ads, dim) {
     const spendTof = list.reduce((s, a) => s + (Number.isFinite(a.spend_tof_lw) ? a.spend_tof_lw : 0), 0);
     const spendTotal = list.reduce((s, a) => s + (a.spend_total || 0), 0);
     return {
-      segment,
-      count: list.length,
-      spend_total: spendTotal,
-      spend_lw: spendTof + spendBof,
+      segment, count: list.length,
+      spend_total: spendTotal, spend_lw: spendTof + spendBof,
       avg_hook: hooks.length ? hooks.reduce((s, x) => s + x, 0) / hooks.length : NaN,
       avg_cpm:  cpms.length  ? cpms.reduce((s, x) => s + x, 0) / cpms.length  : NaN,
       total_fti: totalFti,
@@ -325,7 +370,6 @@ function computeSegments(ads, dim) {
   }).sort((a, b) => b.spend_total - a.spend_total);
 }
 
-// Highlight best/worst hook in segment table
 function segmentCellColor(val, allVals, dir = 'higher_better') {
   const valid = allVals.filter(Number.isFinite);
   if (!Number.isFinite(val) || valid.length < 2) return '';
@@ -430,7 +474,7 @@ function renderSummary(filtered) {
   );
 }
 
-// --- render orchestrator ---------------------------------------------------
+// --- render ----------------------------------------------------------------
 function render() {
   const filtered = rows.filter(r => {
     if (filterFunnel !== 'All' && String(r.objective).toUpperCase() !== filterFunnel) return false;
@@ -463,18 +507,8 @@ async function initMeta() {
     const regionEl = document.getElementById('region');
     const segEl    = document.getElementById('segment-dim');
 
-    if (ccyEl) {
-      ccyEl.value = 'USD';
-      currency = 'USD';
-      ccyEl.addEventListener('change', () => { currency = ccyEl.value; render(); });
-    }
-    if (rateEl) {
-      rateEl.value = usdRate;
-      rateEl.addEventListener('change', (e) => {
-        usdRate = ZaapiDataService.toNumber(e.target.value, usdRate) || usdRate;
-        if (currency === 'THB') render();
-      });
-    }
+    if (ccyEl)    { ccyEl.value = 'USD'; currency = 'USD'; ccyEl.addEventListener('change', () => { currency = ccyEl.value; render(); }); }
+    if (rateEl)   { rateEl.value = usdRate; rateEl.addEventListener('change', (e) => { usdRate = ZaapiDataService.toNumber(e.target.value, usdRate) || usdRate; if (currency === 'THB') render(); }); }
     if (funnelEl) funnelEl.addEventListener('change', () => { filterFunnel = funnelEl.value; render(); });
     if (regionEl) regionEl.addEventListener('change', () => { filterRegion = regionEl.value; render(); });
     if (segEl)    segEl.addEventListener('change',    () => { segmentDim  = segEl.value;    render(); });
