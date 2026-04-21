@@ -1,0 +1,11 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Zaapi Dashboard · Learning</title><script src="https://cdn.tailwindcss.com"></script></head>
+<body class="bg-slate-950 text-slate-100 min-h-screen"><main class="max-w-7xl mx-auto p-4 md:p-6 space-y-4">
+<header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"><h1 class="text-xl font-semibold">Accumulated Learning</h1><nav id="shared-nav" class="flex gap-2 flex-wrap"></nav></header>
+<section class="bg-slate-900 border border-slate-800 rounded p-3 grid grid-cols-1 md:grid-cols-2 gap-2">
+<select id="scope" class="bg-slate-950 border border-slate-700 rounded p-2 text-sm"><option value="">All Scope</option></select>
+<select id="market" class="bg-slate-950 border border-slate-700 rounded p-2 text-sm"><option value="">All Market</option></select>
+</section>
+<div id="loading" class="text-sm text-slate-300">Loading data from Google Sheets...</div>
+<section id="content" class="hidden bg-slate-900 border border-slate-800 rounded p-3 overflow-auto"><table class="w-full text-sm" id="table"></table></section>
+</main><script src="data-service.js"></script><script src="shared-nav.js"></script><script src="learning-accum.js"></script></body></html>

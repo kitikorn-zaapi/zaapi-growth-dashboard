@@ -1,351 +1,128 @@
-// ─────────────────────────────────────────────
-//  Zaapi Weekly Dashboard · app.js
-// ─────────────────────────────────────────────
+let trendChart;
 
-const FOREX_DEFAULT = 34;
-let spendChart = null;
-let ftiChart = null;
-let outcomeChart = null;
-let efficiencyChart = null;
-let selectedRange = "L4W";
-let selectedRegion = "Global";
-
-
-function readStoredForexRate() {
-  const raw = localStorage.getItem("zaapi_forex_rate");
-  const parsed = parseFloat(raw);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+function healthEmoji(v) {
+  const s = String(v || "").toLowerCase();
+  if (s.includes("red") || s.includes("bad")) return "🔴";
+  if (s.includes("yellow") || s.includes("watch")) return "🟡";
+  return "🟢";
 }
 
-function toUSD(thb, rate) {
-  return thb / rate;
-}
-
-function fmtUSD(thb, rate) {
-  const usd = toUSD(thb, rate);
-  if (usd >= 1000) return "$" + (usd / 1000).toFixed(1) + "k";
-  return "$" + Math.round(usd).toLocaleString();
-}
-
-function calculateWoW(current, previous) {
-  if (previous === null || previous === undefined || previous === 0) return null;
-  if (current === null || current === undefined) return null;
-  return ((current - previous) / previous) * 100;
-}
-
-function fmtWoW(pct, invert) {
-  if (pct === null) return { text: "—", cls: "neutral" };
-  const improved = invert ? pct < 0 : pct > 0;
-  const flat = Math.abs(pct) < 1;
-  const sign = pct > 0 ? "+" : "";
-  return {
-    text: sign + pct.toFixed(0) + "%",
-    cls: flat ? "neutral" : improved ? "up" : "down"
-  };
-}
-
-function renderState(data) {
-  const el = document.getElementById("state-badge");
-  const label = document.getElementById("state-label");
-
-  const map = {
-    Improving: { cls: "state-improving", icon: "↑" },
-    Flat: { cls: "state-flat", icon: "→" },
-    Blocked: { cls: "state-blocked", icon: "!" }
-  };
-
-  const s = map[data.state] || map.Flat;
-  el.className = "state-badge " + s.cls;
-  el.querySelector(".state-icon").textContent = s.icon;
-  label.textContent = data.state;
-}
-
-function renderSnapshot(data) {
-  const rate = data.forex_rate || FOREX_DEFAULT;
-  const s = data.snapshot;
-
-  const cpfti = s.fti > 0 ? toUSD(s.spend_thb, rate) / s.fti : null;
-  const cpftiPrev = s.fti_prev > 0 ? toUSD(s.spend_prev_thb, rate) / s.fti_prev : null;
-  const cpftiUSD = cpfti ? "$" + Math.round(cpfti).toLocaleString() : "—";
-
-  const cards = [
-    {
-      label: "Spend",
-      value: fmtUSD(s.spend_thb, rate),
-      sub: "prev " + fmtUSD(s.spend_prev_thb, rate),
-      wow: fmtWoW(calculateWoW(s.spend_thb, s.spend_prev_thb)),
-      note: "Google + Meta combined"
-    },
-    {
-      label: "FTI",
-      value: s.fti !== null ? s.fti : "—",
-      sub: "prev " + (s.fti_prev !== null ? s.fti_prev : "—"),
-      wow: fmtWoW(calculateWoW(s.fti, s.fti_prev)),
-      note: "cost/FTI " + cpftiUSD
-    },
-    {
-      label: "Qualified",
-      value: s.qualified !== null ? s.qualified : "—",
-      sub: s.qualified_prev !== null ? "prev " + s.qualified_prev : "incl. organic",
-      wow: fmtWoW(calculateWoW(s.qualified, s.qualified_prev)),
-      note: "enter from Pipedrive"
-    },
-    {
-      label: "HQ+",
-      value: s.hq !== null ? s.hq : "—",
-      sub: s.hq_prev !== null ? "prev " + s.hq_prev : "main goal",
-      wow: fmtWoW(calculateWoW(s.hq, s.hq_prev)),
-      note: "enter from Pipedrive"
-    }
-  ];
-
-  const grid = document.getElementById("snapshot-grid");
-  grid.innerHTML = cards.map(c => `
-    <div class="card">
-      <div class="card-label">${c.label}</div>
-      <div class="card-value">${c.value}</div>
-      <div class="card-row">
-        <span class="card-sub">${c.sub}</span>
-        <span class="wow ${c.wow.cls}">${c.wow.text}</span>
-      </div>
-      <div class="card-note">${c.note}</div>
-    </div>
-  `).join("");
-}
-
-function renderTable(data) {
-  const rate = data.forex_rate || FOREX_DEFAULT;
-  const s = data.snapshot;
-
-  const cpfti = s.fti > 0 ? toUSD(s.spend_thb, rate) / s.fti : null;
-  const cpftiPrev = s.fti_prev > 0 ? toUSD(s.spend_prev_thb, rate) / s.fti_prev : null;
-
-  const rows = [
-    {
-      metric: "Spend (combined)",
-      cur: fmtUSD(s.spend_thb, rate),
-      prev: fmtUSD(s.spend_prev_thb, rate),
-      wow: fmtWoW(calculateWoW(s.spend_thb, s.spend_prev_thb))
-    },
-    {
-      metric: "FTI",
-      cur: s.fti !== null ? s.fti : "—",
-      prev: s.fti_prev !== null ? s.fti_prev : "—",
-      wow: fmtWoW(calculateWoW(s.fti, s.fti_prev))
-    },
-    {
-      metric: "Cost / FTI",
-      cur: cpfti ? "$" + Math.round(cpfti).toLocaleString() : "—",
-      prev: cpftiPrev ? "$" + Math.round(cpftiPrev).toLocaleString() : "—",
-      wow: fmtWoW(calculateWoW(cpfti, cpftiPrev), true)
-    },
-    {
-      metric: "Qualified",
-      cur: s.qualified !== null ? s.qualified : "—",
-      prev: s.qualified_prev !== null ? s.qualified_prev : "—",
-      wow: fmtWoW(calculateWoW(s.qualified, s.qualified_prev))
-    },
-    {
-      metric: "HQ+",
-      cur: s.hq !== null ? s.hq : "—",
-      prev: s.hq_prev !== null ? s.hq_prev : "—",
-      wow: fmtWoW(calculateWoW(s.hq, s.hq_prev))
-    }
-  ];
-
-  const tbody = document.getElementById("wow-tbody");
-  tbody.innerHTML = rows.map(r => `
-    <tr>
-      <td class="metric-col">${r.metric}</td>
-      <td class="num-col">${r.cur}</td>
-      <td class="num-col muted">${r.prev}</td>
-      <td class="num-col"><span class="wow ${r.wow.cls}">${r.wow.text}</span></td>
-    </tr>
-  `).join("");
-}
-
-function renderRegions(data) {
-  const rate = data.forex_rate || FOREX_DEFAULT;
-  const tbody = document.getElementById("region-tbody");
-
-  tbody.innerHTML = data.region_spend.map(r => {
-    const total = r.google + r.meta;
-    const isHigh = r.lost_is_rank > 50;
-    return `
-      <tr>
-        <td class="metric-col"><strong>${r.region}</strong></td>
-        <td class="num-col">${fmtUSD(total, rate)}</td>
-        <td class="num-col muted">${fmtUSD(r.google, rate)}</td>
-        <td class="num-col muted">${fmtUSD(r.meta, rate)}</td>
-        <td class="num-col">${r.fti > 0 ? r.fti.toFixed(1) : "—"}</td>
-        <td class="num-col"><span class="${isHigh ? "tag-high" : "tag-low"}">${r.lost_is_rank.toFixed(0)}%</span></td>
-      </tr>
-    `;
-  }).join("");
-}
-
-function renderInsights(data) {
-  const list = document.getElementById("insights-list");
-  list.innerHTML = data.insights.map((txt, i) => `
-    <li class="insight-item">
-      <span class="insight-num">${i + 1}</span>
-      <span>${txt}</span>
-    </li>
-  `).join("");
-}
-
-function renderNextStep(data) {
-  const ns = data.next_step;
-  const el = document.getElementById("next-step-text");
-  el.textContent = typeof ns === "string" ? ns : ns.label;
-}
-
-function buildChart(ctx, labels, datasets, yAsCurrency = false) {
-  return new Chart(ctx, {
-    type: "line",
-    data: { labels, datasets },
-    options: {
-      animation: false,
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: "index", intersect: false },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: value => yAsCurrency ? "$" + value : value
-          }
-        }
-      },
-      plugins: {
-        legend: { position: "bottom" }
-      }
-    }
-  });
-}
-
-function getFilteredHistory(history, range) {
-  const ranges = { L4W: 4, L8W: 8, L12W: 12 };
-  const windowSize = ranges[range];
-  if (!windowSize || range === "MAX") return history;
-  return history.slice(-windowSize);
-}
-
-function renderGraphs(data) {
-  if (typeof Chart === "undefined") return;
-  const rate = data.forex_rate || FOREX_DEFAULT;
-  const regionHistoryMap = data.history_by_region || {};
-  const baseHistory = selectedRegion === "Global"
-    ? (Array.isArray(data.history) ? data.history : [])
-    : (Array.isArray(regionHistoryMap[selectedRegion]) ? regionHistoryMap[selectedRegion] : []);
-  const history = getFilteredHistory(baseHistory, selectedRange);
-  const labels = history.map(h => h.week);
-
-  const buildDatasets = rows => ({
-    ads: {
-      spend: [
-        { label: "Spend", data: rows.map(h => typeof h.spend === "number" ? h.spend / rate : null), borderColor: "#2d7ff9", backgroundColor: "#2d7ff9", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 },
-        { label: "Spend Target", data: rows.map(h => typeof h.spend_target === "number" ? h.spend_target / rate : null), borderColor: "#5aa1ff", backgroundColor: "#5aa1ff", borderWidth: 2, borderDash: [5, 4], pointRadius: 1.5, pointHoverRadius: 3, tension: 0.15 }
-      ],
-      fti: [
-        { label: "FTI", data: rows.map(h => h.fti), borderColor: "#0f9e75", backgroundColor: "#0f9e75", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 },
-        { label: "FTI Google", data: rows.map(h => typeof h.fti_google === "number" ? h.fti_google : null), borderColor: "#4ac39e", backgroundColor: "#4ac39e", borderWidth: 2, pointRadius: 1.5, pointHoverRadius: 3, tension: 0.15 },
-        { label: "FTI Meta", data: rows.map(h => typeof h.fti_meta === "number" ? h.fti_meta : null), borderColor: "#79d6bb", backgroundColor: "#79d6bb", borderWidth: 2, pointRadius: 1.5, pointHoverRadius: 3, tension: 0.15 }
-      ]
-    },
-    business: {
-      outcome: [
-        { label: "Qualified", data: rows.map(h => h.qualified), borderColor: "#ff8a00", backgroundColor: "#ff8a00", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 },
-        { label: "HQ+", data: rows.map(h => h.hq), borderColor: "#8d5cf6", backgroundColor: "#8d5cf6", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 }
-      ],
-      efficiency: [
-        { label: "Cost per FTI", data: rows.map(h => typeof h.cost_per_fti === "number" ? h.cost_per_fti / rate : null), borderColor: "#2d7ff9", backgroundColor: "#2d7ff9", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 },
-        { label: "Cost per Qualified", data: rows.map(h => typeof h.cost_per_qualified === "number" ? h.cost_per_qualified / rate : null), borderColor: "#ff8a00", backgroundColor: "#ff8a00", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 },
-        { label: "Cost per HQ+", data: rows.map(h => typeof h.cost_per_hq === "number" ? h.cost_per_hq / rate : null), borderColor: "#8d5cf6", backgroundColor: "#8d5cf6", borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.15 }
-      ]
-    }
-  });
-
-  const datasets = buildDatasets(history);
-
-  if (spendChart) spendChart.destroy();
-  if (ftiChart) ftiChart.destroy();
-  if (outcomeChart) outcomeChart.destroy();
-  if (efficiencyChart) efficiencyChart.destroy();
-
-  spendChart = buildChart(document.getElementById("spend-chart"), labels, datasets.ads.spend, true);
-  ftiChart = buildChart(document.getElementById("fti-chart"), labels, datasets.ads.fti, false);
-  outcomeChart = buildChart(document.getElementById("outcome-chart"), labels, datasets.business.outcome, false);
-  efficiencyChart = buildChart(document.getElementById("efficiency-chart"), labels, datasets.business.efficiency, true);
-}
-
-function setupGraphFilters(data) {
-  const timeButtons = Array.from(document.querySelectorAll("#time-range-controls [data-range]"));
-  const regionButtons = Array.from(document.querySelectorAll("#region-controls [data-region]"));
-
-  const markActive = (buttons, currentValue, key) => {
-    buttons.forEach(btn => {
-      const isActive = btn.dataset[key] === currentValue;
-      btn.classList.toggle("is-active", isActive);
-      btn.setAttribute("aria-pressed", String(isActive));
-    });
-  };
-
-  markActive(timeButtons, selectedRange, "range");
-  markActive(regionButtons, selectedRegion, "region");
-
-  timeButtons.forEach(btn => {
-    if (btn.dataset.bound === "true") return;
-    btn.dataset.bound = "true";
-    btn.addEventListener("click", () => {
-      selectedRange = btn.dataset.range || "L4W";
-      markActive(timeButtons, selectedRange, "range");
-      renderGraphs(data);
-    });
-  });
-
-  regionButtons.forEach(btn => {
-    if (btn.dataset.bound === "true") return;
-    btn.dataset.bound = "true";
-    btn.addEventListener("click", () => {
-      selectedRegion = btn.dataset.region || "Global";
-      markActive(regionButtons, selectedRegion, "region");
-      renderGraphs(data);
-    });
-  });
-}
-
-async function init() {
-  let data;
-  try {
-    const res = await fetch("data.json");
-    data = await res.json();
-  } catch (e) {
-    document.body.innerHTML = `<div style="padding:2rem;font-family:monospace;color:#c00">
-      Failed to load data.json — make sure it's in the same folder as index.html.<br>${e}
-    </div>`;
-    return;
+function linRegPredict(last4) {
+  const n = last4.length;
+  if (!n) return 0;
+  let sx = 0, sy = 0, sxy = 0, sxx = 0;
+  for (let i = 0; i < n; i++) {
+    const x = i + 1;
+    const y = last4[i];
+    sx += x; sy += y; sxy += x * y; sxx += x * x;
   }
+  const m = (n * sxy - sx * sy) / (n * sxx - sx * sx || 1);
+  const b = (sy - m * sx) / n;
+  return m * (n + 1) + b;
+}
 
-  data.forex_rate = readStoredForexRate() || data.forex_rate || FOREX_DEFAULT;
+function fmtMoney(thb, currency, rate) {
+  const n = ZaapiDataService.toNumber(thb);
+  if (currency === "USD") return `$${(n / rate).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+  return `฿${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+}
 
-  renderState(data);
-  renderSnapshot(data);
-  renderTable(data);
-  renderRegions(data);
-  renderInsights(data);
-  renderNextStep(data);
-  setupGraphFilters(data);
-  renderGraphs(data);
+function renderTrend(rows) {
+  const last8 = rows.slice(-8);
+  const fti = last8.map((r) => ZaapiDataService.toNumber(r.fti));
+  const pred = linRegPredict(fti.slice(-4));
+  const labels = last8.map((r) => ZaapiDataService.fmtCW(r.cw)).concat("Next");
+  const data = fti.concat(pred);
 
-  window.addEventListener("zaapi:forex-change", (event) => {
-    const nextRate = parseFloat(event.detail?.rate);
-    data.forex_rate = Number.isFinite(nextRate) && nextRate > 0 ? nextRate : FOREX_DEFAULT;
-    renderSnapshot(data);
-    renderTable(data);
-    renderRegions(data);
-    renderGraphs(data);
+  const dirUp = pred >= fti[fti.length - 1];
+  document.getElementById("trend-label").textContent = `${dirUp ? "📈 Trending up" : "📉 Trending down"} — est. ${Math.round(pred)} FTI next week`;
+
+  if (trendChart) trendChart.destroy();
+  trendChart = new Chart(document.getElementById("fti-trend"), {
+    type: "line",
+    data: { labels, datasets: [{ data, borderColor: "#38bdf8", tension: 0.3, pointRadius: 2 }] },
+    options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { color: "#cbd5e1" } }, y: { ticks: { color: "#cbd5e1" } } } }
   });
 }
 
-document.addEventListener("DOMContentLoaded", init);
+function marketCard(title, row, currency, rate, children = []) {
+  const wow = ZaapiDataService.toNumber(row.wow_delta);
+  const wowText = `${wow >= 0 ? "+" : ""}${wow.toFixed(1)}%`;
+  return `<article class="bg-slate-900 border border-slate-800 rounded p-3">
+    <h3 class="font-semibold mb-2">${title}</h3>
+    <div class="text-sm space-y-1">
+      <div>Spend: <b>${fmtMoney(row.spend_thb, currency, rate)}</b></div>
+      <div>FTI: <b>${ZaapiDataService.toNumber(row.fti)}</b></div>
+      <div>WoW delta: <b>${wowText}</b></div>
+      <div>Health: <b>${healthEmoji(row.health_signal)} ${row.health_signal || ""}</b></div>
+      ${children.join("")}
+    </div>
+  </article>`;
+}
+
+async function initOverview() {
+  const loading = document.getElementById("loading");
+  const content = document.getElementById("content");
+
+  try {
+    const tabs = await ZaapiDataService.fetchTabs(["weekly_summary", "action_log", "targets", "config"]);
+    const config = await ZaapiDataService.fetchConfig();
+    const rate = ZaapiDataService.toNumber(config.usd_thb_rate, 34);
+
+    const weeks = [...new Set(tabs.weekly_summary.map((r) => ZaapiDataService.fmtCW(r.cw)))];
+    const weekSelect = document.getElementById("week-select");
+    weekSelect.innerHTML = weeks.map((w) => `<option>${w}</option>`).join("");
+    weekSelect.value = weeks[weeks.length - 1] || "";
+
+    const render = () => {
+      const cw = weekSelect.value;
+      const currency = document.getElementById("currency-toggle").value;
+      const current = tabs.weekly_summary.find((r) => ZaapiDataService.fmtCW(r.cw) === cw) || {};
+      document.getElementById("ai-summary").textContent = current.ai_summary || "No summary available.";
+      document.getElementById("global-health").textContent = `${healthEmoji(current.health_signal)} ${current.health_signal || ""}`;
+
+      const targetRow = tabs.targets.find((r) => ZaapiDataService.fmtCW(r.cw) === cw) || {};
+      document.getElementById("fti-target").textContent = `${ZaapiDataService.toNumber(current.fti_actual)} / ${ZaapiDataService.toNumber(targetRow.fti_target)} FTI`;
+
+      renderTrend(tabs.weekly_summary);
+
+      const top = (market) => tabs.weekly_summary.find((r) => ZaapiDataService.fmtCW(r.cw) === cw && String(r.market).toUpperCase() === market) || {};
+      const seaSubs = ["MY", "SG", "PH"].map((m) => {
+        const r = top(m);
+        return `<div class="pl-3 text-slate-300">• ${m}: ${ZaapiDataService.toNumber(r.fti)} FTI, ${fmtMoney(r.spend_thb, currency, rate)}</div>`;
+      });
+      const rowSubs = ["UK", "US"].map((m) => {
+        const r = top(m);
+        return `<div class="pl-3 text-slate-300">• ${m}: ${ZaapiDataService.toNumber(r.fti)} FTI, ${fmtMoney(r.spend_thb, currency, rate)}</div>`;
+      });
+
+      document.getElementById("market-grid").innerHTML = [
+        marketCard("TH", top("TH"), currency, rate),
+        marketCard("SEA", top("SEA"), currency, rate, seaSubs),
+        marketCard("ROW", top("ROW"), currency, rate, rowSubs)
+      ].join("");
+
+      const realloc = tabs.action_log.find((r) => ZaapiDataService.fmtCW(r.cw) === cw && String(r.type).toLowerCase() === "reallocate");
+      document.getElementById("reallocation").textContent = realloc
+        ? `Move ฿${ZaapiDataService.toNumber(realloc.amount).toLocaleString()} from ${realloc.from} to ${realloc.to} — ${realloc.reason || ""}`
+        : "No reallocation suggestion for this week.";
+
+      const links = [];
+      if (tabs.action_log.some((r) => ZaapiDataService.fmtCW(r.cw) === cw && /search|meta campaign/i.test(r.scope || ""))) links.push('<a class="underline" href="search.html">Search page</a>');
+      if (tabs.action_log.some((r) => ZaapiDataService.fmtCW(r.cw) === cw && /asset|creative/i.test(r.scope || ""))) links.push('<a class="underline" href="meta-asset.html">Meta Asset page</a>');
+      links.push('<a class="underline" href="action-log.html">Action Log</a>');
+      document.getElementById("look-links").innerHTML = links.join('<span class="text-slate-500">|</span>');
+    };
+
+    weekSelect.addEventListener("change", render);
+    document.getElementById("currency-toggle").addEventListener("change", render);
+    render();
+
+    loading.classList.add("hidden");
+    content.classList.remove("hidden");
+  } catch (error) {
+    loading.textContent = `Failed to load Google Sheets data: ${error.message}`;
+  }
+}
+
+document.addEventListener("DOMContentLoaded", initOverview);
