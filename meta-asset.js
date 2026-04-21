@@ -570,7 +570,11 @@ function render() {
 async function initMeta() {
   const loading = document.getElementById('loading');
   try {
-    const raw = await ZaapiDataService.fetchTab('creative_log');
+    const [raw, actionLog, learningAccum] = await Promise.all([
+      ZaapiDataService.fetchTab('creative_log'),
+      ZaapiDataService.fetchTab('action_log').catch(() => []),
+      ZaapiDataService.fetchTab('learning_accum').catch(() => []),
+    ]);
     rows = raw.map(parseRow).filter(r => r.ad_code);
 
     const config = await ZaapiDataService.getConfig().catch(() => ({}));
@@ -590,6 +594,33 @@ async function initMeta() {
     if (regionEl) regionEl.addEventListener('change', () => { filterRegion = regionEl.value; render(); });
     if (statusEl) statusEl.addEventListener('change', () => { filterStatus = statusEl.value; render(); });
     if (segEl)    segEl.addEventListener('change',    () => { segmentDim  = segEl.value;    render(); });
+
+    // ═══ AI Suggestions Panel (asset layer) ═══
+    // Determine latest CW from action_log
+    const F = (row, keys, fb = '') => ZaapiDataService.pick(row, keys, fb);
+    const actionCWs = [...new Set((actionLog || []).map(a => ZaapiDataService.fmtCW(F(a, ['CW', 'cw']))))].filter(Boolean);
+    const latestCW = actionCWs.sort((a, b) => parseInt(a.replace(/\D/g, ''), 10) - parseInt(b.replace(/\D/g, ''), 10)).slice(-1)[0] || 'CW17';
+    const panelEl = document.getElementById('ai-suggestions-panel');
+    if (panelEl && window.AISuggestionsPanel) {
+      window.AISuggestionsPanel.render(panelEl, {
+        actionLog, learningAccum,
+        currentCW: latestCW,
+        layers: ['asset'],
+        region: filterRegion !== 'All' ? filterRegion : null,
+        lookbackWeeks: 2,
+        title: '🤖 AI Suggestions · Asset Layer + Last 2 Weeks Results',
+      });
+      // Re-render panel when region filter changes
+      if (regionEl) regionEl.addEventListener('change', () => {
+        window.AISuggestionsPanel.render(panelEl, {
+          actionLog, learningAccum, currentCW: latestCW,
+          layers: ['asset'],
+          region: regionEl.value !== 'All' ? regionEl.value : null,
+          lookbackWeeks: 2,
+          title: '🤖 AI Suggestions · Asset Layer + Last 2 Weeks Results',
+        });
+      });
+    }
 
     render();
     loading.classList.add('hidden');
