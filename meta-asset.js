@@ -419,7 +419,7 @@ function buildSectionAExpandContent(r) {
 
   return `
     <div class="asset-slot" data-loaded="false">
-      <div class="text-[11px] text-slate-500 italic py-6 text-center">Loading creative...</div>
+      <div class="text-[11px] text-slate-500 italic py-3 text-center max-w-[180px] border border-slate-800 rounded">Loading...</div>
     </div>
     <div class="text-xs text-slate-400">${axes}</div>
     ${r.video_description ? `<div class="text-xs text-slate-300 italic leading-snug border-l-2 border-slate-700 pl-2">${r.video_description}</div>` : ''}
@@ -453,9 +453,9 @@ window.toggleSectionARow = function(rowKey, imgUrl, adCode) {
     const slot = expandEl.querySelector('.asset-slot');
     if (slot && slot.dataset.loaded !== 'true') {
       slot.innerHTML = `
-        <div class="rounded overflow-hidden bg-slate-950 border border-slate-800">
-          <img src="${imgUrl}" alt="${adCode}" class="w-full h-auto block" loading="lazy"
-            onerror="this.parentElement.innerHTML='<div class=&quot;text-xs text-slate-500 p-4 text-center&quot;>No asset file found at<br><code class=&quot;text-slate-400&quot;>${imgUrl}</code></div>'" />
+        <div class="rounded overflow-hidden bg-slate-950 border border-slate-800 max-w-[180px]">
+          <img src="${imgUrl}" alt="${adCode}" class="block w-full h-auto" loading="lazy"
+            onerror="this.parentElement.innerHTML='<div class=&quot;text-xs text-slate-500 p-3 text-center&quot;>No asset at<br><code class=&quot;text-slate-400 text-[10px]&quot;>${imgUrl}</code></div>'" />
         </div>`;
       slot.dataset.loaded = 'true';
     }
