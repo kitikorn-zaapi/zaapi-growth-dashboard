@@ -1,12 +1,13 @@
 // meta-asset.js — Asset Layer (Layer 3)
-// v4 (Apr 21, 2026) adds:
-//   • SATURATING verdict (fatigue detector, points-based, BOF-focused)
-//   • Replacement recommender (one-axis-swap candidates from same region)
-//   • Video Description rendered on card (new col AE in creative_log)
-//   • Vic Bullets export (clipboard, per region) for weekly stakeholder slide
-//   • Action summary re-ordered by severity, includes SATURATING bucket
-// Unchanged from v3: paused detection, LW-vs-Lifetime card layout, segment table,
-//   sortable summary, asset image toggle, AI Suggestions panel.
+// v5 (Apr 22, 2026) adds:
+//   • Section A: per-country ad list, click-to-expand shows creative image
+//   • Replaces the full-detail cards grid (#cards → #section-a)
+//   • Scale sizing: SCALE +25% (standard) / SCALE +50% (strong signal)
+//   • Verdict-severity sort within each country/funnel subsection
+//   • Composite row keys (country-objective-ad_code) kill the sector-toggle bug
+//   • Metrics moved out of cards; they now live ONLY in the sortable table below
+// v4 additions retained: SATURATING verdict, replacement recommender,
+//   Video Description, Vic Bullets export.
 
 let rows = [];
 let usdRate = 34;
@@ -66,8 +67,6 @@ function parseRow(raw) {
     feature1:    F(raw, ['feature1', 'Feature 1']),
     objective:   F(raw, ['Objective', 'objective', 'funnel']),
     assessment:  F(raw, ['assessment', 'Claude Notes']),
-
-    // ═══ NEW v4: Video Description (creative_log col AE) ═══
     video_description: F(raw, ['Video Description', 'video_description']),
 
     // lifetime
@@ -108,32 +107,21 @@ function isPausedInObjective(r) {
   return lwZero && hasLifetime;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// NEW v4: Fatigue scoring — deterministic, points-based.
-// Fires on ads that *previously worked* (had lifetime FTI) and now show decay.
-// Distinct from the existing KILL (never-worked) and REFRESH (saturated-but-never-scaled) paths.
-// ═══════════════════════════════════════════════════════════════════════════
+// --- fatigue scoring (v4, unchanged) ---------------------------------------
 function computeFatigueScore(r) {
   const isBOF = (r.objective || '').toUpperCase() === 'BOF';
   const hasLifetimeFTI = Number.isFinite(r.fti) && r.fti > 0;
-
-  // Eligibility: TOF rows don't carry FTI, so SATURATING only fires on BOF rows for now.
-  // TOF decay still surfaces via existing WATCH (hook drop) and REFRESH (freq>3) verdicts.
-  if (!isBOF || !hasLifetimeFTI) {
-    return { score: 0, signals: [], eligible: false };
-  }
+  if (!isBOF || !hasLifetimeFTI) return { score: 0, signals: [], eligible: false };
 
   const signals = [];
   let score = 0;
 
-  // S1: Frequency in saturation zone AND FTI declining
   if (Number.isFinite(r.frequency_lw) && r.frequency_lw >= 3.0 &&
       Number.isFinite(r.fti_lw) && Number.isFinite(r.fti_pw) && r.fti_lw < r.fti_pw) {
     signals.push(`Freq ${r.frequency_lw.toFixed(1)} + FTI ↓`);
     score += 2;
   }
 
-  // S2: FTI decay ≥30% at flat-or-up spend (not a budget cut)
   const spendLW = r.spend_bof_lw;
   const spendPW = r.spend_bof_pw;
   if (Number.isFinite(r.fti_lw) && Number.isFinite(r.fti_pw) && r.fti_pw > 0 &&
@@ -143,7 +131,6 @@ function computeFatigueScore(r) {
     score += 2;
   }
 
-  // S3: CPA drift ≥50% (efficiency eroding with budget still flowing)
   if (Number.isFinite(r.cpa_lw) && Number.isFinite(r.cpa_pw) && r.cpa_pw > 0 &&
       r.cpa_lw > r.cpa_pw * 1.5 &&
       Number.isFinite(spendLW) && spendLW >= 50) {
@@ -151,7 +138,6 @@ function computeFatigueScore(r) {
     score += 1;
   }
 
-  // S4: Collapse — was working, now zero
   if (Number.isFinite(r.fti_lw) && r.fti_lw === 0 &&
       Number.isFinite(r.fti_pw) && r.fti_pw > 0 &&
       Number.isFinite(spendLW) && spendLW >= 50) {
@@ -162,7 +148,7 @@ function computeFatigueScore(r) {
   return { score, signals, eligible: true };
 }
 
-// --- AI suggestion per row -------------------------------------------------
+// --- AI suggestion per row (unchanged verdict logic) -----------------------
 function suggestion(r) {
   const isBOF   = (r.objective || '').toUpperCase() === 'BOF';
   const hookLw  = r.hook_rate_lw;
@@ -175,7 +161,7 @@ function suggestion(r) {
 
   const C = {
     kill:       'bg-red-950/60 border-red-900 text-red-300',
-    saturating: 'bg-orange-950/80 border-orange-700 text-orange-200', // NEW v4
+    saturating: 'bg-orange-950/80 border-orange-700 text-orange-200',
     scale:      'bg-emerald-950/60 border-emerald-900 text-emerald-300',
     target:     'bg-purple-950/60 border-purple-900 text-purple-300',
     channel:    'bg-cyan-950/60 border-cyan-900 text-cyan-300',
@@ -186,39 +172,22 @@ function suggestion(r) {
     cont:       'bg-slate-900/60 border-slate-700 text-slate-300',
   };
 
-  // 0) Paused
   if (isPausedInObjective(r)) {
     return { icon: '⏸', label: 'PAUSED', reason: 'Zero spend last week — check lifetime metrics below', cls: C.paused };
   }
-  // 1) No data
   if (!Number.isFinite(spendLw) || spendLw < 10) {
     return { icon: '⏳', label: 'NO DATA', reason: 'Spend too low to judge yet', cls: C.nodata };
   }
-  // 2) Kill: hook collapsed (never-worked path)
   if (Number.isFinite(hookLw) && hookLw > 0 && hookLw < 15) {
     return { icon: '🛑', label: 'KILL', reason: `Hook ${hookLw.toFixed(0)}% < 15% — creative isn't landing`, cls: C.kill };
   }
 
-  // ═══ NEW v4: Fatigue check — winner-going-stale path ═══
-  // Runs before existing verdicts so SATURATING wins over REFRESH/WATCH when eligible.
   const fatigue = computeFatigueScore(r);
   if (fatigue.eligible && fatigue.score >= 5) {
-    return {
-      icon: '🛑',
-      label: 'KILL',
-      reason: `Fatigued out (score ${fatigue.score}): ${fatigue.signals.join(' · ')}`,
-      cls: C.kill,
-      fatigue,
-    };
+    return { icon: '🛑', label: 'KILL', reason: `Fatigued out (score ${fatigue.score}): ${fatigue.signals.join(' · ')}`, cls: C.kill, fatigue };
   }
   if (fatigue.eligible && fatigue.score >= 3) {
-    return {
-      icon: '🔥',
-      label: 'SATURATING',
-      reason: `Winner fatiguing (score ${fatigue.score}): ${fatigue.signals.join(' · ')}`,
-      cls: C.saturating,
-      fatigue,
-    };
+    return { icon: '🔥', label: 'SATURATING', reason: `Winner fatiguing (score ${fatigue.score}): ${fatigue.signals.join(' · ')}`, cls: C.saturating, fatigue };
   }
 
   if (isBOF) {
@@ -235,7 +204,7 @@ function suggestion(r) {
       return { icon: '♻️', label: 'REFRESH CREATIVE', reason: `Freq ${freqLw.toFixed(1)} — audience saturated, rotate in a new edit`, cls: C.refresh };
     }
     if (Number.isFinite(r.cpa_lw) && Number.isFinite(r.cpa_pw) && r.cpa_pw > 0 && r.cpa_lw > r.cpa_pw * 1.5) {
-      return { icon: '📡', label: 'NEW CHANNEL', reason: `CPA up ${((r.cpa_lw / r.cpa_pw - 1) * 100).toFixed(0)}% WoW — try different placement (IG Reels / Stories)`, cls: C.channel };
+      return { icon: '📡', label: 'NEW CHANNEL', reason: `CPA up ${((r.cpa_lw / r.cpa_pw - 1) * 100).toFixed(0)}% WoW — try different placement`, cls: C.channel };
     }
     return { icon: '✅', label: 'CONTINUE', reason: 'Healthy — maintain current setup', cls: C.cont };
   }
@@ -261,7 +230,7 @@ function suggestion(r) {
 
 function borderForSuggestion(s) {
   if (s.label === 'KILL')              return 'border-red-500';
-  if (s.label === 'SATURATING')        return 'border-orange-400'; // NEW v4
+  if (s.label === 'SATURATING')        return 'border-orange-400';
   if (s.label === 'SCALE')             return 'border-emerald-500';
   if (s.label === 'REFRESH CREATIVE')  return 'border-yellow-500';
   if (s.label === 'NEW TARGETING')     return 'border-purple-500';
@@ -271,20 +240,12 @@ function borderForSuggestion(s) {
   return 'border-slate-700';
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// NEW v4: Replacement recommender.
-// When an ad shows KILL or SATURATING, surface 1-2 candidates to inherit into.
-// Rule: same region, healthy verdict (SCALE/CONTINUE), ranked by FTI_lw/spend_lw.
-// Candidate must differ from dying ad on at least one axis (prod/angle/feature1).
-// If no same-region candidates exist, propose a one-axis-swap hypothesis instead.
-// ═══════════════════════════════════════════════════════════════════════════
+// --- replacement recommender (v4, unchanged) -------------------------------
 function findReplacements(dyingAd, allRows) {
   const isBOF = (dyingAd.objective || '').toUpperCase() === 'BOF';
   const sameObjective = allRows.filter(r =>
     (r.objective || '').toUpperCase() === (dyingAd.objective || '').toUpperCase()
   );
-
-  // Pool: same region, different ad_code, healthy verdict
   const pool = sameObjective.filter(r => {
     if (r.ad_code === dyingAd.ad_code) return false;
     if (String(r.region).toUpperCase() !== String(dyingAd.region).toUpperCase()) return false;
@@ -292,8 +253,6 @@ function findReplacements(dyingAd, allRows) {
     const sug = suggestion(r);
     return ['SCALE', 'CONTINUE'].includes(sug.label);
   });
-
-  // Rank by efficiency (FTI per $ on BOF, hook * spend on TOF)
   const ranked = pool
     .map(r => {
       let efficiency = 0;
@@ -312,10 +271,7 @@ function findReplacements(dyingAd, allRows) {
       axisDiff: diffAxes(dyingAd, r),
       rationale: inheritRationale(dyingAd, r, isBOF),
     }));
-
   if (ranked.length > 0) return ranked;
-
-  // Fallback: propose net-new combo by swapping one axis
   return proposeNetNewSwap(dyingAd);
 }
 
@@ -337,18 +293,13 @@ function inheritRationale(dyingAd, candidate, isBOF) {
   return `${axisLabels} · ${perfLabel}`;
 }
 
-// Net-new swap suggestion when no inherit candidate exists
 function proposeNetNewSwap(dyingAd) {
-  // Priority order of axes to swap (lightest-touch first)
-  // Angle swap > Production swap > Feature swap (angle is cheapest to test in AI)
   const angleSwaps = { 'VB': 'TS', 'TS': 'VB', 'ST': 'VB', 'ED': 'VB' };
   const angleCodes = { 'Value bomb': 'VB', 'Testimonial': 'TS', 'Storytelling': 'ST', 'Educational': 'ED' };
   const angleNames = { 'VB': 'Value bomb', 'TS': 'Testimonial', 'ST': 'Storytelling', 'ED': 'Educational' };
-
   const currentAngleCode = angleCodes[dyingAd.angle] || 'VB';
   const newAngleCode = angleSwaps[currentAngleCode] || 'TS';
   const newAngleName = angleNames[newAngleCode];
-
   return [{
     type: 'net_new',
     candidate: null,
@@ -357,97 +308,109 @@ function proposeNetNewSwap(dyingAd) {
   }];
 }
 
-// --- card ------------------------------------------------------------------
-function cardId(r) {
-  return `card-${r.ad_code}-${(r.objective || 'NA').toLowerCase()}`.replace(/[^a-zA-Z0-9-]/g, '-');
+// ═══════════════════════════════════════════════════════════════════════════
+// SECTION A: Per-country ad list (new in v5)
+// One-line rows (ad_code + verdict), click to expand → shows the creative image.
+// Metrics live in the sortable table below, not on the row.
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Hybrid region display — honest about what's pooled vs operational
+const REGION_DISPLAY = {
+  TH:  { label: 'TH',                 order: 1 },
+  SEA: { label: 'SEA (MY+SG+PH)',     order: 2 },
+  ROW: { label: 'ROW (UK primary)',   order: 3 },
+};
+
+// Sort within each subsection: most urgent first
+const VERDICT_SEVERITY = {
+  'KILL':             1,
+  'SATURATING':       2,
+  'WATCH':            3,
+  'REFRESH CREATIVE': 4,
+  'NEW TARGETING':    5,
+  'NEW CHANNEL':      6,
+  'CONTINUE':         7,
+  'SCALE':            8,
+  'PAUSED':           9,
+  'NO DATA':         10,
+};
+
+// Scale sizing: answers "how much?" when the verdict is SCALE.
+// Two tiers:
+//   +50% = strong signal — hook >45% + freq <2.0 (TOF) OR fti_lw ≥5 (BOF)
+//   +25% = standard signal — just passed SCALE thresholds
+function scaleSize(r, sug) {
+  if (sug.label !== 'SCALE') return null;
+  const isBOF = (r.objective || '').toUpperCase() === 'BOF';
+  if (isBOF) {
+    if (Number.isFinite(r.fti_lw) && r.fti_lw >= 5) return '+50%';
+    return '+25%';
+  }
+  if (Number.isFinite(r.hook_rate_lw) && r.hook_rate_lw > 45 &&
+      Number.isFinite(r.frequency_lw) && r.frequency_lw < 2.0) return '+50%';
+  return '+25%';
 }
 
-function renderCard(r) {
-  const objective = (r.objective || '').toUpperCase();
-  const isBOF = objective === 'BOF';
-  const spendLW = isBOF ? r.spend_bof_lw : r.spend_tof_lw;
-  const spendPW = isBOF ? r.spend_bof_pw : r.spend_tof_pw;
-  const paused = isPausedInObjective(r);
+// Composite row key — kills the sector-3-toggles-sector-1 bug.
+// Same ad_code can appear under both TOF and BOF; scoping by objective makes ids unique.
+function sectionARowKey(r) {
+  const region = String(r.region || 'NA').toUpperCase();
+  const obj = String(r.objective || 'NA').toUpperCase();
+  const safeCode = String(r.ad_code || 'noid').replace(/[^a-zA-Z0-9]/g, '-');
+  return `sa-${region}-${obj}-${safeCode}`;
+}
 
-  const hookDelta  = paused ? '' : deltaHTML(r.hook_rate_lw, r.hook_rate_pw, 'higher_better', 'pct_abs');
-  const freqDelta  = paused ? '' : deltaHTML(r.frequency_lw, r.frequency_pw, 'lower_better', 'abs');
-  const cpmDelta   = paused ? '' : deltaHTML(r.cpm_lw, r.cpm_pw, 'lower_better', 'pct_rel');
-  const spendDelta = paused ? '' : deltaHTML(spendLW, spendPW, 'higher_better', 'pct_rel');
-  const ftiDelta   = paused ? '' : deltaHTML(r.fti_lw, r.fti_pw, 'higher_better', 'abs');
-  const cpaDelta   = paused ? '' : deltaHTML(r.cpa_lw, r.cpa_pw, 'lower_better', 'pct_rel');
-
+// One-line row: arrow + ad_code + verdict pill. No metrics.
+function renderSectionARow(r) {
   const sug = suggestion(r);
+  const size = scaleSize(r, sug);
+  const rowKey = sectionARowKey(r);
+  const imgUrl = `${assetBase}${r.ad_code}.webp`;
+  const imgUrlEscaped = imgUrl.replace(/'/g, "\\'");
+  const adCodeEscaped = String(r.ad_code || '').replace(/'/g, "\\'");
+  const verdictLabel = size ? `${sug.label} ${size}` : sug.label;
   const border = borderForSuggestion(sug);
 
-  let statusBadge;
-  if (paused) {
-    statusBadge = `<span class="text-xs px-1.5 py-0.5 rounded bg-slate-700 text-slate-300">⏸ PAUSED</span>`;
-  } else {
-    const statusColor = String(r.status).toLowerCase() === 'kill'
-      ? 'bg-red-900 text-red-200' : 'bg-emerald-900 text-emerald-200';
-    statusBadge = `<span class="text-xs px-1.5 py-0.5 rounded ${statusColor}">${r.status || 'Live'}</span>`;
-  }
-  const objBadgeColor = isBOF ? 'bg-purple-900 text-purple-200' : 'bg-sky-900 text-sky-200';
+  return `
+    <div id="${rowKey}-wrap" class="flex flex-col">
+      <button
+        class="flex items-center gap-2 px-3 py-1.5 rounded hover:bg-slate-800/50 text-left w-full border ${border} bg-slate-900/50 transition-colors"
+        onclick="toggleSectionARow('${rowKey}', '${imgUrlEscaped}', '${adCodeEscaped}')"
+        aria-expanded="false"
+        data-row-key="${rowKey}"
+      >
+        <span class="row-arrow text-slate-500 text-xs w-3 flex-shrink-0">▸</span>
+        <span class="font-mono text-xs font-semibold truncate flex-1 min-w-0">${r.ad_code}</span>
+        <span class="text-[11px] px-2 py-0.5 rounded ${sug.cls} whitespace-nowrap flex-shrink-0 font-semibold">
+          ${sug.icon} ${verdictLabel}
+        </span>
+      </button>
+      <div id="${rowKey}-expand" class="hidden border-x border-b ${border} bg-slate-950/60 rounded-b px-3 py-3 space-y-2"></div>
+    </div>`;
+}
 
-  const lwValueCls = paused ? 'text-slate-600' : '';
-  const lwHook  = paused ? '—' : fmtPct(r.hook_rate_lw);
-  const lwCpm   = paused ? '—' : fmtMoney(r.cpm_lw);
-  const lwFreq  = paused ? '—' : fmtFreq(r.frequency_lw);
-  const lwFti   = paused ? '—' : fmtNum(r.fti_lw);
-  const lwCpa   = (paused || !(r.fti_lw > 0)) ? '—' : fmtMoney(r.cpa_lw);
+// Expanded content — the point of this is "show me the ad". Image first.
+function buildSectionAExpandContent(r) {
+  const sug = suggestion(r);
+  const axes = [r.prod, r.angle, r.feature1, r.objective].filter(Boolean).join(' · ');
 
-  const lwBlockTOF = `
-    <div class="text-sm ${lwValueCls}">Hook: <b>${lwHook}</b>${hookDelta}</div>
-    <div class="text-sm ${lwValueCls}">CPM: <b>${lwCpm}</b>${cpmDelta}</div>
-    <div class="text-sm ${lwValueCls}">Frequency: <b>${lwFreq}</b>${freqDelta}</div>
-    <div class="text-sm ${lwValueCls}">Spend: <b>${fmtMoney(spendLW)}</b>${spendDelta}</div>`;
-  const lwBlockBOF = `
-    <div class="text-sm ${lwValueCls}">FTI: <b>${lwFti}</b>${ftiDelta}</div>
-    <div class="text-sm ${lwValueCls}">CPA: <b>${lwCpa}</b>${cpaDelta}</div>
-    <div class="text-sm ${lwValueCls}">Frequency: <b>${lwFreq}</b>${freqDelta}</div>
-    <div class="text-sm ${lwValueCls}">Spend: <b>${fmtMoney(spendLW)}</b>${spendDelta}</div>`;
-
-  const hasLifetime = Number.isFinite(r.spend) && r.spend > 0;
-  const lifetimeTOF = `
-    <div class="text-sm">Hook: <b>${fmtPct(r.hook_rate)}</b></div>
-    <div class="text-sm">Thumb-Stop: <b>${fmtPct(r.thumb_stop)}</b></div>
-    <div class="text-sm">CPM: <b>${fmtMoney(r.cpm)}</b></div>
-    <div class="text-sm">Frequency: <b>${fmtFreq(r.frequency)}</b></div>
-    <div class="text-sm text-slate-500">Total ad spend (all objectives): <b>${fmtMoney(r.spend)}</b></div>`;
-  const lifetimeBOF = `
-    <div class="text-sm">FTI: <b>${fmtNum(r.fti)}</b></div>
-    <div class="text-sm">CPA: <b>${r.fti > 0 ? fmtMoney(r.cpa) : '—'}</b></div>
-    <div class="text-sm">Frequency: <b>${fmtFreq(r.frequency)}</b></div>
-    <div class="text-sm text-slate-500">Total ad spend (all objectives): <b>${fmtMoney(r.spend)}</b></div>`;
-
-  const imgUrl = `${assetBase}${r.ad_code}.webp`;
-  const cid = cardId(r);
-
-  // ═══ NEW v4: Video Description block — shown above metrics, always visible when present ═══
-  const videoDescBlock = r.video_description
-    ? `<div class="text-xs text-slate-300 bg-slate-950/60 border border-slate-800 rounded p-2 italic leading-snug">
-         <span class="text-[10px] uppercase tracking-wide text-slate-500 not-italic">Video</span><br/>
-         ${r.video_description}
-       </div>`
-    : '';
-
-  // ═══ NEW v4: Replacement recommender — shown below lifetime, only for KILL/SATURATING ═══
+  // Replacement candidates — only when ad is dying
   const needsReplacement = ['KILL', 'SATURATING'].includes(sug.label);
   let replacementBlock = '';
   if (needsReplacement) {
     const reps = findReplacements(r, rows);
     replacementBlock = `
-      <div class="border-t border-slate-800 pt-2 space-y-1.5">
+      <div class="border-t border-slate-800 pt-2">
         <div class="text-[10px] uppercase tracking-wide text-orange-300 mb-1">→ Replacement candidates</div>
         ${reps.map(rep => {
           if (rep.type === 'inherit') {
-            return `<div class="text-xs bg-indigo-950/30 border border-indigo-900 rounded p-1.5">
+            return `<div class="text-xs bg-indigo-950/30 border border-indigo-900 rounded p-1.5 mb-1">
               <div class="font-mono text-indigo-300">${rep.candidate.ad_code}</div>
               <div class="text-[11px] text-slate-300">${rep.rationale}</div>
             </div>`;
           }
-          return `<div class="text-xs bg-slate-900/60 border border-slate-700 rounded p-1.5">
-            <div class="text-slate-400 italic">Net-new swap suggestion</div>
+          return `<div class="text-xs bg-slate-900/60 border border-slate-700 rounded p-1.5 mb-1">
+            <div class="text-slate-400 italic">Net-new swap</div>
             <div class="text-[11px] text-slate-300">${rep.rationale}</div>
           </div>`;
         }).join('')}
@@ -455,78 +418,116 @@ function renderCard(r) {
   }
 
   return `
-    <article id="${cid}" class="bg-slate-900 border ${border} rounded p-3 space-y-2" data-ad-code="${r.ad_code}">
-      <div class="flex justify-between items-start gap-2">
-        <div class="flex items-center gap-2 min-w-0">
-          <button
-            class="flex-shrink-0 w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs flex items-center justify-center"
-            onclick="toggleAsset('${cid}', '${imgUrl.replace(/'/g, "\\'")}', '${r.ad_code}')"
-            title="View creative" aria-label="View creative">👁</button>
-          <b class="text-sm truncate">${r.ad_code}</b>
-        </div>
-        <div class="flex gap-1 flex-shrink-0">
-          ${objective ? `<span class="text-xs px-1.5 py-0.5 rounded ${objBadgeColor}">${objective}</span>` : ''}
-          ${statusBadge}
-        </div>
-      </div>
-
-      <!-- AI suggestion strip -->
-      <div class="border ${sug.cls} rounded px-2 py-1.5 flex items-start gap-2 text-xs">
-        <span class="flex-shrink-0">${sug.icon}</span>
-        <div class="min-w-0">
-          <div class="font-bold">${sug.label}</div>
-          <div class="text-[11px] leading-tight opacity-80">${sug.reason}</div>
-        </div>
-      </div>
-
-      <!-- asset preview slot -->
-      <div class="asset-slot hidden" data-loaded="false"></div>
-
-      ${videoDescBlock}
-
-      <div class="text-xs text-slate-400">${r.region} · ${r.prod} · ${r.angle}</div>
-      <div class="text-xs text-slate-500">${r.feature1 || ''}</div>
-
-      <!-- LAST WEEK section -->
-      <div class="border-t border-slate-800 pt-2">
-        <div class="text-[10px] uppercase tracking-wide text-slate-500 mb-1 flex items-center justify-between">
-          <span>Last Week ${paused ? '· paused' : '(vs prior week)'}</span>
-        </div>
-        ${isBOF ? lwBlockBOF : lwBlockTOF}
-      </div>
-
-      <!-- LIFETIME section -->
-      ${hasLifetime ? `
-      <div class="border-t border-slate-800 pt-2">
-        <div class="text-[10px] uppercase tracking-wide text-slate-500 mb-1">Lifetime — ${objective} performance</div>
-        ${isBOF ? lifetimeBOF : lifetimeTOF}
-      </div>` : ''}
-
-      ${replacementBlock}
-
-      ${r.assessment ? `<div class="text-xs text-slate-400 border-t border-slate-800 pt-2">${r.assessment}</div>` : ''}
-    </article>`;
+    <div class="asset-slot" data-loaded="false">
+      <div class="text-[11px] text-slate-500 italic py-6 text-center">Loading creative...</div>
+    </div>
+    <div class="text-xs text-slate-400">${axes}</div>
+    ${r.video_description ? `<div class="text-xs text-slate-300 italic leading-snug border-l-2 border-slate-700 pl-2">${r.video_description}</div>` : ''}
+    <div class="text-xs leading-snug">
+      <span class="text-slate-500">Why ${sug.label}:</span> ${sug.reason}
+    </div>
+    ${r.assessment ? `<div class="text-xs text-slate-400 border-t border-slate-800 pt-2">${r.assessment}</div>` : ''}
+    ${replacementBlock}
+    <div class="text-[10px] text-slate-500 pt-1 border-t border-slate-800">
+      Metrics → scroll to sortable table below
+    </div>`;
 }
 
-// --- asset toggle (global) -------------------------------------------------
-window.toggleAsset = function (cardElId, imgUrl, adCode) {
-  const card = document.getElementById(cardElId);
-  if (!card) return;
-  const slot = card.querySelector('.asset-slot');
-  if (!slot) return;
-  if (!slot.classList.contains('hidden')) { slot.classList.add('hidden'); return; }
-  if (slot.dataset.loaded !== 'true') {
-    slot.innerHTML = `
-      <div class="mt-1 mb-2 rounded overflow-hidden bg-slate-950 border border-slate-800 relative">
-        <img src="${imgUrl}" alt="${adCode}" class="w-full h-auto block" loading="lazy"
-          onerror="this.parentElement.innerHTML='<div class=&quot;text-xs text-slate-500 p-3 text-center&quot;>No asset file found at<br><code class=&quot;text-slate-400&quot;>${imgUrl}</code></div>'" />
-      </div>`;
-    slot.dataset.loaded = 'true';
+// Toggle — lazy-loads both expand content and image on first open.
+window.toggleSectionARow = function(rowKey, imgUrl, adCode) {
+  const expandEl = document.getElementById(`${rowKey}-expand`);
+  if (!expandEl) return;
+  const btn = document.querySelector(`[data-row-key="${rowKey}"]`);
+  const arrow = btn ? btn.querySelector('.row-arrow') : null;
+  const wasHidden = expandEl.classList.contains('hidden');
+
+  if (wasHidden) {
+    const rowData = rows.find(r => sectionARowKey(r) === rowKey);
+    if (!rowData) return;
+
+    if (!expandEl.dataset.contentLoaded) {
+      expandEl.innerHTML = buildSectionAExpandContent(rowData);
+      expandEl.dataset.contentLoaded = 'true';
+    }
+
+    const slot = expandEl.querySelector('.asset-slot');
+    if (slot && slot.dataset.loaded !== 'true') {
+      slot.innerHTML = `
+        <div class="rounded overflow-hidden bg-slate-950 border border-slate-800">
+          <img src="${imgUrl}" alt="${adCode}" class="w-full h-auto block" loading="lazy"
+            onerror="this.parentElement.innerHTML='<div class=&quot;text-xs text-slate-500 p-4 text-center&quot;>No asset file found at<br><code class=&quot;text-slate-400&quot;>${imgUrl}</code></div>'" />
+        </div>`;
+      slot.dataset.loaded = 'true';
+    }
+
+    expandEl.classList.remove('hidden');
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+    if (arrow) arrow.textContent = '▾';
+  } else {
+    expandEl.classList.add('hidden');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+    if (arrow) arrow.textContent = '▸';
   }
-  slot.classList.remove('hidden');
 };
 
-// --- SEGMENT ANALYSIS ------------------------------------------------------
+function renderSectionA(filteredRows) {
+  if (!filteredRows.length) {
+    return '<div class="text-sm text-slate-500 p-4 text-center bg-slate-900 border border-slate-800 rounded">No ads match the current filters.</div>';
+  }
+
+  // Group by region (creative_log today tags as TH / SEA / ROW)
+  const byRegion = new Map();
+  filteredRows.forEach(r => {
+    const region = String(r.region || 'UNKNOWN').toUpperCase();
+    if (!byRegion.has(region)) byRegion.set(region, []);
+    byRegion.get(region).push(r);
+  });
+
+  // Sort regions in business order: TH, SEA, ROW, then anything else
+  const orderedRegions = [...byRegion.entries()].sort((a, b) => {
+    const oa = REGION_DISPLAY[a[0]]?.order ?? 99;
+    const ob = REGION_DISPLAY[b[0]]?.order ?? 99;
+    return oa - ob;
+  });
+
+  const sortFn = (a, b) => {
+    const sa = suggestion(a).label;
+    const sb = suggestion(b).label;
+    return (VERDICT_SEVERITY[sa] ?? 99) - (VERDICT_SEVERITY[sb] ?? 99);
+  };
+
+  return orderedRegions.map(([regionCode, regionRows]) => {
+    const display = REGION_DISPLAY[regionCode]?.label || regionCode;
+    const totalAds = regionRows.length;
+    const tof = regionRows.filter(r => String(r.objective || '').toUpperCase() === 'TOF').sort(sortFn);
+    const bof = regionRows.filter(r => String(r.objective || '').toUpperCase() === 'BOF').sort(sortFn);
+
+    const subsection = (label, list) => {
+      if (!list.length) return '';
+      return `
+        <div class="space-y-1 mt-3 first:mt-0">
+          <div class="text-[10px] uppercase tracking-wide text-slate-500 px-1 flex items-baseline gap-2">
+            <span class="font-semibold">${label}</span>
+            <span class="opacity-70">${list.length} ad${list.length !== 1 ? 's' : ''}</span>
+          </div>
+          <div class="space-y-1">${list.map(renderSectionARow).join('')}</div>
+        </div>`;
+    };
+
+    return `
+      <article class="bg-slate-900 border border-slate-800 rounded p-3">
+        <div class="flex items-baseline justify-between pb-2 border-b border-slate-800">
+          <h3 class="font-semibold">${display}</h3>
+          <span class="text-xs text-slate-500">${totalAds} ad${totalAds !== 1 ? 's' : ''}</span>
+        </div>
+        ${subsection('TOF', tof)}
+        ${subsection('BOF', bof)}
+        ${!tof.length && !bof.length ? '<div class="text-xs text-slate-500 italic py-2">No ads match filters for this region.</div>' : ''}
+      </article>`;
+  }).join('');
+}
+
+// --- SEGMENT ANALYSIS (unchanged — this is Section B v1; will rebuild later) ---
 function buildAdMap(filteredRows) {
   const byCode = new Map();
   filteredRows.forEach(r => {
@@ -594,19 +595,16 @@ function segmentCellColor(val, allVals, dir = 'higher_better') {
 function renderSegmentTable(filteredRows) {
   const ads = buildAdMap(filteredRows);
   const segs = computeSegments(ads, segmentDim);
-
   const hooks = segs.map(s => s.avg_hook);
   const cpms  = segs.map(s => s.avg_cpm);
   const ftis  = segs.map(s => s.total_fti);
   const cpas  = segs.map(s => s.avg_cpa);
-
   const dimLabel = { angle: 'Angle', prod: 'Production', region: 'Region', feature1: 'Feature' }[segmentDim] || segmentDim;
 
   const head = `<tr class="text-slate-400">${
     [dimLabel, '# Ads', 'Spend (total)', 'Spend (LW)', 'Avg Hook LW', 'Avg CPM LW', 'Total FTI LW', 'Avg CPA LW']
       .map(h => `<th class="text-left px-2 py-1 border-b border-slate-700 text-xs">${h}</th>`).join('')
   }</tr>`;
-
   const body = segs.map(s => `<tr>
     <td class="px-2 py-1 border-b border-slate-800 font-semibold">${s.segment}</td>
     <td class="px-2 py-1 border-b border-slate-800">${s.count}</td>
@@ -622,18 +620,27 @@ function renderSegmentTable(filteredRows) {
     `<tr><td class="px-2 py-3 text-slate-500" colspan="8">No ads match current filters.</td></tr>`);
 }
 
-// --- summary table ---------------------------------------------------------
+// --- toggleFromTable — redirect to Section A expand (cards removed) -------
 window.toggleFromTable = function (adCode, objective) {
-  const cid = `card-${adCode}-${(objective || 'NA').toLowerCase()}`.replace(/[^a-zA-Z0-9-]/g, '-');
-  const card = document.getElementById(cid);
-  if (!card) return;
-  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  const imgUrl = `${assetBase}${adCode}.webp`;
-  window.toggleAsset(cid, imgUrl, adCode);
-  card.classList.add('ring-2', 'ring-sky-400');
-  setTimeout(() => card.classList.remove('ring-2', 'ring-sky-400'), 2000);
+  const r = rows.find(x =>
+    x.ad_code === adCode &&
+    String(x.objective || '').toUpperCase() === String(objective || '').toUpperCase()
+  );
+  if (!r) return;
+  const rowKey = sectionARowKey(r);
+  const wrap = document.getElementById(`${rowKey}-wrap`);
+  if (!wrap) return;
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const expandEl = document.getElementById(`${rowKey}-expand`);
+  if (expandEl && expandEl.classList.contains('hidden')) {
+    const imgUrl = `${assetBase}${adCode}.webp`;
+    window.toggleSectionARow(rowKey, imgUrl, adCode);
+  }
+  wrap.classList.add('ring-2', 'ring-sky-400', 'rounded');
+  setTimeout(() => wrap.classList.remove('ring-2', 'ring-sky-400'), 2000);
 };
 
+// --- sortable summary (Section C — unchanged) -----------------------------
 function renderSummary(filtered) {
   const sorted = [...filtered].sort((a, b) => {
     const av = a[sortKey], bv = b[sortKey];
@@ -702,8 +709,7 @@ function renderSummary(filtered) {
   );
 }
 
-// --- ACTION SUMMARY --------------------------------------------------------
-// ═══ v4: reordered by severity, SATURATING bucket added ═══
+// --- ACTION SUMMARY (verdict-bucket grid — kept, now below Section A) -----
 function renderActionSummary(filteredRows) {
   const buckets = [
     { label: 'KILL',              icon: '🛑', title: 'Kill',              color: 'bg-red-950/40 border-red-900 text-red-200' },
@@ -714,9 +720,7 @@ function renderActionSummary(filteredRows) {
     { label: 'NEW CHANNEL',       icon: '📡', title: 'Try New Channel',    color: 'bg-cyan-950/40 border-cyan-900 text-cyan-200' },
     { label: 'SCALE',             icon: '📈', title: 'Scale',              color: 'bg-emerald-950/40 border-emerald-900 text-emerald-200' },
   ];
-
   const rowsWithSug = filteredRows.map(r => ({ r, sug: suggestion(r) }));
-
   const html = buckets.map(b => {
     const hits = rowsWithSug.filter(x => x.sug.label === b.label);
     const items = hits.map(({ r }) => {
@@ -737,22 +741,15 @@ function renderActionSummary(filteredRows) {
         </div>
       </div>`;
   }).join('');
-
   document.getElementById('action-summary').innerHTML = html;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// NEW v4: Vic Bullets export — clipboard-formatted block for stakeholder slide
-// Structure per region: TOP (scale/continue) · DEAD (kill/saturating + replacements) · WATCH
+// Vic Bullets export (v4 — unchanged)
 // ═══════════════════════════════════════════════════════════════════════════
 function buildVicBullets(region) {
-  const pool = rows.filter(r => {
-    if (region !== 'ALL' && String(r.region).toUpperCase() !== region) return false;
-    return true;
-  });
-
+  const pool = rows.filter(r => region === 'ALL' || String(r.region).toUpperCase() === region);
   const rowsWithSug = pool.map(r => ({ r, sug: suggestion(r) }));
-
   const TOP = rowsWithSug.filter(x => ['SCALE', 'CONTINUE'].includes(x.sug.label));
   const DEAD = rowsWithSug.filter(x => ['KILL', 'SATURATING'].includes(x.sug.label));
   const WATCH = rowsWithSug.filter(x => ['WATCH', 'REFRESH CREATIVE', 'NEW TARGETING', 'NEW CHANNEL'].includes(x.sug.label));
@@ -769,11 +766,8 @@ function buildVicBullets(region) {
     if (includeReplacements) {
       const reps = findReplacements(r, rows);
       reps.forEach(rep => {
-        if (rep.type === 'inherit') {
-          line += `\n    → Replace with: ${rep.candidate.ad_code} (${rep.rationale})`;
-        } else {
-          line += `\n    → Test: ${rep.rationale}`;
-        }
+        if (rep.type === 'inherit') line += `\n    → Replace with: ${rep.candidate.ad_code} (${rep.rationale})`;
+        else line += `\n    → Test: ${rep.rationale}`;
       });
     }
     return line;
@@ -781,11 +775,8 @@ function buildVicBullets(region) {
 
   const header = `${region === 'ALL' ? 'ALL REGIONS' : region} · CW${guessLatestCW()} · ${new Date().toISOString().slice(0, 10)}`;
   const sep = '─'.repeat(Math.min(header.length, 60));
-
-  const blocks = [
-    header,
-    sep,
-    '',
+  return [
+    header, sep, '',
     `✅ TOP (continue / scale) — ${TOP.length}`,
     TOP.length ? TOP.map(x => formatAd(x, false)).join('\n\n') : '  (none)',
     '',
@@ -794,20 +785,15 @@ function buildVicBullets(region) {
     '',
     `👀 WATCH / ACT — ${WATCH.length}`,
     WATCH.length ? WATCH.map(x => formatAd(x, false)).join('\n\n') : '  (none)',
-  ];
-
-  return blocks.join('\n');
+  ].join('\n');
 }
 
-// Best-effort latest CW from asset page context — not perfect, just for export labeling
 function guessLatestCW() {
-  // Prefer the one from shared nav if rendered
   const navChip = document.querySelector('#shared-nav span');
   if (navChip) {
     const match = navChip.textContent.match(/CW(\d+)/);
     if (match) return match[1];
   }
-  // Fallback: current ISO week
   const now = new Date();
   const start = new Date(now.getFullYear(), 0, 1);
   const diff = (now - start) / (1000 * 60 * 60 * 24);
@@ -852,7 +838,7 @@ function showExportModal(text) {
   ta.focus(); ta.select();
 }
 
-// --- render ----------------------------------------------------------------
+// --- render ---------------------------------------------------------------
 function render() {
   const filtered = rows.filter(r => {
     if (filterFunnel !== 'All' && String(r.objective).toUpperCase() !== filterFunnel) return false;
@@ -867,10 +853,11 @@ function render() {
     return true;
   });
 
-  document.getElementById('cards').innerHTML = filtered.length
-    ? filtered.map(renderCard).join('')
-    : '<div class="text-sm text-slate-500 col-span-full">No ads match the current filters.</div>';
+  // Section A (per-country ad list) — primary view
+  const sectionAEl = document.getElementById('section-a');
+  if (sectionAEl) sectionAEl.innerHTML = renderSectionA(filtered);
 
+  // Action Summary + Segment + Sortable summary — secondary views
   renderActionSummary(filtered);
   renderSegmentTable(filtered);
   renderSummary(filtered);
@@ -905,20 +892,18 @@ async function initMeta() {
     if (statusEl) statusEl.addEventListener('change', () => { filterStatus = statusEl.value; render(); });
     if (segEl)    segEl.addEventListener('change',    () => { segmentDim  = segEl.value;    render(); });
 
-    // ═══ NEW v4: Vic Bullets export button handlers ═══
     document.querySelectorAll('.vic-export-btn').forEach(btn => {
       btn.addEventListener('click', () => copyVicBullets(btn.dataset.region));
     });
 
-    // AI Suggestions Panel (asset layer) — unchanged from v3
+    // AI Suggestions panel (asset layer) — unchanged from v4
     const pick = (row, keys, fb = '') => ZaapiDataService.pick(row, keys, fb);
     const actionCWs = [...new Set((actionLog || []).map(a => ZaapiDataService.fmtCW(pick(a, ['CW', 'cw']))))].filter(Boolean);
     const latestCW = actionCWs.sort((a, b) => parseInt(a.replace(/\D/g, ''), 10) - parseInt(b.replace(/\D/g, ''), 10)).slice(-1)[0] || 'CW17';
     const panelEl = document.getElementById('ai-suggestions-panel');
     if (panelEl && window.AISuggestionsPanel) {
       window.AISuggestionsPanel.render(panelEl, {
-        actionLog, learningAccum,
-        currentCW: latestCW,
+        actionLog, learningAccum, currentCW: latestCW,
         layers: ['asset'],
         region: filterRegion !== 'All' ? filterRegion : null,
         lookbackWeeks: 2,
