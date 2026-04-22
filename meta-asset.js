@@ -7,7 +7,7 @@
 //   • Composite row keys (country-objective-ad_code) kill the sector-toggle bug
 //   • Metrics moved out of cards; they now live ONLY in the sortable table below
 // v4 additions retained: SATURATING verdict, replacement recommender,
-//   Video Description, Vic Bullets export.
+//   Video Description, Weekly Creative Recap export.
 
 let rows = [];
 let usdRate = 34;
@@ -745,9 +745,9 @@ function renderActionSummary(filteredRows) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Vic Bullets export (v4 — unchanged)
+// Weekly Creative Recap export (v4 — unchanged)
 // ═══════════════════════════════════════════════════════════════════════════
-function buildVicBullets(region) {
+function buildWeeklyRecap(region) {
   const pool = rows.filter(r => region === 'ALL' || String(r.region).toUpperCase() === region);
   const rowsWithSug = pool.map(r => ({ r, sug: suggestion(r) }));
   const TOP = rowsWithSug.filter(x => ['SCALE', 'CONTINUE'].includes(x.sug.label));
@@ -800,8 +800,8 @@ function guessLatestCW() {
   return String(Math.ceil((diff + start.getDay() + 1) / 7)).padStart(2, '0');
 }
 
-async function copyVicBullets(region) {
-  const text = buildVicBullets(region);
+async function copyWeeklyRecap(region) {
+  const text = buildWeeklyRecap(region);
   try {
     await navigator.clipboard.writeText(text);
     showToast(`✓ Copied ${region} block (${text.split('\n').length} lines)`);
@@ -812,7 +812,7 @@ async function copyVicBullets(region) {
 }
 
 function showToast(msg) {
-  const t = document.getElementById('vic-export-toast');
+  const t = document.getElementById('recap-export-toast');
   if (!t) return;
   t.textContent = msg;
   t.classList.remove('hidden');
@@ -820,16 +820,16 @@ function showToast(msg) {
 }
 
 function showExportModal(text) {
-  const existing = document.getElementById('vic-export-modal');
+  const existing = document.getElementById('recap-export-modal');
   if (existing) existing.remove();
   const modal = document.createElement('div');
-  modal.id = 'vic-export-modal';
+  modal.id = 'recap-export-modal';
   modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4';
   modal.innerHTML = `
     <div class="bg-slate-900 border border-slate-700 rounded max-w-3xl w-full max-h-[80vh] flex flex-col">
       <div class="flex items-center justify-between p-3 border-b border-slate-800">
-        <h3 class="text-sm font-semibold">Vic Bullets Export — copy manually</h3>
-        <button onclick="document.getElementById('vic-export-modal').remove()" class="text-slate-400 hover:text-white text-lg">×</button>
+        <h3 class="text-sm font-semibold">Weekly Creative Recap — copy manually</h3>
+        <button onclick="document.getElementById('recap-export-modal').remove()" class="text-slate-400 hover:text-white text-lg">×</button>
       </div>
       <textarea readonly class="flex-1 bg-slate-950 text-slate-200 p-3 font-mono text-xs resize-none overflow-auto">${text.replace(/</g, '&lt;')}</textarea>
     </div>`;
@@ -892,8 +892,8 @@ async function initMeta() {
     if (statusEl) statusEl.addEventListener('change', () => { filterStatus = statusEl.value; render(); });
     if (segEl)    segEl.addEventListener('change',    () => { segmentDim  = segEl.value;    render(); });
 
-    document.querySelectorAll('.vic-export-btn').forEach(btn => {
-      btn.addEventListener('click', () => copyVicBullets(btn.dataset.region));
+    document.querySelectorAll('.recap-export-btn').forEach(btn => {
+      btn.addEventListener('click', () => copyWeeklyRecap(btn.dataset.region));
     });
 
     // AI Suggestions panel (asset layer) — unchanged from v4
