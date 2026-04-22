@@ -49,7 +49,7 @@
     </label>
   </section>
 
-  <!-- ═══ NEW v4: Vic Bullets Export bar ═══ -->
+  <!-- Vic Bullets Export bar -->
   <section class="bg-indigo-950/40 border border-indigo-900 rounded p-3 flex flex-wrap items-center gap-3">
     <div class="flex flex-col">
       <span class="text-sm font-semibold text-indigo-200">🧾 Vic Bullets Export</span>
@@ -111,9 +111,9 @@
           <dt class="font-semibold text-red-300">Frequency · lower for TOF, fine for BOF ↓</dt>
           <dd class="text-slate-400 leading-snug">How many times each user saw the ad. Above 3 = fatigue zone on TOF. Retargeting (BOF) frequency can be higher by design.</dd>
           <dt class="font-semibold text-emerald-300">FTI · higher is better ↑</dt>
-          <dd class="text-slate-400 leading-snug">First Time Integrated — registered + connected 1 channel. The conversion that matters. Higher = more pipeline.</dd>
+          <dd class="text-slate-400 leading-snug">First Time Integrated — registered + connected 1 channel. The ads-pixel conversion event (asset health signal, not final product metric).</dd>
           <dt class="font-semibold text-red-300">CPA · lower is better ↓</dt>
-          <dd class="text-slate-400 leading-snug">Cost per FTI. Compare to plan CAC ($550 TH / $739 SEA / $1,800 ROW). Below plan = efficient, above plan = leak.</dd>
+          <dd class="text-slate-400 leading-snug">Cost per FTI. Company focus this phase is CAC efficiency — LTV/MRR come into play once a market reaches maturity.</dd>
         </dl>
       </div>
 
@@ -122,17 +122,16 @@
         <dl class="space-y-2">
           <dt class="font-semibold text-red-300">🛑 KILL</dt>
           <dd class="text-slate-400 leading-snug">Hook &lt; 15% (never worked) OR fatigue score ≥5 (was working, now collapsed). Turn it off.</dd>
-          <!-- ═══ NEW v4: SATURATING entry ═══ -->
           <dt class="font-semibold text-orange-200">🔥 SATURATING</dt>
-          <dd class="text-slate-400 leading-snug">Winner fatiguing. Fires only on ads with lifetime FTI &gt; 0 that now show multi-signal decay (fatigue score 3–4): freq ≥3 + FTI ↓, FTI decay ≥30% at flat spend, CPA drift ≥50%, or FTI collapse to 0. <b>Refresh now or lose it.</b> Card shows replacement candidates inherited from same-region winners.</dd>
-          <dt class="font-semibold text-emerald-300">📈 SCALE</dt>
-          <dd class="text-slate-400 leading-snug">TOF: Hook &gt; 35% + Freq &lt; 2.5. BOF: FTI ≥ 2. Proven winner — pour more budget in.</dd>
+          <dd class="text-slate-400 leading-snug">Winner fatiguing. Fires only on ads with lifetime FTI &gt; 0 that now show multi-signal decay (fatigue score 3–4): freq ≥3 + FTI ↓, FTI decay ≥30% at flat spend, CPA drift ≥50%, or FTI collapse to 0. <b>Refresh now or lose it.</b></dd>
+          <dt class="font-semibold text-emerald-300">📈 SCALE +25% / +50%</dt>
+          <dd class="text-slate-400 leading-snug">TOF: Hook &gt; 35% + Freq &lt; 2.5. BOF: FTI ≥ 2. <b>+50%</b> fires on strong signals (hook &gt; 45% + freq &lt; 2.0, or FTI ≥ 5). <b>+25%</b> is the default scale size.</dd>
           <dt class="font-semibold text-purple-300">🎯 NEW TARGETING</dt>
           <dd class="text-slate-400 leading-snug">Creative works (hook OK) but no conversions on ≥$50 spend. Audience is wrong — test a new persona or segment.</dd>
           <dt class="font-semibold text-cyan-300">📡 NEW CHANNEL</dt>
           <dd class="text-slate-400 leading-snug">CPM or CPA up &gt;50% WoW. Audience right, placement getting expensive — test IG Reels, Stories, or turn off Audience Network.</dd>
           <dt class="font-semibold text-yellow-300">♻️ REFRESH CREATIVE</dt>
-          <dd class="text-slate-400 leading-snug">Frequency &gt; 3 and no FTI (ad fatigued without ever converting). Rotate a fresh edit of the same angle. Distinct from SATURATING, which fires on ads that <i>did</i> convert historically.</dd>
+          <dd class="text-slate-400 leading-snug">Frequency &gt; 3 and no FTI (ad fatigued without ever converting). Rotate a fresh edit of the same angle.</dd>
           <dt class="font-semibold text-orange-300">👀 WATCH</dt>
           <dd class="text-slate-400 leading-snug">TOF: borderline hook (25–35%) or hook dropped &gt;10pp WoW. BOF: $10–$50 spend with 0 FTI — inconclusive, not enough budget yet.</dd>
           <dt class="font-semibold text-slate-300">⏸ PAUSED</dt>
@@ -153,13 +152,22 @@
     <!-- ═══ AI Suggestions Panel (asset layer) ═══ -->
     <div id="ai-suggestions-panel"></div>
 
-    <!-- AI Action Summary: per-ad verdicts grouped by action type -->
-    <article class="bg-slate-900 border border-slate-800 rounded p-3">
-      <h2 class="font-semibold mb-2">🤖 Threshold-based Action List (per ad)</h2>
-      <div id="action-summary" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2"></div>
+    <!-- ═══ SECTION A · Per-country ad list (primary view) ═══ -->
+    <article class="space-y-2">
+      <div class="flex items-baseline justify-between">
+        <h2 class="font-semibold">Per-country ads · click a row to see the creative</h2>
+        <span class="text-[11px] text-slate-500">sorted by action priority · metrics in table below</span>
+      </div>
+      <div id="section-a" class="space-y-3"></div>
     </article>
 
-    <!-- Segment Analysis -->
+    <!-- ═══ Action Summary · verdict-bucket grid (alternate view) ═══ -->
+    <details class="bg-slate-900 border border-slate-800 rounded p-3" open>
+      <summary class="cursor-pointer font-semibold">🤖 Action list grouped by verdict (click to toggle)</summary>
+      <div id="action-summary" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2 mt-3"></div>
+    </details>
+
+    <!-- ═══ Segment Analysis (Section B v1) ═══ -->
     <article class="bg-slate-900 border border-slate-800 rounded p-3">
       <div class="flex items-center justify-between mb-2">
         <h2 class="font-semibold">Segment Analysis · what's working</h2>
@@ -177,12 +185,9 @@
       </div>
     </article>
 
-    <!-- Ad cards -->
-    <div id="cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-
-    <!-- Summary table -->
-    <article class="bg-slate-900 border border-slate-800 rounded p-3 overflow-auto">
-      <h2 class="font-semibold mb-2">Sortable summary table</h2>
+    <!-- ═══ Section C · Sortable summary table (all metrics live here) ═══ -->
+    <article class="bg-slate-900 border border-slate-800 rounded p-3 overflow-auto" id="summary-anchor">
+      <h2 class="font-semibold mb-2">Sortable summary table · all metrics</h2>
       <table class="w-full text-sm" id="summary"></table>
     </article>
   </section>
