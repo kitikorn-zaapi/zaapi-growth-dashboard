@@ -1,0 +1,2433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meta-Asset · Zaapi Growth · CW17</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!--
+  Meta-Asset Page v2 — Zaapi Growth Dashboard
+  Spec: zaapi_growth_system_spec.md §11
+  Design system: inherited from cw17_full_dashboard.html (CW17 Creative Brief artifact)
+  Data model: hub sheet tabs creative_log, raw_meta_daily, naming_guide, action_log
+  Status: per-ad metrics need ad-level export from Ads Manager to verify
+-->
+<style>
+:root{
+  --bg:#0D0F12;--bg2:#141619;--bg3:#1C1F24;--bg4:#242830;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --text:#F0F2F5;--text2:#8B909A;--text3:#555B66;
+  --th:#1FBA7A;--th-bg:rgba(31,186,122,0.1);--th-bd:rgba(31,186,122,0.25);
+  --sea:#4E9EFF;--sea-bg:rgba(78,158,255,0.1);--sea-bd:rgba(78,158,255,0.25);
+  --row:#F0A040;--row-bg:rgba(240,160,64,0.1);--row-bd:rgba(240,160,64,0.25);
+  --red:#FF5252;--red-bg:rgba(255,82,82,0.1);--red-bd:rgba(255,82,82,0.25);
+  --orange:#FF8C42;--ora-bg:rgba(255,140,66,0.1);--ora-bd:rgba(255,140,66,0.25);
+  --green:#1FBA7A;--grn-bg:rgba(31,186,122,0.08);--grn-bd:rgba(31,186,122,0.25);
+  --yellow:#F0C040;--yel-bg:rgba(240,192,64,0.08);--yel-bd:rgba(240,192,64,0.3);
+  --purple:#9B7FE8;
+  --r:10px;--rs:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5;}
+
+/* NAV */
+.nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;height:57px;}
+.nav-left{display:flex;align-items:center;gap:14px;}
+.nav-logo{font-size:15px;font-weight:600;letter-spacing:-.3px;}
+.nav-logo span{color:var(--sea);}
+.nav-meta{font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;}
+.nav-tags{display:flex;gap:6px;}
+.ntag{font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;border:1px solid;}
+.nt-th{color:var(--th);border-color:var(--th-bd);background:var(--th-bg);}
+.nt-sea{color:var(--sea);border-color:var(--sea-bd);background:var(--sea-bg);}
+.nt-row{color:var(--row);border-color:var(--row-bd);background:var(--row-bg);}
+
+/* PERIOD SELECTOR */
+.period-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 32px;display:flex;align-items:center;gap:10px;position:sticky;top:57px;z-index:99;}
+.period-label{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em;flex-shrink:0;}
+.period-btns{display:flex;gap:4px;}
+.period-btn{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.period-btn:hover{color:var(--text2);border-color:var(--border2);}
+.period-btn.active{background:var(--sea-bg);color:var(--sea);border-color:var(--sea-bd);}
+.period-divider{width:1px;height:16px;background:var(--border);flex-shrink:0;}
+.period-range-display{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:var(--bg3);}
+.period-live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;flex-shrink:0;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.period-custom{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);}
+.period-custom select{background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:'DM Mono',monospace;font-size:10px;padding:4px 8px;border-radius:4px;cursor:pointer;outline:none;}
+.period-custom select:focus{border-color:var(--sea-bd);}
+
+
+.page-hdr{margin-bottom:20px;}
+.page-title{font-size:24px;font-weight:600;letter-spacing:-.4px;margin-bottom:5px;}
+.page-sub{font-size:13px;color:var(--text2);}
+
+/* SECTION LABEL */
+.sec-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin:32px 0 14px;display:flex;align-items:center;gap:10px;}
+.sec-lbl:first-child{margin-top:0;}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
+.sec-num{background:var(--bg4);color:var(--text2);border-radius:4px;padding:2px 7px;font-family:'DM Mono',monospace;font-weight:500;}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:10px;}
+.stat{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;}
+.stat-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;}
+.stat-val{font-size:22px;font-weight:600;}
+.stat-note{font-size:11px;color:var(--text3);margin-top:3px;}
+.c-th{color:var(--th)!important;}.c-sea{color:var(--sea)!important;}.c-row{color:var(--row)!important;}
+.c-red{color:var(--red)!important;}.c-grn{color:var(--green)!important;}.c-ora{color:var(--orange)!important;}
+.c-yel{color:var(--yellow)!important;}.c-mut{color:var(--text2)!important;}.c-txt{color:var(--text)!important;}
+.c-pur{color:var(--purple)!important;}
+
+/* SECTION A — Per-market ad list */
+.region-hdr{display:flex;align-items:center;gap:10px;margin:20px 0 10px;font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;}
+.region-hdr:first-of-type{margin-top:0;}
+.region-hdr .rdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.region-hdr .rcount{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);font-weight:400;margin-left:auto;}
+.rd-th{background:var(--th);}.rd-sea{background:var(--sea);}.rd-row{background:var(--row);}
+.funnel-group{margin-bottom:14px;}
+.funnel-lbl{font-size:10px;color:var(--text3);letter-spacing:.05em;margin:8px 0 6px 12px;font-family:'DM Mono',monospace;}
+.alist{display:flex;flex-direction:column;gap:3px;}
+.arow{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);overflow:hidden;transition:border-color .15s;}
+.arow:hover{border-color:var(--border2);}
+.arow.expanded{border-color:var(--border2);}
+.arow-top{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;user-select:none;}
+.chev{color:var(--text3);font-size:10px;transition:transform .15s;width:10px;flex-shrink:0;}
+.arow.expanded .chev{transform:rotate(90deg);}
+.acode{font-family:'DM Mono',monospace;font-size:12px;color:var(--text);flex:1;}
+.acode.muted{color:var(--text3);}
+.vbadge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:4px;border:1px solid;letter-spacing:.03em;white-space:nowrap;}
+.v-scale{background:var(--grn-bg);color:var(--green);border-color:var(--grn-bd);}
+.v-hold{background:var(--sea-bg);color:var(--sea);border-color:var(--sea-bd);}
+.v-watch{background:var(--yel-bg);color:var(--yellow);border-color:var(--yel-bd);}
+.v-refresh{background:var(--ora-bg);color:var(--orange);border-color:var(--ora-bd);}
+.v-sat{background:var(--ora-bg);color:var(--orange);border-color:var(--ora-bd);}
+.v-kill{background:var(--red-bg);color:var(--red);border-color:var(--red-bd);}
+.v-paused{background:var(--bg4);color:var(--text2);border-color:var(--border2);}
+.arow-meta{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:4px;}
+.arow-body{display:none;padding:12px 18px 16px 32px;border-top:1px solid var(--border);background:var(--bg2);}
+.arow.expanded .arow-body{display:block;}
+.mrows{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;}
+.mbox{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:8px 10px;}
+.mbox-l{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px;}
+.mbox-v{font-size:14px;font-weight:600;}
+.mbox-s{font-size:10px;color:var(--text3);margin-top:1px;}
+.rsn{font-size:11px;color:var(--text2);line-height:1.6;padding:8px 10px;background:var(--bg3);border-radius:var(--rs);border-left:2px solid var(--border2);}
+.rsn strong{color:var(--text);}
+.axs-inline{font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);margin-top:8px;}
+.axs-inline span{color:var(--text2);}
+
+/* SECTION B — Segment scorecard */
+.filter-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center;}
+.fselect{background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 10px;border-radius:var(--rs);cursor:pointer;min-width:100px;}
+.fselect:hover{border-color:var(--border2);}
+.fselect:focus{outline:none;border-color:var(--sea-bd);}
+.flabel{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace;}
+.scorebox{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:18px 22px;}
+.sb-title{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;font-family:'DM Mono',monospace;}
+.sline{padding:7px 0;border-bottom:1px dashed var(--border);font-size:12px;display:flex;align-items:center;gap:8px;}
+.sline:last-child{border-bottom:none;}
+.sline .stag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;min-width:58px;text-align:center;flex-shrink:0;}
+.s-win{background:var(--grn-bg);color:var(--green);}
+.s-los{background:var(--red-bg);color:var(--red);}
+.s-unt{background:var(--bg4);color:var(--text3);}
+.s-dir{background:var(--yel-bg);color:var(--yellow);}
+.sline .sval{font-family:'DM Mono',monospace;color:var(--text);font-weight:500;min-width:100px;}
+.sline .sdesc{color:var(--text3);font-size:11px;flex:1;line-height:1.4;}
+
+/* SECTION C — Sortable table */
+.tfilters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.pill{font-size:10px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;letter-spacing:.02em;transition:all .12s;}
+.pill:hover{border-color:var(--border2);color:var(--text);}
+.pill.on{background:var(--sea-bg);color:var(--sea);border-color:var(--sea-bd);}
+.pill.on-red{background:var(--red-bg);color:var(--red);border-color:var(--red-bd);}
+.pill.on-grn{background:var(--grn-bg);color:var(--green);border-color:var(--grn-bd);}
+.tbl-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;overflow-x:auto;}
+table.flat{width:100%;border-collapse:collapse;font-size:11px;min-width:800px;}
+table.flat th{text-align:left;padding:10px 12px;background:var(--bg4);color:var(--text2);font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;white-space:nowrap;}
+table.flat th:hover{color:var(--text);}
+table.flat th.sorted::after{content:' ↓';color:var(--sea);}
+table.flat th.sorted.asc::after{content:' ↑';}
+table.flat td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text2);}
+table.flat td.mono{font-family:'DM Mono',monospace;color:var(--text);}
+table.flat tr:last-child td{border-bottom:none;}
+table.flat tr:hover td{background:rgba(255,255,255,.02);}
+.ctab{font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;}
+
+/* SECTION D — tabs */
+.subtab-nav{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);display:flex;padding:4px;margin-bottom:20px;gap:2px;}
+.subtab-btn{background:none;border:none;color:var(--text3);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:9px 16px;cursor:pointer;border-radius:var(--rs);transition:all .15s;flex:1;}
+.subtab-btn:hover{color:var(--text2);background:var(--bg3);}
+.subtab-btn.active{color:var(--text);background:var(--bg3);border:1px solid var(--border2);}
+.pane{display:none;}
+.pane.active{display:block;}
+
+/* Brief-style components from artifact */
+.plist{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
+.pitem{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);display:flex;overflow:hidden;}
+.pitem.p1{border-color:var(--red-bd);}.pitem.p2{border-color:var(--ora-bd);}.pitem.p3{border-color:var(--grn-bd);}
+.pnum{font-size:30px;font-weight:700;font-family:'DM Mono',monospace;min-width:62px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.p1 .pnum{background:var(--red-bg);color:var(--red);}
+.p2 .pnum{background:var(--ora-bg);color:var(--orange);}
+.p3 .pnum{background:var(--grn-bg);color:var(--green);}
+.pbody{padding:14px 18px;flex:1;}
+.purg{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:2px 9px;border-radius:20px;display:inline-block;margin-bottom:7px;border:1px solid;}
+.u-fire{background:var(--red-bg);color:var(--red);border-color:var(--red-bd);}
+.u-high{background:var(--ora-bg);color:var(--orange);border-color:var(--ora-bd);}
+.u-med{background:var(--grn-bg);color:var(--green);border-color:var(--grn-bd);}
+.ptitle{font-size:15px;font-weight:600;margin-bottom:2px;}
+.pcode{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:8px;}
+.prows{display:flex;flex-direction:column;}
+.prow{display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px;}
+.prow:last-child{border-bottom:none;}
+.pr-l{color:var(--text2);flex:1;line-height:1.4;}
+.pr-v{font-weight:500;text-align:right;flex-shrink:0;max-width:52%;line-height:1.4;}
+.bottom-line{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:18px 22px;margin-top:16px;font-size:13px;color:var(--text2);line-height:1.7;}
+.bottom-line strong{color:var(--text);}
+.bgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;}
+.bcard{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.bcard.bc-def{border-color:var(--sea-bd);}
+.pband{display:flex;align-items:stretch;border-bottom:1px solid var(--border);}
+.pband-rank{font-size:24px;font-weight:700;font-family:'DM Mono',monospace;min-width:52px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pband-rank.r-fire{background:var(--red-bg);color:var(--red);}
+.pband-rank.r-high{background:var(--ora-bg);color:var(--orange);}
+.pband-rank.r-med{background:var(--grn-bg);color:var(--green);}
+.pband-info{padding:9px 13px;flex:1;border-left:1px solid var(--border);}
+.pband-info .purg{margin-bottom:4px;}
+.pband-note{font-size:11px;color:var(--text2);line-height:1.5;}
+.bcard-hdr{padding:13px 17px 11px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.bcard-hdr.hdr-def{border-color:rgba(78,158,255,.15);}
+.bcard-hl{flex:1;}
+.bnum{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:1px;}
+.btitle{font-size:14px;font-weight:600;}
+.bcode{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);margin-top:1px;}
+.bweek{font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;background:var(--bg4);color:var(--text2);border:1px solid var(--border);white-space:nowrap;flex-shrink:0;}
+.bweek.w2{background:var(--row-bg);color:var(--row);border-color:var(--row-bd);}
+.bcard-body{padding:13px 17px;}
+.badges{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px;}
+.bdg{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;border:1px solid;}
+.b-th{color:var(--th);border-color:var(--th-bd);background:var(--th-bg);}
+.b-sea{color:var(--sea);border-color:var(--sea-bd);background:var(--sea-bg);}
+.b-row{color:var(--row);border-color:var(--row-bd);background:var(--row-bg);}
+.b-vb{color:var(--purple);border-color:rgba(155,127,232,.3);background:rgba(155,127,232,.08);}
+.b-ed{color:#68D391;border-color:rgba(104,211,145,.3);background:rgba(104,211,145,.08);}
+.b-st{color:#F6AD55;border-color:rgba(246,173,85,.3);background:rgba(246,173,85,.08);}
+.b-ts{color:#F687B3;border-color:rgba(246,135,179,.3);background:rgba(246,135,179,.08);}
+.b-ug{color:var(--sea);border-color:var(--sea-bd);background:var(--sea-bg);}
+.ctx-tag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;display:inline-block;margin-bottom:7px;text-transform:uppercase;letter-spacing:.06em;}
+.ct-def{background:var(--sea-bg);color:var(--sea);border:1px solid var(--sea-bd);}
+.axes{background:var(--bg4);border-radius:var(--rs);padding:9px 11px;margin-bottom:11px;}
+.ax{font-size:11px;color:var(--text3);line-height:2;}
+.ax span{color:var(--text);font-weight:500;}
+.dt{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin:10px 0 5px;}
+.drow{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px;}
+.drow:last-child{border-bottom:none;}
+.dl{color:var(--text2);flex:1;line-height:1.4;}
+.dv{font-weight:500;text-align:right;flex-shrink:0;max-width:52%;line-height:1.4;}
+.dv.g{color:var(--green);}.dv.r{color:var(--red);}.dv.w{color:var(--orange);}.dv.n{color:var(--text);}.dv.m{color:var(--text2);}
+.ddiv{border:none;border-top:1px dashed var(--border);margin:7px 0;}
+.gap{background:rgba(240,160,64,.06);border:1px solid rgba(240,160,64,.2);border-radius:var(--rs);padding:8px 10px;margin:9px 0;}
+.gap-ttl{font-size:10px;font-weight:600;color:var(--orange);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;}
+.gap-txt{font-size:11px;color:rgba(240,160,64,.85);line-height:1.5;}
+.pred{border-left:2px solid var(--green);padding:7px 10px;background:rgba(31,186,122,.05);border-radius:0 var(--rs) var(--rs) 0;margin-top:9px;}
+.pred.warn{border-color:var(--orange);background:rgba(255,140,66,.05);}
+.pred-lbl{font-size:10px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;}
+.pred-lbl.w{color:var(--orange);}
+.pred-txt{font-size:11px;color:rgba(31,186,122,.9);line-height:1.5;}
+.pred-txt.w{color:rgba(255,140,66,.9);}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;}
+.pcard{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;}
+.preg{font-size:13px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.pdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.pd-th{background:var(--th);}.pd-sea{background:var(--sea);}.pd-row{background:var(--row);}
+.pchans{font-size:12px;color:var(--text2);line-height:1.8;}
+.no-chan{color:var(--red);font-weight:500;}
+.rules{display:flex;flex-direction:column;gap:8px;margin-bottom:28px;}
+.rule{display:flex;gap:10px;align-items:flex-start;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:11px 15px;font-size:12px;color:var(--text2);}
+.rule::before{content:'→';color:var(--text3);flex-shrink:0;font-weight:600;}
+
+/* Data freshness banner */
+.fresh{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:18px;padding:8px 12px;background:var(--bg2);border:1px dashed var(--border);border-radius:var(--rs);}
+.fresh .dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
+
+@media(max-width:900px){
+  .stats{grid-template-columns:repeat(2,1fr);}
+  .bgrid{grid-template-columns:1fr;}
+  .pgrid{grid-template-columns:1fr;}
+  .mrows{grid-template-columns:repeat(2,1fr);}
+  .mkt-strip{grid-template-columns:1fr;}
+  .expand-grid{grid-template-columns:1fr;}
+}
+@media(max-width:640px){
+  .nav,.wrap{padding-left:16px;padding-right:16px;}
+  .wrap{padding-top:20px;padding-bottom:60px;}
+  .stats{grid-template-columns:1fr;}
+}
+
+/* ═══ MARKET STATUS STRIP ═══ */
+.mkt-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;}
+.mkt-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;position:relative;overflow:hidden;}
+.mkt-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.mkt-card.mc-th::before{background:var(--th);}
+.mkt-card.mc-sea::before{background:var(--sea);}
+.mkt-card.mc-row::before{background:var(--row);}
+.mkt-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.mkt-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;}
+.mkt-name-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.mnd-th{background:var(--th);}.mnd-sea{background:var(--sea);}.mnd-row{background:var(--row);}
+.mkt-status{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.04em;}
+.ms-scale{color:var(--green);background:rgba(31,186,122,.12);border:1px solid rgba(31,186,122,.3);}
+.ms-crit{color:var(--red);background:rgba(255,82,82,.12);border:1px solid rgba(255,82,82,.3);}
+.ms-reset{color:var(--orange);background:rgba(255,140,66,.12);border:1px solid rgba(255,140,66,.3);}
+.mkt-numbers{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;}
+.mkt-num{background:var(--bg4);border-radius:var(--rs);padding:7px 8px;}
+.mn-sub{font-size:9px;color:var(--text3);margin-top:1px;line-height:1.3;}
+.mn-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px;}
+.mn-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:600;}
+.mnv-g{color:var(--green);}.mnv-r{color:var(--red);}.mnv-o{color:var(--orange);}.mnv-t{color:var(--text);}
+.mkt-headline{font-size:12px;font-weight:600;color:var(--text);margin-bottom:10px;line-height:1.4;}
+.mkt-summary{font-size:11px;color:var(--text2);line-height:1.65;margin-bottom:10px;padding-top:8px;border-top:1px solid var(--border);}
+.mkt-decision{font-size:11px;padding:8px 11px;border-radius:var(--rs);border:1px solid;line-height:1.5;display:flex;align-items:flex-start;gap:7px;}
+.mkt-decision.ms-scale{background:rgba(31,186,122,.06);border-color:rgba(31,186,122,.2);color:rgba(31,186,122,.9);}
+.mkt-decision.ms-crit{background:rgba(255,82,82,.06);border-color:rgba(255,82,82,.2);color:rgba(255,100,100,.9);}
+.mkt-decision.ms-reset{background:rgba(255,140,66,.07);border-color:rgba(255,140,66,.2);color:rgba(255,160,80,.9);}
+.dec-label{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;opacity:.8;flex-shrink:0;margin-top:1px;}
+
+.mkt-action strong{color:var(--text);display:block;margin-bottom:2px;font-size:11px;}
+
+/* ═══ CONTENT HEALTH STRIP ═══ */
+.health-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;}
+.hs-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.hs-head{padding:10px 14px;font-size:11px;font-weight:700;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.hsh-grn{background:rgba(31,186,122,.08);color:var(--green);border-bottom-color:rgba(31,186,122,.2);}
+.hsh-yel{background:rgba(240,192,64,.07);color:var(--yellow);border-bottom-color:rgba(240,192,64,.2);}
+.hsh-red{background:rgba(255,82,82,.08);color:var(--red);border-bottom-color:rgba(255,82,82,.2);}
+.hs-count{font-family:'DM Mono',monospace;font-size:10px;opacity:.6;}
+.hs-body{padding:10px 14px;}
+.hs-item{font-size:11px;color:var(--text2);padding:5px 0;border-bottom:1px dashed var(--border);line-height:1.5;}
+.hs-item:last-child{border-bottom:none;}
+.hs-item strong{color:var(--text);display:block;margin-bottom:1px;}
+.ftag{font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;margin-right:4px;display:inline-block;}
+.ft-fat{color:var(--orange);background:rgba(255,140,66,.12);border:1px solid rgba(255,140,66,.25);}
+.ft-doa{color:var(--red);background:rgba(255,82,82,.1);border:1px solid rgba(255,82,82,.2);}
+.ft-clone{color:var(--green);background:rgba(31,186,122,.1);border:1px solid rgba(31,186,122,.2);}
+
+/* ═══ EXPAND PANEL (replaces old arow-body) ═══ */
+.expand-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
+.expand-col{}
+.exp-col-title{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.failure-tag{display:inline-block;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;margin-bottom:7px;}
+.flt-fat{color:var(--orange);background:rgba(255,140,66,.12);border:1px solid rgba(255,140,66,.3);}
+.flt-doa{color:var(--red);background:rgba(255,82,82,.12);border:1px solid rgba(255,82,82,.3);}
+.flt-na{color:var(--text3);background:var(--bg4);border:1px solid var(--border2);}
+.exp-text{font-size:11px;color:var(--text2);line-height:1.65;}
+.exp-text strong{color:var(--text);}
+.action-box{border-radius:var(--rs);padding:10px 12px;font-size:11px;line-height:1.6;margin-top:0;}
+.ab-grn{background:rgba(31,186,122,.06);border:1px solid rgba(31,186,122,.2);color:rgba(31,186,122,.9);}
+.ab-red{background:rgba(255,82,82,.06);border:1px solid rgba(255,82,82,.2);color:rgba(255,120,120,.9);}
+.ab-ora{background:rgba(255,140,66,.07);border:1px solid rgba(255,140,66,.2);color:rgba(255,160,80,.9);}
+.ab-yel{background:rgba(240,192,64,.06);border:1px solid rgba(240,192,64,.2);color:rgba(240,192,64,.9);}
+.replace-box{background:var(--bg4);border-radius:var(--rs);padding:10px 12px;}
+.rb-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px;}
+.rb-text{font-size:11px;color:var(--text2);line-height:1.6;}
+.rb-text strong{color:var(--text);}
+.rb-pred{margin-top:6px;font-size:10px;font-family:'DM Mono',monospace;color:var(--green);background:rgba(31,186,122,.06);border:1px solid rgba(31,186,122,.15);border-radius:3px;padding:4px 8px;display:inline-block;}
+
+/* ASSET PREVIEW (GitHub-backed, lazy-loaded on row expansion) */
+.asset-preview{margin-bottom:14px;border-radius:var(--rs);overflow:hidden;background:linear-gradient(180deg,var(--bg2),#0a0c0f);border:1px solid var(--border);position:relative;min-height:140px;display:flex;align-items:center;justify-content:center;}
+.asset-preview img,.asset-preview video{max-width:100%;max-height:340px;object-fit:contain;display:block;}
+.asset-missing{padding:28px 18px;text-align:center;color:var(--text3);font-family:'DM Mono',monospace;font-size:10.5px;line-height:1.7;}
+.asset-missing .ttl{display:block;font-weight:500;color:var(--text2);margin-bottom:6px;font-size:11px;}
+.asset-missing code{background:var(--bg);padding:2px 6px;border-radius:3px;color:var(--yellow);font-family:'DM Mono',monospace;font-size:10px;}
+.asset-missing a{color:var(--sea);text-decoration:none;border-bottom:1px dotted var(--sea-bd);}
+.asset-missing a:hover{border-bottom-style:solid;}
+.asset-cap{position:absolute;top:8px;right:10px;font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);background:rgba(0,0,0,.55);padding:2px 7px;border-radius:3px;letter-spacing:.05em;text-transform:uppercase;}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-left">
+    <div class="nav-logo">Zaapi <span>Growth</span></div>
+    <div class="nav-meta">Meta-Asset · CW18 2026</div>
+  </div>
+  <div class="nav-tags">
+    <span class="ntag nt-th" id="nv-th">TH · —</span>
+    <span class="ntag nt-sea" id="nv-sea">SEA · —</span>
+    <span class="ntag nt-row" id="nv-row">ROW · —</span>
+  </div>
+</div>
+
+<!-- PERIOD SELECTOR -->
+<div class="period-bar">
+  <span class="period-live-dot"></span>
+  <span class="period-label">Period:</span>
+  <div class="period-btns" id="periodBtns">
+    <button class="period-btn" onclick="setPeriod('CW14',this)">CW14</button>
+    <button class="period-btn" onclick="setPeriod('CW15',this)">CW15</button>
+    <button class="period-btn" onclick="setPeriod('CW16',this)">CW16</button>
+    <button class="period-btn" onclick="setPeriod('CW17',this)">CW17</button>
+    <button class="period-btn active" onclick="setPeriod('CW18',this)">CW18 <span style="font-size:9px;opacity:.6;">latest</span></button>
+  </div>
+  <div class="period-divider"></div>
+  <div class="period-custom">
+    <span>Custom range:</span>
+    <select id="periodFrom" onchange="setCustomPeriod()">
+      <option>CW14</option><option>CW15</option><option>CW16</option><option>CW17</option><option selected>CW18</option>
+    </select>
+    <span style="color:var(--text3);">→</span>
+    <select id="periodTo" onchange="setCustomPeriod()">
+      <option>CW14</option><option>CW15</option><option>CW16</option><option>CW17</option><option selected>CW18</option>
+    </select>
+  </div>
+  <div class="period-divider"></div>
+  <div class="period-range-display" id="periodDisplay">Apr 28 – May 4, 2026 · CW18</div>
+</div>
+
+<div class="wrap">
+
+<div class="page-hdr">
+  <div class="page-title">Meta-Asset — Per-Ad Performance &amp; Production Queue</div>
+  <div class="page-sub">Every creative, every verdict, every brief. Scan the existing ad layer, then what's shipping next.</div>
+</div>
+
+<div class="fresh">
+  <span class="dot"></span>
+  <span>Data: <strong style="color:var(--text2);">Facebook Ads · Jan–Mar 2026 · real campaign data</strong> · market cards marked <span style="color:var(--th);font-family:'DM Mono',monospace;font-size:11px;">● live</span> are pulled from real Facebook data</span>
+</div>
+
+<!-- STATS STRIP -->
+<div class="stats" id="stats-strip"></div>
+
+<!-- ═════════════ MARKET STATUS STRIP ═════════════ -->
+<div class="sec-lbl"><span class="sec-num">★</span> Market status · CW17 at a glance</div>
+<div class="mkt-strip" id="mktStrip"></div>
+
+<!-- ═════════════ CONTENT HEALTH ═════════════ -->
+<div class="sec-lbl"><span class="sec-num">✦</span> Content health · winners · stable · losers</div>
+<div class="health-strip" id="healthStrip"></div>
+
+<!-- ═════════════ SECTION A — PER-MARKET AD LIST ═════════════ -->
+<div class="sec-lbl"><span class="sec-num">A</span> Per-market ad list · verdict-sorted</div>
+<div id="sectionA"></div>
+
+<!-- ═════════════ SECTION B — SEGMENT SCORECARD ═════════════ -->
+<div class="sec-lbl"><span class="sec-num">B</span> Segment scorecard · pick an axis</div>
+<div class="filter-bar">
+  <span class="flabel">Region</span>
+  <select class="fselect" id="fB-region">
+    <option value="ALL">All</option><option value="TH">TH</option><option value="SEA">SEA</option><option value="ROW">ROW</option>
+  </select>
+  <span class="flabel">Funnel</span>
+  <select class="fselect" id="fB-funnel">
+    <option value="ALL">All</option><option value="TOF">TOF (Awareness)</option><option value="BOF">BOF (Conversion)</option>
+  </select>
+  <span class="flabel">Axis</span>
+  <select class="fselect" id="fB-axis">
+    <option value="prod">Production</option><option value="angle">Angle</option><option value="feat">Feature</option><option value="country">Country</option><option value="lang">Language</option>
+  </select>
+</div>
+<div class="scorebox" id="scorebox"></div>
+
+<!-- ═════════════ SECTION C — SORTABLE TABLE ═════════════ -->
+<div class="sec-lbl"><span class="sec-num">C</span> All assets · flat · sortable · filterable</div>
+<div class="tfilters" id="tfilters"></div>
+<div class="tbl-wrap">
+  <table class="flat" id="flatTable">
+    <thead>
+      <tr>
+        <th style="width:14px;"></th>
+        <th data-col="code">ad_code</th>
+        <th data-col="region">mkt</th>
+        <th data-col="country">ctry</th>
+        <th data-col="prod">prod</th>
+        <th data-col="angle">angle</th>
+        <th data-col="funnel">fun</th>
+        <th data-col="fti" class="num">FTI ↓ / PW</th>
+        <th data-col="cpa" class="num">CPA (฿)</th>
+        <th data-col="hook" class="num">hook%</th>
+        <th data-col="freq" class="num">freq</th>
+        <th data-col="verdict">verdict</th>
+      </tr>
+    </thead>
+    <tbody id="flatBody"></tbody>
+  </table>
+</div>
+
+<!-- ═════════════ SECTION D — WHAT TO PRODUCE NEXT ═════════════ -->
+<div class="sec-lbl"><span class="sec-num">D</span> What to produce next · CW17 sprint · 6 videos</div>
+
+<div class="subtab-nav">
+  <button class="subtab-btn active" onclick="showSub('priority',this)">Execution Priority</button>
+  <button class="subtab-btn" onclick="showSub('briefs',this)">All 6 Briefs</button>
+  <button class="subtab-btn" onclick="showSub('platform',this)">Platform Rules</button>
+</div>
+
+<!-- SUB-TAB 1: PRIORITY -->
+<div class="pane active" id="sub-priority">
+  <div class="stats">
+    <div class="stat"><div class="stat-lbl">TH top performer</div><div class="stat-val c-th">132 FTI</div><div class="stat-note">KOL-ED-001 · no in-house backup</div></div>
+    <div class="stat"><div class="stat-lbl">TH scale engine</div><div class="stat-val c-th">SCALE +50%</div><div class="stat-note">UG-TS-001 · single point of failure</div></div>
+    <div class="stat"><div class="stat-lbl">SEA working ads</div><div class="stat-val c-red">Zero</div><div class="stat-note">MY creative freq 5.76 — saturating</div></div>
+    <div class="stat"><div class="stat-lbl">ROW last attempt</div><div class="stat-val c-red">0 FTI</div><div class="stat-note">VB angle failed · angle reset probe</div></div>
+  </div>
+
+  <div class="sec-lbl">🔴 Must go first</div>
+  <div class="plist">
+    <div class="pitem p1">
+      <div class="pnum">1</div>
+      <div class="pbody">
+        <div class="purg u-fire">🔴 Fire — SEA has zero working ads right now</div>
+        <div class="ptitle">#4 + #5 · ST (Storytelling) · SEA</div>
+        <div class="pcode">SEA-EN-IH-ST-002 + SEA-EN-IH-ST-001 — must shoot together</div>
+        <div class="badges" style="margin-bottom:9px;"><span class="bdg b-sea">SEA</span><span class="bdg b-st">Storytelling</span><span class="bdg b-vb">Value Bomb</span></div>
+        <div class="prows">
+          <div class="prow"><span class="pr-l">Current SEA Meta status — any working ad?</span><span class="pr-v c-red">None. Zero. The pipeline is empty.</span></div>
+          <div class="prow"><span class="pr-l">CW17 dashboard verdict on MY Awareness creative</span><span class="pr-v c-red">REFRESH — freq 5.76, saturated. Needs replacement now.</span></div>
+          <div class="prow"><span class="pr-l">Always-on target if both SEA tests fail</span><span class="pr-v c-red">Pause SEA Meta 4 weeks</span></div>
+          <div class="prow"><span class="pr-l">#4 and #5 must launch simultaneously — production A/B pair</span><span class="pr-v c-txt">Treated as 1 shoot, 2 videos</span></div>
+          <div class="prow"><span class="pr-l">Time pressure: every week without a SEA ad is a week of zero SEA Meta FTI</span><span class="pr-v c-red">No other SEA Meta creative in queue</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">🟠 High urgency — TH scale engine at risk</div>
+  <div class="plist">
+    <div class="pitem p2">
+      <div class="pnum">2</div>
+      <div class="pbody">
+        <div class="purg u-high">🟠 High — single point of failure, KOL-ED can fatigue anytime</div>
+        <div class="ptitle">#2 · ED (Educational) · TH</div>
+        <div class="pcode">TH-TH-IH-ED-001</div>
+        <div class="badges" style="margin-bottom:9px;"><span class="bdg b-th">TH</span><span class="bdg b-ed">Educational</span></div>
+        <div class="prows">
+          <div class="prow"><span class="pr-l">KOL-ED-001 — TH's #1 performer</span><span class="pr-v c-th">FTI 132 — but external KOL, irreplaceable</span></div>
+          <div class="prow"><span class="pr-l">IH-ED ads in TH log</span><span class="pr-v c-red">Zero — no backup exists today</span></div>
+          <div class="prow"><span class="pr-l">If KOL-ED fatigues before #2 is live</span><span class="pr-v c-red">TH loses top performer with nothing to replace it</span></div>
+          <div class="prow"><span class="pr-l">Production complexity</span><span class="pr-v c-txt">Medium — real UI screen record + Thai VO, 55s</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="pitem p2">
+      <div class="pnum">3</div>
+      <div class="pbody">
+        <div class="purg u-high">🟠 High — TH scale engine needs a backup angle</div>
+        <div class="ptitle">#3 · ST (Storytelling) · TH</div>
+        <div class="pcode">TH-TH-IH-ST-001</div>
+        <div class="badges" style="margin-bottom:9px;"><span class="bdg b-th">TH</span><span class="bdg b-st">Storytelling</span></div>
+        <div class="prows">
+          <div class="prow"><span class="pr-l">UG-TS-001 current status</span><span class="pr-v c-th">SCALE +50% — but only TH creative working</span></div>
+          <div class="prow"><span class="pr-l">Risk if UG-TS-001 saturates with no backup live</span><span class="pr-v c-red">TH Meta FTI drops with no replacement ready</span></div>
+          <div class="prow"><span class="pr-l">Production complexity</span><span class="pr-v c-grn">Low — IH, conversational, ships fastest of all TH briefs</span></div>
+          <div class="prow"><span class="pr-l">ST never tested in TH — low downside, high upside</span><span class="pr-v c-txt">New angle, cheap to produce</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">🟢 Important but TH is currently healthy</div>
+  <div class="plist">
+    <div class="pitem p3">
+      <div class="pnum">4</div>
+      <div class="pbody">
+        <div class="purg u-med">🟢 Medium — TH healthy, this tests a new feature</div>
+        <div class="ptitle">#1 · VB (Value Bomb) · TH</div>
+        <div class="pcode">TH-TH-IH-VB-002</div>
+        <div class="badges" style="margin-bottom:9px;"><span class="bdg b-th">TH</span><span class="bdg b-vb">Value Bomb</span></div>
+        <div class="prows">
+          <div class="prow"><span class="pr-l">TH Meta currently</span><span class="pr-v c-th">UG-TS-001 scaling +50% — not in crisis</span></div>
+          <div class="prow"><span class="pr-l">This tests AI Chatbot as primary — untested angle, not a safety net</span><span class="pr-v c-txt">Offensive test, not defensive</span></div>
+          <div class="prow"><span class="pr-l">TH Search แชทบอท keyword data</span><span class="pr-v c-ora">No data yet — hypothesis from MY, not TH-validated</span></div>
+          <div class="prow"><span class="pr-l">Production complexity</span><span class="pr-v c-grn">Low — IH, 40s, straightforward</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="pitem p3">
+      <div class="pnum">5</div>
+      <div class="pbody">
+        <div class="purg u-med">🟢 Medium — ROW is paused anyway until Week 2</div>
+        <div class="ptitle">#6 · TS (Testimonial) · ROW</div>
+        <div class="pcode">ROW-EN-IH-TS-001</div>
+        <div class="badges" style="margin-bottom:9px;"><span class="bdg b-row">ROW</span><span class="bdg b-ts">Testimonial</span></div>
+        <div class="prows">
+          <div class="prow"><span class="pr-l">CW17 dashboard verdict on UK Meta</span><span class="pr-v c-red">KILL — pause UK Meta until Search is viable</span></div>
+          <div class="prow"><span class="pr-l">Planned launch</span><span class="pr-v c-txt">Week 2 — already intentionally delayed</span></div>
+          <div class="prow"><span class="pr-l">Requires real UK Shopify merchant — sourcing time</span><span class="pr-v c-ora">Logistics risk on production side</span></div>
+          <div class="prow"><span class="pr-l">Budget cap</span><span class="pr-v c-mut">~$1,500–2,000 — lowest-stakes test</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-line">
+    <strong>Bottom line:</strong> Shoot #4 + #5 (SEA Storytelling) first — SEA has no working ads and MY creative is saturating at freq 5.76. Every day without a new SEA video is a day of zero SEA Meta FTI. After that, #2 (TH Educational) to protect against KOL-ED fatigue, then #3 (TH Storytelling) which is the easiest to shoot. #1 and #6 are important but not emergencies — TH is scaling and ROW is Week 2 by design.
+  </div>
+</div>
+
+<!-- SUB-TAB 2: BRIEFS -->
+<div class="pane" id="sub-briefs">
+  <div class="sec-lbl">All 6 briefs · IH-only batch · no KOL · no AI VO</div>
+  <div class="bgrid">
+
+    <!-- BRIEF 1 -->
+    <div class="bcard">
+      <div class="pband"><div class="pband-rank r-med">4</div><div class="pband-info"><div class="purg u-med">🟢 Medium — TH healthy, tests a new feature</div><div class="pband-note">TH Meta: UG-TS-001 scaling +50% · <span style="color:var(--text);">Offensive test, not defensive</span> · TH Search แชทบอท: <span style="color:var(--orange);">No data — inferred from MY</span></div></div></div>
+      <div class="bcard-hdr"><div class="bcard-hl"><div class="bnum">Brief #1</div><div class="btitle">AI Chatbot feature test</div><div class="bcode">TH-TH-IH-VB-002</div></div></div>
+      <div class="bcard-body">
+        <div class="badges"><span class="bdg b-th">TH</span><span class="bdg b-vb">Value Bomb</span></div>
+        <div class="axes">
+          <div class="ax">Axes: <span>IH · Value Bomb</span></div>
+          <div class="ax">Primary feature: <span>AI Chatbot</span></div>
+          <div class="ax">Secondary: <span>Chat Integration</span></div>
+          <div class="ax">Hook: <span>Pain-point</span></div>
+          <div class="ax">VO: <span>Thai · 40s</span></div>
+          <div class="ax">Show inside: <span>LINE / FB Messenger preview (no WhatsApp)</span></div>
+        </div>
+        <div class="dt">TH Search — keyword gap</div>
+        <div class="drow"><span class="dl">แชทบอท / AI แชทบอท ever tested in TH Search?</span><span class="dv r">No — zero TH data</span></div>
+        <div class="drow"><span class="dl">AI Chatbot as primary in TH Meta ever tested?</span><span class="dv r">Zero — gap in log</span></div>
+        <div class="ddiv"></div>
+        <div class="dt">MY Search — proxy signal</div>
+        <div class="drow"><span class="dl">MY "chatbot ai" — best non-brand keyword in MY account</span><span class="dv g">CVR 16.7% · CPA 425 THB</span></div>
+        <div class="drow"><span class="dl">Generic "ai chatbot"/"ai chat" broad variants</span><span class="dv r">53 clicks · 0 FTI</span></div>
+        <div class="gap"><div class="gap-ttl">Known data gap</div><div class="gap-txt">No TH Search data for แชทบอท — signal inferred from MY. Recommend adding [แชทบอท] to TH Search in parallel.</div></div>
+        <div class="pred"><div class="pred-lbl">Prediction</div><div class="pred-txt">≥15 FTI by CW20 · Below 8 = AI Chatbot angle doesn't land in TH</div></div>
+      </div>
+    </div>
+
+    <!-- BRIEF 2 -->
+    <div class="bcard">
+      <div class="pband"><div class="pband-rank r-high">2</div><div class="pband-info"><div class="purg u-high">🟠 High — single point of failure on KOL-ED</div><div class="pband-note">IH-ED in TH log: <span style="color:var(--red);">Zero — no backup exists</span> · If KOL-ED fatigues: <span style="color:var(--red);">TH loses top performer, nothing to replace it</span></div></div></div>
+      <div class="bcard-hdr"><div class="bcard-hl"><div class="bnum">Brief #2</div><div class="btitle">De-risk the KOL-ED winner</div><div class="bcode">TH-TH-IH-ED-001</div></div></div>
+      <div class="bcard-body">
+        <div class="badges"><span class="bdg b-th">TH</span><span class="bdg b-ed">Educational</span></div>
+        <div class="axes">
+          <div class="ax">Axes: <span>IH · Educational</span></div>
+          <div class="ax">Primary feature: <span>Chat Integration</span></div>
+          <div class="ax">Secondary: <span>AI Chatbot</span></div>
+          <div class="ax">Hook: <span>Demo</span></div>
+          <div class="ax">VO: <span>Thai · 55s</span></div>
+          <div class="ax">Show in inbox: <span>LINE · FB Messenger · Shopee · Lazada · IG DM — no WhatsApp</span></div>
+        </div>
+        <div class="dt">Data behind this brief</div>
+        <div class="drow"><span class="dl">KOL-ED-001 — TH all-time best · external KOL, can't rebook on demand</span><span class="dv g">FTI 132</span></div>
+        <div class="drow"><span class="dl">IH-ED ads in TH log today</span><span class="dv r">Zero — no in-house backup</span></div>
+        <div class="drow"><span class="dl">Test: ED wins because of format (UI demo), or KOL identity?</span><span class="dv n">Format vs identity</span></div>
+        <div class="pred"><div class="pred-lbl">Prediction</div><div class="pred-txt">≥50 FTI by CW19 · Below 20 = KOL credibility was load-bearing</div></div>
+      </div>
+    </div>
+
+    <!-- BRIEF 3 REVISED (TH-TH-IH-ST-001) -->
+    <div class="bcard">
+      <div class="pband"><div class="pband-rank r-high">3</div><div class="pband-info"><div class="purg u-high">🟠 High — TH scale engine needs backup angle</div><div class="pband-note">UG-TS-001: <span style="color:var(--th);">SCALE +50%</span> — but only TH creative working · If saturates: <span style="color:var(--red);">TH Meta FTI drops with no replacement</span></div></div></div>
+      <div class="bcard-hdr"><div class="bcard-hl"><div class="bnum">Brief #3</div><div class="btitle">ST (Storytelling) — TH scale engine backup</div><div class="bcode">TH-TH-IH-ST-001</div></div></div>
+      <div class="bcard-body">
+        <div class="badges"><span class="bdg b-th">TH</span><span class="bdg b-st">Storytelling</span></div>
+        <div class="axes">
+          <div class="ax">Axes: <span>IH · Storytelling</span></div>
+          <div class="ax">Primary feature: <span>Chat Integration</span></div>
+          <div class="ax">Secondary: <span>AI Chatbot</span></div>
+          <div class="ax">Hook: <span>Story opening</span></div>
+          <div class="ax">VO: <span>Thai · 45–55s</span></div>
+          <div class="ax">Show in inbox: <span>LINE overload · Shopee chaos · FB Messenger juggling · missed Lazada orders</span></div>
+        </div>
+        <div class="dt">Why this is the fastest TH shoot</div>
+        <div class="drow"><span class="dl">ST angle tested in TH log</span><span class="dv r">Zero — new angle, no risk of repetition</span></div>
+        <div class="drow"><span class="dl">Production complexity</span><span class="dv g">Low — IH, conversational, ships fastest</span></div>
+        <div class="drow"><span class="dl">Revised from TH-TH-UG-TS-002 (UGC testimonial, customer sourcing ≥2wk)</span><span class="dv w">Swapped for speed</span></div>
+        <div class="pred"><div class="pred-lbl">Prediction</div><div class="pred-txt">≥15 FTI by CW20 · ST format carries in TH</div></div>
+      </div>
+    </div>
+
+    <!-- BRIEF 4 -->
+    <div class="bcard">
+      <div class="pband"><div class="pband-rank r-fire">1</div><div class="pband-info"><div class="purg u-fire">🔴 Fire — SEA has zero working ads</div><div class="pband-note">Must shoot simultaneously with #5 · <span style="color:var(--red);">No other SEA Meta creative in queue</span> · MY Awareness: <span style="color:var(--red);">freq 5.76 — saturated</span></div></div></div>
+      <div class="bcard-hdr"><div class="bcard-hl"><div class="bnum">Brief #4</div><div class="btitle">Revive the SEA winner</div><div class="bcode">SEA-EN-IH-ST-002</div></div></div>
+      <div class="bcard-body">
+        <div class="badges"><span class="bdg b-sea">SEA</span><span class="bdg b-st">Storytelling</span></div>
+        <div class="axes">
+          <div class="ax">Axes: <span>IH · Storytelling</span></div>
+          <div class="ax">Primary feature: <span>WhatsApp ← key variable</span></div>
+          <div class="ax">Secondary: <span>AI Chatbot</span></div>
+          <div class="ax">Hook: <span>Outcome framing — no pain-hook</span></div>
+          <div class="ax">VO: <span>English · 45s</span></div>
+          <div class="ax">Story arc: <span>Drowning in WhatsApp/Shopee/Lazada → Zaapi solves it · include "3× faster" or "saves 2hrs/day"</span></div>
+        </div>
+        <div class="dt">Data behind this brief</div>
+        <div class="drow"><span class="dl">SEA-EN-AI-ST-001 — only SEA ad that ever worked, now paused</span><span class="dv n">FTI 24 — paused</span></div>
+        <div class="drow"><span class="dl">All existing SEA Meta ads lead with Chat Integration</span><span class="dv r">Feature mismatch vs Search demand</span></div>
+        <div class="drow"><span class="dl">MY Search "whatsapp crm"</span><span class="dv g">Converted · CPA 1,847 THB</span></div>
+        <div class="drow"><span class="dl">"Still drowning in messages" pain-hook</span><span class="dv r">Burned pattern · banned 6 weeks</span></div>
+        <div class="pred"><div class="pred-lbl">Prediction — highest SEA priority</div><div class="pred-txt">≥15 FTI by CW20 · Below 8 = ST-001 was a one-off</div></div>
+      </div>
+    </div>
+
+    <!-- BRIEF 5 -->
+    <div class="bcard">
+      <div class="pband"><div class="pband-rank r-fire">1</div><div class="pband-info"><div class="purg u-fire">🔴 Fire — SEA has zero working ads</div><div class="pband-note">Must shoot simultaneously with #4 · <span style="color:var(--red);">Can't shoot one without the other</span> · 1 session → 2 videos · If both fail: pause SEA Meta 4 weeks</div></div></div>
+      <div class="bcard-hdr"><div class="bcard-hl"><div class="bnum">Brief #5</div><div class="btitle">AI Chatbot for SEA</div><div class="bcode">SEA-EN-IH-VB-002</div></div><div class="bweek">Week 1</div></div>
+      <div class="bcard-body">
+        <div class="badges"><span class="bdg b-sea">SEA</span><span class="bdg b-vb">Value Bomb</span></div>
+        <div class="axes">
+          <div class="ax">Axes: <span>IH · Value Bomb</span></div>
+          <div class="ax">Primary feature: <span>AI Chatbot ← key variable</span></div>
+          <div class="ax">Secondary: <span>WhatsApp</span></div>
+          <div class="ax">Hook: <span>Outcome framing</span></div>
+          <div class="ax">VO: <span>English · 40s</span></div>
+          <div class="ax">Message: <span>"AI replies to customers on WhatsApp + IG so you don't have to"</span></div>
+        </div>
+        <div class="dt">Data behind this brief</div>
+        <div class="drow"><span class="dl">MY Search "chatbot ai" — best non-brand keyword in MY account</span><span class="dv g">CVR 16.7% · CPA 425 THB</span></div>
+        <div class="drow"><span class="dl">Generic "ai chatbot" / "ai chat" broad variants</span><span class="dv r">53 clicks · 0 FTI</span></div>
+        <div class="drow"><span class="dl">Parallel with #4 — faster signal on ST vs VB mechanism</span><span class="dv n">Accepted attribution trade-off</span></div>
+        <div class="pred"><div class="pred-lbl">Prediction</div><div class="pred-txt">50–80% of #4's FTI · No pain-hook opening</div></div>
+      </div>
+    </div>
+
+    <!-- BRIEF 6 -->
+    <div class="bcard">
+      <div class="pband"><div class="pband-rank r-med">5</div><div class="pband-info"><div class="purg u-med">🟢 Medium — ROW paused anyway until Week 2</div><div class="pband-note">CW17 verdict: <span style="color:var(--red);">KILL UK Meta until Search viable</span> · Week 2 launch · sourcing UK Shopify merchant · Budget cap ~$1,500–2,000</div></div></div>
+      <div class="bcard-hdr"><div class="bcard-hl"><div class="bnum">Brief #6</div><div class="btitle">ROW angle reset probe</div><div class="bcode">ROW-EN-IH-TS-001</div></div><div class="bweek w2">Week 2</div></div>
+      <div class="bcard-body">
+        <div class="badges"><span class="bdg b-row">ROW</span><span class="bdg b-ts">Testimonial</span></div>
+        <div class="axes">
+          <div class="ax">Axes: <span>IH · Testimonial</span></div>
+          <div class="ax">Primary feature: <span>Shopify ← key variable</span></div>
+          <div class="ax">Secondary: <span>WhatsApp</span></div>
+          <div class="ax">Hook: <span>Bold claim</span></div>
+          <div class="ax">VO: <span>English · 40s</span></div>
+          <div class="ax">On screen: <span>Real UK Shopify merchant — raw face, not polished marketing</span></div>
+        </div>
+        <div class="dt">Why Shopify? — UK Search data</div>
+        <div class="drow"><span class="dl">UK Search priority group: "Shopify Customer Support"</span><span class="dv g">⭐⭐⭐⭐ Core Shopify ICP</span></div>
+        <div class="drow"><span class="dl">"shopify chatbot" + "shopify live chat" UK search volume</span><span class="dv g">480 SV + 590 SV</span></div>
+        <div class="drow"><span class="dl">Zaapi's unique angle vs Gorgias (no WhatsApp) and Wati (no Shopify)</span><span class="dv g">Unique differentiator in UK</span></div>
+        <div class="drow"><span class="dl">Previous ROW attempt (VB, no Shopify angle)</span><span class="dv r">FTI 0 — generic angle failed</span></div>
+        <div class="pred warn"><div class="pred-lbl w">Prediction — binary outcome</div><div class="pred-txt w">≥3 FTI by CW21 = ROW Meta stays open · Zero = pause entirely</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SUB-TAB 3: PLATFORM -->
+<div class="pane" id="sub-platform">
+  <div class="sec-lbl">Platforms to show by region · country-localised</div>
+  <div class="pgrid">
+    <div class="pcard"><div class="preg"><div class="pdot pd-th"></div>Thailand · Ads #1 #2 #3</div><div class="pchans">LINE <strong>(most prominent)</strong><br>Facebook Messenger<br>Shopee · Lazada · IG DM<br><span class="no-chan">✕ No WhatsApp</span></div></div>
+    <div class="pcard"><div class="preg"><div class="pdot pd-sea"></div>SEA (MY/SG/PH) · Ads #4 #5</div><div class="pchans">WhatsApp <strong>(primary)</strong><br>Shopee · Lazada · IG<br><br><span style="color:var(--text3);font-size:11px;">TH is LINE-dominant. WhatsApp irrelevant there — only correct for MY/SG/PH.</span></div></div>
+    <div class="pcard"><div class="preg"><div class="pdot pd-row"></div>ROW (UK) · Ad #6</div><div class="pchans">WhatsApp<br>Shopify<br><br><span style="color:var(--text3);font-size:11px;">Shopee/Lazada don't operate in UK. Shopify is dominant for UK SMBs.</span></div></div>
+  </div>
+
+  <div class="sec-lbl">Why this matters — the correction that was made</div>
+  <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:18px 22px;margin-bottom:28px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <div>
+        <div class="dt">The mistake and fix</div>
+        <div class="drow"><span class="dl">Original #1 brief said</span><span class="dv r">"Show AI inside WhatsApp/LINE preview"</span></div>
+        <div class="drow"><span class="dl">Corrected to</span><span class="dv g">"Show AI inside LINE / FB Messenger preview"</span></div>
+        <div class="drow"><span class="dl">Why WhatsApp was wrong for TH</span><span class="dv n">Thai SMBs don't use WhatsApp — seeing it makes the ad feel irrelevant</span></div>
+        <div class="drow"><span class="dl">Rule now locked</span><span class="dv n">Check channel relevance per country, not per region</span></div>
+      </div>
+      <div>
+        <div class="dt">Data source for each decision</div>
+        <div class="drow"><span class="dl">TH uses LINE</span><span class="dv n">~47M LINE users · LINE OA is primary SMB channel</span></div>
+        <div class="drow"><span class="dl">SEA uses WhatsApp</span><span class="dv g">MY Search "whatsapp crm" · CPA 1,847 THB</span></div>
+        <div class="drow"><span class="dl">UK uses Shopify</span><span class="dv g">UK Search "shopify chatbot" 480 SV · "shopify live chat" 590 SV</span></div>
+        <div class="drow"><span class="dl">Pattern tag locked</span><span class="dv n">platform_localization_per_country · whatsapp_TH_anti_pattern</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">Rules that apply to all 6</div>
+  <div class="rules">
+    <div class="rule">Lead features are deliberate — each video tests a specific feature demand. Don't swap them even if another feature feels more natural for the script.</div>
+    <div class="rule">No "still drowning in messages" VB pain-hooks for SEA (#4 #5) — that pattern is burned. Use outcome framing or story framing instead.</div>
+    <div class="rule">Include a specific number wherever possible (e.g. "3× faster", "saves 2hrs/day"). TH and SEA ads currently have almost none — known gap.</div>
+    <div class="rule">All 6 are in-house only — no UGC, no KOL, no AI voiceover for this batch.</div>
+  </div>
+
+  <div class="sec-lbl">8-week always-on target</div>
+  <div class="pgrid">
+    <div class="pcard"><div class="preg"><div class="pdot pd-th"></div>Thailand</div><div style="font-size:12px;color:var(--text2);margin-bottom:6px;">Today: UG-TS-001 driving scale</div><div style="font-size:12px;color:var(--th);font-weight:500;">Target: UG-TS-001 + 2–3 new variants = 3–4 always-on</div></div>
+    <div class="pcard"><div class="preg"><div class="pdot pd-sea"></div>SEA</div><div style="font-size:12px;color:var(--red);margin-bottom:6px;">Today: Nothing reliably working</div><div style="font-size:12px;color:var(--sea);font-weight:500;">Target: 1–2 ST variants always-on, or SEA Meta paused 4 weeks</div></div>
+    <div class="pcard"><div class="preg"><div class="pdot pd-row"></div>ROW</div><div style="font-size:12px;color:var(--red);margin-bottom:6px;">Today: Nothing</div><div style="font-size:12px;color:var(--row);font-weight:500;">Target: 1 (if TS lands) · else pause entirely</div></div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA — same as original + diagnosis/action/replace fields
+// ═══════════════════════════════════════════════════════════
+const ADS = [
+  // TH — confirmed
+  {code:'TH-TH-KOL-TS-001',region:'TH',country:'TH',lang:'TH',prod:'KOL',angle:'TS',feat:'ChatIntegration',funnel:'BOF',status:'LIVE',verdict:'SCALE',fti:12,fti_pw:10,fti_life:58,cpa:168,hook:38,freq:1.8,spend:2016,cw:'CW17',src:'C',
+   note:'iHAVECPU testimonial · dark post ads performing well as lead magnet',
+   failure_type:null,
+   diagnosis:'Hook 38%, freq 1.8, CPA ฿168 — all strong. 3.3× below plan CAC. BOF conversion confirmed. iHAVECPU creator resonates strongly in TH market.',
+   action_type:'SCALE',action:'Increase budget +25% this week. Keep creative unchanged. Watch freq — if crosses 2.8 → hold.',
+   replace:'N/A — keep scaling. Produce a 2nd KOL creator as backup to reduce dependency on single talent.'},
+
+  {code:'TH-TH-KOL-TS-001',region:'TH',country:'TH',lang:'TH',prod:'KOL',angle:'TS',feat:'ChatIntegration',funnel:'TOF',status:'LIVE',verdict:'SCALE',fti:8,fti_pw:7,fti_life:34,cpa:198,hook:34,freq:1.6,spend:1584,cw:'CW17',src:'C',
+   note:'TOF awareness variant of iHAVECPU',
+   failure_type:null,
+   diagnosis:'TOF awareness variant. Hook 34%, freq 1.6 — significant room to grow. Feeds BOF retargeting pool at healthy CPA.',
+   action_type:'SCALE',action:'Scale +25% alongside BOF. Keep as separate ad set — do not merge with BOF.',
+   replace:'N/A'},
+
+  {code:'TH-TH-KOL-ED-001',region:'TH',country:'TH',lang:'TH',prod:'KOL',angle:'ED',feat:'ChatIntegration',funnel:'BOF',status:'LIVE',verdict:'WATCH',fti:18,fti_pw:22,fti_life:132,cpa:142,hook:31,freq:2.1,spend:2556,cw:'CW17',src:'C',
+   note:'TH all-time top performer · external KOL, no in-house backup',
+   failure_type:null,
+   diagnosis:'All-time TH top performer: 132 FTI lifetime, ฿142 CPA. Freq now 2.1 — entering watch zone. External KOL cannot be rebooked on demand — this is a single point of failure.',
+   action_type:'WATCH',action:'Hold budget flat. Do NOT scale — freq is climbing. Urgently produce in-house ED backup (TH-IH-ED-001). If freq hits 2.8 → start phasing out.',
+   replace:'TH-IH-ED-001: same UI walkthrough format, in-house narrator, Thai VO, 55s. Tests whether format or KOL identity is the driver.'},
+
+  {code:'TH-TH-UG-TS-001',region:'TH',country:'TH',lang:'TH',prod:'UG',angle:'TS',feat:'ChatIntegration',funnel:'BOF',status:'LIVE',verdict:'SCALE',fti:15,fti_pw:11,fti_life:47,cpa:168,hook:33,freq:1.9,spend:2520,cw:'CW17',src:'C',
+   note:'Current TH scale engine · SCALE +50% · only reproducible TH winner',
+   failure_type:null,
+   diagnosis:'TH scale engine. UGC testimonial, organic feel. CPA ฿168, freq 1.9, hook 33% — all strong. Only fully reproducible winner in TH. Budget anchor.',
+   action_type:'SCALE',action:'SCALE +50% immediately. Primary budget allocation for TH Meta.',
+   replace:'N/A — this IS the engine. Produce ST backup (TH-IH-ST-001) before freq climbs past 2.5.'},
+
+  {code:'TH-TH-UG-TS-001',region:'TH',country:'TH',lang:'TH',prod:'UG',angle:'TS',feat:'ChatIntegration',funnel:'TOF',status:'LIVE',verdict:'SCALE',fti:9,fti_pw:7,fti_life:28,cpa:191,hook:29,freq:1.7,spend:1719,cw:'CW17',src:'C',
+   note:'UG-TS-001 TOF variant',
+   failure_type:null,
+   diagnosis:'TOF variant of UG-TS-001. Freq 1.7 — plenty of room. Feeds BOF retargeting pool.',
+   action_type:'SCALE',action:'Scale +50% in line with BOF variant.',
+   replace:'N/A'},
+
+  {code:'TH-TH-IH-VB-001',region:'TH',country:'TH',lang:'TH',prod:'IH',angle:'VB',feat:'ChatIntegration',funnel:'BOF',status:'LIVE',verdict:'HOLD',fti:4,fti_pw:5,fti_life:18,cpa:285,hook:22,freq:2.4,spend:1140,cw:'CW17',src:'P',
+   note:'Placeholder · legacy IH value-bomb',
+   failure_type:null,
+   diagnosis:'Value Bomb format underperforms vs TS peers in TH. Hook 22% borderline, freq 2.4 creeping up. CPA ฿285 above plan but not crisis.',
+   action_type:'HOLD',action:'Hold budget flat. Watch freq weekly. If crosses 2.8 → pause immediately.',
+   replace:'Test ST angle (TH-IH-ST-001) when produced. VB consistently loses to TS in TH — pattern is real.'},
+
+  {code:'TH-TH-AI-VB-001',region:'TH',country:'TH',lang:'TH',prod:'AI',angle:'VB',feat:'AIChatbot',funnel:'BOF',status:'PAUSED',verdict:'PAUSED',fti:0,fti_pw:2,fti_life:6,cpa:0,hook:18,freq:3.2,spend:0,cw:'CW17',src:'P',
+   note:'Placeholder · AI-VB paused · Thai TTS + lip-sync quality unviable',
+   failure_type:'NEVER_WORKED',
+   diagnosis:'Thai TTS + lip-sync quality unviable for TH market. Hook 18% — at kill floor before pause. Audience rejected the format. Never had a real chance.',
+   action_type:'KILL',action:'Do not reactivate. Thai AI video quality fails the local authenticity bar. No AI VO in local-language markets.',
+   replace:'In-house production only for TH. AI-generated video only valid for EN-language markets where quality is acceptable.'},
+
+  {code:'TH-TH-MX-VB-001',region:'TH',country:'TH',lang:'TH',prod:'MX',angle:'VB',feat:'ChatIntegration',funnel:'BOF',status:'LIVE',verdict:'WATCH',fti:3,fti_pw:4,fti_life:15,cpa:312,hook:24,freq:2.7,spend:936,cw:'CW17',src:'P',
+   note:'Placeholder · legacy MX production · avoid new MX ads per spec',
+   failure_type:null,
+   diagnosis:'Legacy mixed format. Freq 2.7 approaching fatigue threshold. CPA ฿312 — inefficient but not crisis. Framework spec: no new MX ads.',
+   action_type:'WATCH',action:'Hold spend flat. Phase out when TH-IH-ST-001 ships. Do not invest more in MX format per spec.',
+   replace:'TH-IH-ST-001 when available. MX is legacy — no new MX briefs.'},
+
+  // SEA — confirmed
+  {code:'SEA-EN-AI-ST-001',region:'SEA',country:'MY',lang:'EN',prod:'AI',angle:'ST',feat:'ChatIntegration',funnel:'BOF',status:'PAUSED',verdict:'PAUSED',fti:0,fti_pw:0,fti_life:24,cpa:0,hook:41,freq:3.1,spend:0,cw:'CW17',src:'C',
+   note:'Only SEA ad that ever worked · FTI 24 lifetime · paused · nothing replaced it',
+   failure_type:'FATIGUE',
+   diagnosis:'Only SEA ad that ever worked: 24 FTI lifetime, hook 41% when running. Paused when freq reached 3.1. Fatigued — was working, wore out from overexposure. Nothing replaced it.',
+   action_type:'HOLD',action:'Do not reactivate — freq was 3.1 at pause. Use as blueprint for replacement: same ST angle + WhatsApp feature, fresh in-house talent.',
+   replace:'SEA-IH-ST-002: IH Storytelling, WhatsApp angle, outcome hook (not pain hook). Must shoot Week 1 — emergency.'},
+
+  {code:'SEA-EN-AI-VB-002',region:'SEA',country:'MY',lang:'EN',prod:'AI',angle:'VB',feat:'ChatIntegration',funnel:'TOF',status:'LIVE',verdict:'REFRESH',fti:1,fti_pw:2,fti_life:7,cpa:1847,hook:19,freq:5.76,spend:1847,cw:'CW17',src:'P',
+   note:'MY Awareness creative · freq 5.76 saturated · CW17 verdict REFRESH',
+   failure_type:'FATIGUE',
+   diagnosis:'CRISIS: Freq 5.76 — each user has seen this ad nearly 6 times. Had 7 FTI lifetime, now dead from overexposure. CPA ฿1,847 vs plan ฿739. Fully saturated.',
+   action_type:'REFRESH',action:'PAUSE immediately today. Every additional impression is wasted spend on a burned audience. Do not wait for replacement.',
+   replace:'SEA-IH-ST-002 (Week 1 shoot). Bridge with SEA-AI-ED-001 if needed while ST is in production. Same VB angle will not recover — needs fresh format + angle.'},
+
+  {code:'SEA-EN-AI-VB-001',region:'SEA',country:'MY',lang:'EN',prod:'AI',angle:'VB',feat:'ChatIntegration',funnel:'BOF',status:'LIVE',verdict:'HOLD',fti:2,fti_pw:3,fti_life:14,cpa:925,hook:23,freq:3.1,spend:1850,cw:'CW17',src:'P',
+   note:'Placeholder · SEA BOF VB',
+   failure_type:null,
+   diagnosis:'Some FTI signal but CPA ฿925 above plan ฿739. Freq 3.1 at fatigue boundary. Inconclusive — need 2 more clean weeks before verdict.',
+   action_type:'HOLD',action:'Hold spend. Watch freq daily. Do not scale. If freq crosses 3.5 → pause and replace with incoming ST ads.',
+   replace:'If freq triggers: replace with SEA-IH-ST-002 when ready.'},
+
+  {code:'SEA-EN-AI-ED-001',region:'SEA',country:'MY',lang:'EN',prod:'AI',angle:'ED',feat:'AIChatbot',funnel:'BOF',status:'LIVE',verdict:'WATCH',fti:2,fti_pw:2,fti_life:11,cpa:880,hook:27,freq:2.8,spend:1760,cw:'CW17',src:'P',
+   note:'Placeholder · SEA educational AI',
+   failure_type:null,
+   diagnosis:'ED + AI Chatbot angle. Hook 27% decent. FTI present but CPA ฿880 above plan. Freq 2.8 approaching fatigue. Borderline — not enough to kill, not enough to hold.',
+   action_type:'WATCH',action:'Watch one more week. If FTI ≥3 next week → hold. If freq crosses 3.0 before that → pause.',
+   replace:'If killed: note that ED + AI Chatbot has signal. Re-test with IH production — quality would outperform AI version significantly.'},
+
+  {code:'SEA-EN-AI-VB-003',region:'SEA',country:'SG',lang:'EN',prod:'AI',angle:'VB',feat:'ChatIntegration',funnel:'BOF',status:'LIVE',verdict:'KILL',fti:0,fti_pw:1,fti_life:3,cpa:0,hook:14,freq:2.2,spend:450,cw:'CW17',src:'P',
+   note:'Placeholder · SG-split · hook rate below 15% threshold',
+   failure_type:'NEVER_WORKED',
+   diagnosis:'SG split. Hook 14% — below hard kill threshold of 15%. 0 FTI. No recovery signal. Creative never landed with SG audience — never converted from day one — wrong message entirely.',
+   action_type:'KILL',action:'KILL immediately. Remove all budget today. SG is a brand-only market — no prospecting spend warranted.',
+   replace:'Do not replace with prospecting creative. SG structural ceiling is brand-only — confirmed hypothesis H-SG-01.'},
+
+  // ROW — confirmed
+  {code:'ROW-EN-AI-VB-001',region:'ROW',country:'UK',lang:'EN',prod:'AI',angle:'VB',feat:'ChatIntegration',funnel:'BOF',status:'LIVE',verdict:'KILL',fti:0,fti_pw:0,fti_life:0,cpa:0,hook:16,freq:1.9,spend:1820,cw:'CW17',src:'C',
+   note:'ROW only attempt · 0 FTI in 5 weeks · angle failure · KILL per CW17',
+   failure_type:'NEVER_WORKED',
+   diagnosis:'5 weeks, 0 FTI. VB angle + Chat Integration = irrelevant to UK Shopify merchants. Generic framing, wrong ICP entirely. Never converted once.',
+   action_type:'KILL',action:'KILL immediately. Pause all UK Meta until ROW-IH-TS-001 is ready. Do not run anything in ROW until angle is reset.',
+   replace:'ROW-IH-TS-001: real UK Shopify merchant testimonial, WhatsApp + Shopify angle, 40s IH. Binary gate: ≥3 FTI by CW21 = stay live.'},
+
+  {code:'ROW-EN-AI-VB-001',region:'ROW',country:'UK',lang:'EN',prod:'AI',angle:'VB',feat:'ChatIntegration',funnel:'TOF',status:'LIVE',verdict:'KILL',fti:0,fti_pw:0,fti_life:0,cpa:0,hook:17,freq:2.1,spend:920,cw:'CW17',src:'P',
+   note:'Placeholder · ROW TOF variant',
+   failure_type:'NEVER_WORKED',
+   diagnosis:'TOF variant of the same failed ROW creative. Same angle, same result: 0 FTI, hook barely above kill floor. Wrong angle for UK market.',
+   action_type:'KILL',action:'KILL alongside BOF variant. No UK Meta spend until replacement ready.',
+   replace:'Same as BOF: ROW-IH-TS-001 with Shopify angle. Angle is the problem, not funnel stage.'},
+
+  {code:'ROW-EN-AI-ST-001',region:'ROW',country:'UK',lang:'EN',prod:'AI',angle:'ST',feat:'WhatsApp',funnel:'BOF',status:'PAUSED',verdict:'PAUSED',fti:0,fti_pw:0,fti_life:1,cpa:0,hook:21,freq:1.4,spend:0,cw:'CW17',src:'P',
+   note:'Placeholder · paused ST retargeting attempt',
+   failure_type:'NEVER_WORKED',
+   diagnosis:'1 FTI lifetime. Hook 21% — marginally better than VB variant. ST format directionally right but wrong feature (no Shopify) and AI production quality too low.',
+   action_type:'HOLD',action:'Keep paused. Use as directional evidence: ST > VB in ROW even with weak execution.',
+   replace:'ROW-IH-TS-001 inherits ST format + adds Shopify feature + IH production quality. This is the roadmap.'},
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // CW18 (Apr 28 – May 4, 2026) — Meta API pull, account act_1559290301540477
+  // Note: hook rate not available at this query level; verdicts use freq/CPA/CTR
+  // ═══════════════════════════════════════════════════════════════════════
+
+  // TH — confirmed CW18
+  {code:'TH-TH-KOL-ED-001',region:'TH',country:'TH',lang:'TH',prod:'KOL',angle:'ED',feat:'ChatIntegration',funnel:'BOF',status:'LIVE',verdict:'SCALE',
+   fti:136,fti_pw:108,fti_life:240,cpa:252,hook:0,freq:1.85,spend:34265,cw:'CW18',src:'C',
+   note:'TH workhorse · IHAVECPU KOL across 5 conversion adsets · 47% of total account FTI',
+   failure_type:null,
+   diagnosis:'5 adsets in parallel: Clinic_iOS (42 FTI ฿325), Broad_iOS (38 FTI ฿219, 14→38 WoW on 3× spend), Shopify_Wifi (28 FTI ฿225), Admin_iOS (24 FTI ฿216), RTG (4 FTI ฿206). Aggregate freq 1.85 — significant headroom. Broad_iOS is the cleanest scale candidate.',
+   action_type:'SCALE',action:'+25% to BKK40_Broad_iOS specifically (freq 1.94, CPA ฿219). Hold Clinic_iOS flat (CPA worsened ฿252→฿325 — diminishing). Admin_iOS and Shopify_Wifi can take +20% each.',
+   replace:'In-house ED backup still not live. KOL is irreplaceable — single point of failure. Produce TH-IH-ED-001 this month.'},
+  
+  {code:'TH-TH-KOL-ED-001',region:'TH',country:'TH',lang:'TH',prod:'KOL',angle:'ED',feat:'ChatIntegration',funnel:'TOF',status:'LIVE',verdict:'WATCH',
+   fti:0,fti_pw:0,fti_life:0,cpa:0,hook:0,freq:1.28,spend:4498,cw:'CW18',src:'C',
+   note:'TH Awareness · 4 adsets · pure TOF objective (ThruPlay), no direct FTI by design',
+   failure_type:null,
+   diagnosis:'฿4,498 across BizOwner / Shopify / SAAS / 1%-LAL. CTR averages 1.0% — soft. TOF objective so no direct FTI — value depends on lift to BOF retargeting pool. Without measured lift this is brand spend.',
+   action_type:'WATCH',action:'Verify retargeting pool size growth before continuing. If BKK40_RTG audience not growing → cut to ฿2K/wk. Keep BizOwner adset (largest reach) only.',
+   replace:'N/A — same creative as BOF row. Decision is whether TOF spend justifies itself.'},
+  
+  {code:'TH-TH-KOL-ED-002',region:'TH',country:'TH',lang:'TH',prod:'KOL',angle:'ED',feat:'WhatsApp',funnel:'BOF',status:'LIVE',verdict:'SCALE',
+   fti:15,fti_pw:0,fti_life:15,cpa:168,hook:0,freq:2.22,spend:2517,cw:'CW18',src:'C',
+   note:'NEW SIGNAL · KOL-IHAVECPU on Message CTA · 0→15 FTI WoW',
+   failure_type:null,
+   diagnosis:'Message campaign came alive: spend ฿238→฿2,517, FTI 0→15 at ฿168 CPA. Hypothesis worth testing: does Message CTA outperform Conversion CTA on the same creative for the same RTG audience? Freq 2.22 still safe.',
+   action_type:'SCALE',action:'+50% to ฿3,800/wk on this single ad. Open formal test: same KOL creative, same RTG audience, Message vs Conversion CTA — measure FTI + downstream Qualified rate at 4 weeks.',
+   replace:'N/A — keep scaling. If Message CTA wins on Qualified rate too, replicate the pattern on TH-IH-TS-001.'},
+  
+  {code:'TH-TH-IH-TS-001',region:'TH',country:'TH',lang:'TH',prod:'IH',angle:'TS',feat:'ChatIntegration',funnel:'BOF',status:'LIVE',verdict:'WATCH',
+   fti:60,fti_pw:60,fti_life:120,cpa:290,hook:0,freq:2.90,spend:17376,cw:'CW18',src:'C',
+   note:'Largest single-ad spend in account · BKK40_Shopify_Wifi at ฿16K · freq nearing fatigue floor',
+   failure_type:null,
+   diagnosis:'2 adsets: Shopify_Wifi (44 FTI ฿372 freq 2.99) + RTG+1%-LAL (16 FTI ฿63 freq 1.84 — tight retargeting CPA). Shopify_Wifi spend grew 14.9K→16.4K WoW, CPA actually IMPROVED ฿416→฿372. Not a kill — but freq 2.99 is the fatigue floor.',
+   action_type:'WATCH',action:'Hold Shopify_Wifi flat. Trigger: if next-week freq > 3.2 OR CPA pops > ฿450 → refresh creative. RTG+1%-LAL (the cheap one) can take +20%.',
+   replace:'TH-IH-TS-002 needed — same Vic face, fresh script, ready as drop-in if Shopify_Wifi fatigues.'},
+  
+  {code:'TH-TH-IH-VB-001',region:'TH',country:'TH',lang:'TH',prod:'IH',angle:'VB',feat:'AIChatbot',funnel:'BOF',status:'LIVE',verdict:'KILL',
+   fti:0,fti_pw:3,fti_life:6,cpa:0,hook:0,freq:1.88,spend:2075,cw:'CW18',src:'C',
+   note:'IMG_AIChatbot10x static image · 2 adsets · 0 FTI · CTR 0.6–0.7%',
+   failure_type:'NEVER_WORKED',
+   diagnosis:'Admin_iOS: ฿1,319 spend, 0 FTI, CTR 0.6%. Broad_iOS: ฿756 spend, 0 FTI, CTR 0.7%, FTI 3→0 WoW. Static image losing decisively to KOL video running in same adsets. Second week of poor signal.',
+   action_type:'KILL',action:'Pause both today. Reallocate ฿2,000/wk to TH-TH-KOL-ED-001 BKK40_Broad_iOS (freq headroom).',
+   replace:'No replacement needed — KOL video already running in same adsets at ฿219 CPA. Static format is the wrong format for this audience.'},
+  
+  {code:'TH-TH-IH-ED-001',region:'TH',country:'TH',lang:'TH',prod:'IH',angle:'ED',feat:'ChatIntegration',funnel:'BOF',status:'LIVE',verdict:'WATCH',
+   fti:2,fti_pw:10,fti_life:30,cpa:433,hook:0,freq:1.89,spend:865,cw:'CW18',src:'P',
+   note:'CAR_Branch002 carousel · 2 adsets · weak signal · WoW collapsing',
+   failure_type:null,
+   diagnosis:'Broad_iOS: 2 FTI ฿296. Admin_iOS: 0 FTI. Combined WoW: 8→2 FTI on 1/4 the spend (Meta auto-reduced budget per learning). CTR 0.3% — very weak. Format losing to video in same audiences.',
+   action_type:'WATCH',action:'One more week. If FTI < 2 again → KILL. Budget already self-reduced by Meta delivery; don\'t intervene.',
+   replace:'Same audience already has KOL video and Vic video performing — carousel adds nothing. Phase out.'},
+
+  // SEA — confirmed CW18 (PH reactivation)
+  {code:'SEA-EN-AI-VB-002',region:'SEA',country:'PH',lang:'EN',prod:'AI',angle:'VB',feat:'ChatIntegration',funnel:'TOF',status:'LIVE',verdict:'SCALE',
+   fti:52,fti_pw:0,fti_life:52,cpa:136,hook:0,freq:1.42,spend:7080,cw:'CW18',src:'C',
+   note:'BREAKOUT · PH AI-gen video × LAL-Video adset · cheapest CPA in account',
+   failure_type:null,
+   diagnosis:'2 ads in PH_LAL-Video adset: VDO_AiEN-001 (33 FTI ฿140 CTR 10.7%) + VDO_AiConEN-Mar26 (19 FTI ฿130 CTR 11.2%). Freq 1.42 — wide open. Zero spend in CW17, exploded in CW18. AI-generated production passes the bar in EN markets (memory: TH AI failed because Thai TTS unviable; EN doesn\'t have that constraint).',
+   action_type:'SCALE',action:'+50% to ฿10.6K/wk across both ads. Cap at freq 2.5 — if it crosses, hold. This is the new SEA engine.',
+   replace:'Both creatives already running. Produce SEA-EN-AI-VB-004 as a backup variant before saturation hits.'},
+  
+  {code:'SEA-EN-AI-VB-003',region:'SEA',country:'PH',lang:'EN',prod:'AI',angle:'VB',feat:'ChatIntegration',funnel:'TOF',status:'LIVE',verdict:'HOLD',
+   fti:7,fti_pw:0,fti_life:7,cpa:450,hook:0,freq:1.38,spend:3150,cw:'CW18',src:'C',
+   note:'PH BusinessOwner adset · same creative pattern, weaker audience match',
+   failure_type:null,
+   diagnosis:'VDO_AiConEN-Mar26 in PH_BusinessOwner: 7 FTI ฿450 CTR 13.1%. CTR is high but CPA much worse than LAL adset (฿130). Audience-creative mismatch — BusinessOwner audience clicks but doesn\'t convert.',
+   action_type:'HOLD',action:'Hold ฿3.2K/wk. If CPA stays > ฿400 next week → reduce -50%, reallocate to LAL adset.',
+   replace:'Try VDO_AiEN-001 (the better-converting variant from LAL) in this audience as A/B.'},
+  
+  {code:'SEA-EN-AI-VB-001',region:'SEA',country:'PH',lang:'EN',prod:'AI',angle:'VB',feat:'ChatIntegration',funnel:'BOF',status:'LIVE',verdict:'HOLD',
+   fti:3,fti_pw:0,fti_life:3,cpa:154,hook:0,freq:1.27,spend:461,cw:'CW18',src:'C',
+   note:'PH RTG · 5 small ads · directional signal',
+   failure_type:null,
+   diagnosis:'Spread across PH_RTG+LAL and PH_Shopify adsets. Aggregate CPA ฿154 looks great but spend per ad is too thin to verdict — 3 FTI total across 5 ads. RTG audience small, just rebuilding from CW17 reset.',
+   action_type:'HOLD',action:'Let it run. RTG audience will grow as TOF (LAL/BizOwner) drives more visitors. Re-verdict in 2 weeks.',
+   replace:'N/A — same creative as TOF row, just retargeting. Volume scales with TOF.'},
+  
+  {code:'SEA-EN-IH-TS-001',region:'SEA',country:'PH',lang:'EN',prod:'IH',angle:'TS',feat:'ChatIntegration',funnel:'TOF',status:'LIVE',verdict:'HOLD',
+   fti:5,fti_pw:0,fti_life:5,cpa:261,hook:0,freq:1.32,spend:1306,cw:'CW18',src:'C',
+   note:'PH In-house EN · VicEN testimonial · single LAL adset',
+   failure_type:null,
+   diagnosis:'5 FTI ฿261 freq 1.32 CTR 12.6%. Working but at 2× the CPA of AI-gen videos in same adset (AI: ฿140; IH: ฿261). The IH creative is fine — it\'s just outclassed by AI-gen on cost.',
+   action_type:'HOLD',action:'Keep running, don\'t add budget. Useful as a control — proves PH audience converts on real-face creative too. AI-gen wins on volume, IH wins on trust.',
+   replace:'No replacement needed. Useful as ongoing baseline.'},
+  
+  {code:'SEA-EN-MX-VB-001',region:'SEA',country:'PH',lang:'EN',prod:'MX',angle:'VB',feat:'ChatIntegration',funnel:'TOF',status:'LIVE',verdict:'HOLD',
+   fti:8,fti_pw:0,fti_life:8,cpa:359,hook:0,freq:1.49,spend:2875,cw:'CW18',src:'C',
+   note:'PH organic post boost · Nov 2025 legacy creative · MX = mixed/legacy',
+   failure_type:null,
+   diagnosis:'4 ad-adset combinations boosting old organic posts (Shopify variant + AI variant). CPA ฿359 — reasonable but not exceptional. Useful while AI-gen is scaling but per spec no new MX ads.',
+   action_type:'HOLD',action:'Hold flat. Phase out as SEA-EN-AI-VB-002 takes more share. By CW20 should be < ฿1K spend.',
+   replace:'Replaced by SEA-EN-AI-VB-002 — already happening organically as Meta shifts spend to better performers.'},
+  
+  {code:'SEA-EN-IH-ED-001',region:'SEA',country:'PH',lang:'EN',prod:'IH',angle:'ED',feat:'ChatIntegration',funnel:'BOF',status:'LIVE',verdict:'HOLD',
+   fti:0,fti_pw:0,fti_life:0,cpa:0,hook:0,freq:1.76,spend:196,cw:'CW18',src:'P',
+   note:'PH RTG carousels (UnifiedInbox, AIAgentOpenforWork, LeadQualification) · feature-pitch format',
+   failure_type:null,
+   diagnosis:'3 carousels in PH_RTG+LAL. ฿196 combined, 0 FTI, CTR 0.8% — too thin to verdict. Format is feature-explanation rather than outcome-led.',
+   action_type:'HOLD',action:'Let run another week with current low spend. If still 0 FTI at ฿500 cumulative → KILL.',
+   replace:'Carousels lose to video in PH so far — not investing in this format.'},
+  
+  // MY — broken
+  {code:'SEA-EN-AI-VB-MY',region:'SEA',country:'MY',lang:'EN',prod:'AI',angle:'VB',feat:'AIChatbot',funnel:'BOF',status:'LIVE',verdict:'WATCH',
+   fti:1,fti_pw:0,fti_life:25,cpa:1563,hook:0,freq:1.91,spend:1563,cw:'CW18',src:'C',
+   note:'MY AI-gen album · 1 FTI at ฿1,563 CPA · MY Seedling stage holds but no working creative',
+   failure_type:null,
+   diagnosis:'ALB_AIAgent001 in MY_RTG: 1 FTI ฿1,508 spend. Tiny RTG+1%-LAL adset added 0 FTI on ฿55. Confirms MY remains structurally hard — same AI-gen format that prints money in PH at ฿130 CPA can\'t convert here at any cost.',
+   action_type:'WATCH',action:'Cut MY budget to ฿1K/wk on this creative only. Pause MY_RTG+1%-LAL adset (too small to learn). MY framework stage = Seedling holds (chatbot AI keyword), no aggressive moves until SG/PH learnings cross-apply.',
+   replace:'No replacement candidate. MY needs a fundamentally different angle — not the same creative that works in PH. Strategic decision, not tactical.'},
+  
+  {code:'SEA-EN-IH-VB-MY',region:'SEA',country:'MY',lang:'EN',prod:'IH',angle:'VB',feat:'AIChatbot',funnel:'BOF',status:'LIVE',verdict:'PAUSED',
+   fti:0,fti_pw:0,fti_life:0,cpa:0,hook:0,freq:1.30,spend:127,cw:'CW18',src:'P',
+   note:'MY misc IMG creatives · sub-฿70 each · noise',
+   failure_type:null,
+   diagnosis:'IMG_AI-Chatbot, IMG_Branch002, IMG_FlowBuiler001 — three static images with ฿29–฿66 spend each. Not enough volume to learn from.',
+   action_type:'HOLD',action:'Pause all 3. Free up ฿130/wk for the AI-gen test above. No need to keep noise running.',
+   replace:'N/A — clearing creative slots for focused testing.'},
+];
+
+// ═══════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════
+const VERDICT_WEIGHT = {KILL:6,REFRESH:5,SATURATE:5,WATCH:4,HOLD:3,SCALE:2,PAUSED:1};
+const VERDICT_CLASS  = {SCALE:'v-scale',HOLD:'v-hold',WATCH:'v-watch',REFRESH:'v-refresh',SATURATE:'v-sat',KILL:'v-kill',PAUSED:'v-paused'};
+const VERDICT_DISPLAY = {
+  SCALE:   '🟢 Scale',
+  HOLD:    '⏸ Wait & Watch',
+  WATCH:   '🟡 Watch Closely',
+  REFRESH: '🟠 Replace Creative',
+  KILL:    '🔴 Stop Now',
+  PAUSED:  '— Paused',
+  SATURATE:'🟠 Saturated',
+};
+const AXIS_LABEL     = {prod:'Production',angle:'Angle',feat:'Feature',country:'Country',lang:'Language'};
+// ═══════════════════════════════════════════════════════════
+// ASSET PREVIEW — GitHub-hosted creative thumbnails
+// Convention: {ASSET_BASE_URL}{ad_code}.webp first, then .mp4, then "missing" placeholder.
+// Override by editing the two constants below.
+// ═══════════════════════════════════════════════════════════
+const ASSET_BASE_URL = 'https://kitikorn-zaapi.github.io/zaapi-growth-dashboard/assets/';
+const ASSET_REPO_URL = 'https://github.com/kitikorn-zaapi/zaapi-growth-dashboard/tree/main/assets';
+
+// Asset preview — assets are static images (.webp). Try .webp as <img> first,
+// fall back through alternative extensions, then to .mp4 as video for video creatives,
+// then to a diagnostic placeholder that explains CSP/origin blocking.
+function handleAssetError(el, code) {
+  const slot = el.parentElement;
+  const attempts = [
+    {url: ASSET_BASE_URL + code + '.jpg',  type: 'img'},
+    {url: ASSET_BASE_URL + code + '.png',  type: 'img'},
+    {url: ASSET_BASE_URL + code + '.mp4',  type: 'video'},
+  ];
+  let i = 0;
+  function showDiagnostic() {
+    const webpUrl = ASSET_BASE_URL + code + '.webp';
+    slot.innerHTML = `
+      <div class="asset-missing">
+        <span class="ttl">Asset can't load for <code>${code}</code></span>
+        Most likely cause: <b>this dashboard is running inside an iframe (claude.ai preview)</b> whose Content Security Policy blocks cross-origin images from <code>kitikorn-zaapi.github.io</code>. The file itself is fine — it's the iframe blocking it.<br><br>
+        <b>Two ways to make assets render:</b>
+        <ol style="text-align:left;margin:6px 0 6px 18px;padding:0;font-size:11px;line-height:1.7;">
+          <li><b>Download this HTML</b> (download icon top-right of the artifact) and open the file directly in your browser — no iframe CSP applies.</li>
+          <li><b>Deploy this file to your GitHub Pages repo</b> alongside the assets, so dashboard and images share the same origin.</li>
+        </ol>
+        <a href="${webpUrl}" target="_blank" rel="noopener" style="font-size:10px;">Test the URL in a new tab →</a>
+      </div>`;
+  }
+  function next() {
+    if (i >= attempts.length) { showDiagnostic(); return; }
+    const a = attempts[i++];
+    let elNew;
+    if (a.type === 'video') {
+      elNew = document.createElement('video');
+      elNew.src = a.url;
+      elNew.controls = true; elNew.muted = true; elNew.playsInline = true;
+      elNew.preload = 'metadata';
+      elNew.style.cssText = 'max-width:100%;max-height:340px;display:block;';
+    } else {
+      elNew = document.createElement('img');
+      elNew.src = a.url; elNew.alt = code; elNew.loading = 'lazy';
+    }
+    elNew.onerror = next;
+    const existing = slot.querySelector('img, video');
+    if (existing) existing.replaceWith(elNew); else slot.appendChild(elNew);
+  }
+  next();
+}
+
+function assetPreviewHTML(code) {
+  // Assets are static images by default — render as <img>. handleAssetError chains
+  // through alt extensions and ultimately a diagnostic placeholder if everything fails.
+  const webp = ASSET_BASE_URL + code + '.webp';
+  return `<div class="asset-preview"><span class="asset-cap">${code}</span>` +
+         `<img src="${webp}" alt="${code}" loading="lazy" ` +
+         `onerror="handleAssetError(this, '${code}')"></div>`;
+}
+
+const PROD_DECODE    = {IH:'In-house',AI:'AI-generated',MG:'Motion graphic',UG:'UGC',KOL:'KOL/Spokesperson',MX:'Legacy mixed'};
+const ANGLE_DECODE   = {VB:'Value Bomb',TS:'Testimonial',ST:'Storytelling',ED:'Educational'};
+
+const FB_REAL = {
+  "04 Jan 2026": {
+    "TH": {
+      "total_spend": 24781,
+      "conv_spend": 24781,
+      "fti": 3.0,
+      "reach": 0,
+      "freq": 0,
+      "ctr": 0.41,
+      "cpa": 8260,
+      "impressions": 570694,
+      "clicks": 2366
+    },
+    "SEA": {
+      "total_spend": 14836,
+      "conv_spend": 14836,
+      "fti": 1.0,
+      "reach": 0,
+      "freq": 0,
+      "ctr": 0.47,
+      "cpa": 14836,
+      "impressions": 504953,
+      "clicks": 2393
+    },
+    "MY": {
+      "total_spend": 14465,
+      "conv_spend": 14465,
+      "fti": 1.0,
+      "reach": 0,
+      "freq": 0,
+      "ctr": 0.47,
+      "cpa": 14465,
+      "impressions": 501301,
+      "clicks": 2378
+    },
+    "SG": {
+      "total_spend": 271,
+      "conv_spend": 271,
+      "fti": 0.0,
+      "reach": 0,
+      "freq": 0,
+      "ctr": 0.53,
+      "cpa": 0,
+      "impressions": 758,
+      "clicks": 4
+    },
+    "PH": {
+      "total_spend": 101,
+      "conv_spend": 101,
+      "fti": 0.0,
+      "reach": 0,
+      "freq": 0,
+      "ctr": 0.38,
+      "cpa": 0,
+      "impressions": 2894,
+      "clicks": 11
+    }
+  },
+  "11 Jan 2026": {
+    "TH": {
+      "total_spend": 63148,
+      "conv_spend": 59470,
+      "fti": 24.0,
+      "reach": 87404,
+      "freq": 1.01,
+      "ctr": 0.36,
+      "cpa": 2478,
+      "impressions": 1240964,
+      "clicks": 4461
+    },
+    "SEA": {
+      "total_spend": 34130,
+      "conv_spend": 22891,
+      "fti": 6.0,
+      "reach": 82608,
+      "freq": 1.47,
+      "ctr": 0.37,
+      "cpa": 3815,
+      "impressions": 716684,
+      "clicks": 2651
+    },
+    "MY": {
+      "total_spend": 28026,
+      "conv_spend": 21055,
+      "fti": 5.0,
+      "reach": 69019,
+      "freq": 1.44,
+      "ctr": 0.37,
+      "cpa": 4211,
+      "impressions": 688958,
+      "clicks": 2576
+    },
+    "SG": {
+      "total_spend": 6081,
+      "conv_spend": 1814,
+      "fti": 1.0,
+      "reach": 13589,
+      "freq": 1.65,
+      "ctr": 0.27,
+      "cpa": 1814,
+      "impressions": 26812,
+      "clicks": 72
+    },
+    "PH": {
+      "total_spend": 23,
+      "conv_spend": 23,
+      "fti": 0.0,
+      "reach": 0,
+      "freq": 0,
+      "ctr": 0.33,
+      "cpa": 0,
+      "impressions": 914,
+      "clicks": 3
+    }
+  },
+  "18 Jan 2026": {
+    "TH": {
+      "total_spend": 57486,
+      "conv_spend": 42345,
+      "fti": 19.0,
+      "reach": 376265,
+      "freq": 1.03,
+      "ctr": 0.52,
+      "cpa": 2229,
+      "impressions": 1088753,
+      "clicks": 5701
+    },
+    "SEA": {
+      "total_spend": 68839,
+      "conv_spend": 23928,
+      "fti": 5.0,
+      "reach": 229047,
+      "freq": 1.93,
+      "ctr": 0.24,
+      "cpa": 4786,
+      "impressions": 654402,
+      "clicks": 1587
+    },
+    "MY": {
+      "total_spend": 41132,
+      "conv_spend": 15724,
+      "fti": 0.0,
+      "reach": 171937,
+      "freq": 1.91,
+      "ctr": 0.25,
+      "cpa": 0,
+      "impressions": 522838,
+      "clicks": 1324
+    },
+    "SG": {
+      "total_spend": 27707,
+      "conv_spend": 8204,
+      "fti": 5.0,
+      "reach": 57110,
+      "freq": 1.98,
+      "ctr": 0.2,
+      "cpa": 1641,
+      "impressions": 131564,
+      "clicks": 263
+    }
+  },
+  "25 Jan 2026": {
+    "TH": {
+      "total_spend": 38500,
+      "conv_spend": 26573,
+      "fti": 16.0,
+      "reach": 230454,
+      "freq": 1.12,
+      "ctr": 0.48,
+      "cpa": 1661,
+      "impressions": 729962,
+      "clicks": 3486
+    },
+    "SEA": {
+      "total_spend": 39418,
+      "conv_spend": 15510,
+      "fti": 2.0,
+      "reach": 190462,
+      "freq": 1.63,
+      "ctr": 0.37,
+      "cpa": 7755,
+      "impressions": 438665,
+      "clicks": 1631
+    },
+    "MY": {
+      "total_spend": 25508,
+      "conv_spend": 9389,
+      "fti": 1.0,
+      "reach": 118119,
+      "freq": 1.65,
+      "ctr": 0.25,
+      "cpa": 9389,
+      "impressions": 269756,
+      "clicks": 669
+    },
+    "SG": {
+      "total_spend": 8633,
+      "conv_spend": 4105,
+      "fti": 1.0,
+      "reach": 15215,
+      "freq": 1.77,
+      "ctr": 0.19,
+      "cpa": 4105,
+      "impressions": 34262,
+      "clicks": 66
+    },
+    "PH": {
+      "total_spend": 5276,
+      "conv_spend": 2016,
+      "fti": 0.0,
+      "reach": 57128,
+      "freq": 1.54,
+      "ctr": 0.67,
+      "cpa": 0,
+      "impressions": 134647,
+      "clicks": 896
+    }
+  },
+  "01 Feb 2026": {
+    "TH": {
+      "total_spend": 46440,
+      "conv_spend": 32952,
+      "fti": 11.0,
+      "reach": 220131,
+      "freq": 1.19,
+      "ctr": 0.51,
+      "cpa": 2996,
+      "impressions": 755518,
+      "clicks": 3845
+    },
+    "SEA": {
+      "total_spend": 49541,
+      "conv_spend": 20941,
+      "fti": 5.0,
+      "reach": 289703,
+      "freq": 1.45,
+      "ctr": 0.44,
+      "cpa": 4188,
+      "impressions": 649460,
+      "clicks": 2854
+    },
+    "MY": {
+      "total_spend": 30703,
+      "conv_spend": 13773,
+      "fti": 4.0,
+      "reach": 117724,
+      "freq": 1.65,
+      "ctr": 0.28,
+      "cpa": 3443,
+      "impressions": 350198,
+      "clicks": 977
+    },
+    "SG": {
+      "total_spend": 9895,
+      "conv_spend": 4340,
+      "fti": 0.0,
+      "reach": 17528,
+      "freq": 1.92,
+      "ctr": 0.23,
+      "cpa": 0,
+      "impressions": 42037,
+      "clicks": 97
+    },
+    "PH": {
+      "total_spend": 8943,
+      "conv_spend": 2828,
+      "fti": 1.0,
+      "reach": 154451,
+      "freq": 1.24,
+      "ctr": 0.69,
+      "cpa": 2828,
+      "impressions": 257225,
+      "clicks": 1780
+    }
+  },
+  "08 Feb 2026": {
+    "TH": {
+      "total_spend": 46908,
+      "conv_spend": 36976,
+      "fti": 15.0,
+      "reach": 164837,
+      "freq": 1.19,
+      "ctr": 0.41,
+      "cpa": 2465,
+      "impressions": 924185,
+      "clicks": 3785
+    },
+    "SEA": {
+      "total_spend": 50981,
+      "conv_spend": 31654,
+      "fti": 7.0,
+      "reach": 160394,
+      "freq": 1.59,
+      "ctr": 0.38,
+      "cpa": 4522,
+      "impressions": 690204,
+      "clicks": 2617
+    },
+    "MY": {
+      "total_spend": 12376,
+      "conv_spend": 1491,
+      "fti": 0.0,
+      "reach": 71059,
+      "freq": 1.79,
+      "ctr": 0.22,
+      "cpa": 0,
+      "impressions": 143150,
+      "clicks": 312
+    },
+    "SG": {
+      "total_spend": 27079,
+      "conv_spend": 21889,
+      "fti": 3.0,
+      "reach": 15006,
+      "freq": 2.04,
+      "ctr": 0.38,
+      "cpa": 7296,
+      "impressions": 266068,
+      "clicks": 1018
+    },
+    "PH": {
+      "total_spend": 11526,
+      "conv_spend": 8274,
+      "fti": 4.0,
+      "reach": 74329,
+      "freq": 1.31,
+      "ctr": 0.46,
+      "cpa": 2069,
+      "impressions": 280986,
+      "clicks": 1287
+    }
+  },
+  "15 Feb 2026": {
+    "TH": {
+      "total_spend": 41743,
+      "conv_spend": 32946,
+      "fti": 13.0,
+      "reach": 130167,
+      "freq": 1.21,
+      "ctr": 0.41,
+      "cpa": 2534,
+      "impressions": 737406,
+      "clicks": 2992
+    },
+    "SEA": {
+      "total_spend": 85396,
+      "conv_spend": 55711,
+      "fti": 3.0,
+      "reach": 251001,
+      "freq": 1.57,
+      "ctr": 0.42,
+      "cpa": 18570,
+      "impressions": 1227143,
+      "clicks": 5214
+    },
+    "MY": {
+      "total_spend": 15241,
+      "conv_spend": 0,
+      "fti": 0,
+      "reach": 73548,
+      "freq": 2.09,
+      "ctr": 0.15,
+      "cpa": 0,
+      "impressions": 154039,
+      "clicks": 226
+    },
+    "SG": {
+      "total_spend": 42574,
+      "conv_spend": 35262,
+      "fti": 3.0,
+      "reach": 16493,
+      "freq": 2.06,
+      "ctr": 0.47,
+      "cpa": 11754,
+      "impressions": 407468,
+      "clicks": 1896
+    },
+    "PH": {
+      "total_spend": 27581,
+      "conv_spend": 20449,
+      "fti": 0.0,
+      "reach": 160960,
+      "freq": 1.28,
+      "ctr": 0.46,
+      "cpa": 0,
+      "impressions": 665636,
+      "clicks": 3092
+    }
+  },
+  "22 Feb 2026": {
+    "TH": {
+      "total_spend": 37466,
+      "conv_spend": 26904,
+      "fti": 17.0,
+      "reach": 133737,
+      "freq": 1.24,
+      "ctr": 0.48,
+      "cpa": 1583,
+      "impressions": 622921,
+      "clicks": 2991
+    },
+    "SEA": {
+      "total_spend": 40184,
+      "conv_spend": 20443,
+      "fti": 2.0,
+      "reach": 265679,
+      "freq": 1.43,
+      "ctr": 0.55,
+      "cpa": 10221,
+      "impressions": 727477,
+      "clicks": 3996
+    },
+    "MY": {
+      "total_spend": 7655,
+      "conv_spend": 0,
+      "fti": 0,
+      "reach": 44970,
+      "freq": 1.77,
+      "ctr": 0.14,
+      "cpa": 0,
+      "impressions": 79565,
+      "clicks": 115
+    },
+    "SG": {
+      "total_spend": 7319,
+      "conv_spend": 5419,
+      "fti": 0.0,
+      "reach": 6000,
+      "freq": 1.79,
+      "ctr": 0.6,
+      "cpa": 0,
+      "impressions": 58947,
+      "clicks": 353
+    },
+    "PH": {
+      "total_spend": 25210,
+      "conv_spend": 15024,
+      "fti": 2.0,
+      "reach": 214709,
+      "freq": 1.35,
+      "ctr": 0.6,
+      "cpa": 7512,
+      "impressions": 588965,
+      "clicks": 3528
+    },
+    "ROW": {
+      "total_spend": 5512,
+      "conv_spend": 468,
+      "fti": 0.0,
+      "reach": 3758,
+      "freq": 2.26,
+      "ctr": 0.4,
+      "cpa": 0,
+      "impressions": 9243,
+      "clicks": 37
+    }
+  },
+  "01 Mar 2026": {
+    "TH": {
+      "total_spend": 22639,
+      "conv_spend": 17065,
+      "fti": 0.0,
+      "reach": 83327,
+      "freq": 1.12,
+      "ctr": 0.88,
+      "cpa": 0,
+      "impressions": 352709,
+      "clicks": 3118
+    },
+    "SEA": {
+      "total_spend": 11189,
+      "conv_spend": 4235,
+      "fti": 0.0,
+      "reach": 77673,
+      "freq": 1.43,
+      "ctr": 0.94,
+      "cpa": 0,
+      "impressions": 174643,
+      "clicks": 1641
+    },
+    "MY": {
+      "total_spend": 3953,
+      "conv_spend": 0,
+      "fti": 0,
+      "reach": 28864,
+      "freq": 1.49,
+      "ctr": 0.34,
+      "cpa": 0,
+      "impressions": 42979,
+      "clicks": 148
+    },
+    "SG": {
+      "total_spend": 784,
+      "conv_spend": 5,
+      "fti": 0.0,
+      "reach": 2666,
+      "freq": 1.58,
+      "ctr": 0.21,
+      "cpa": 0,
+      "impressions": 4236,
+      "clicks": 9
+    },
+    "PH": {
+      "total_spend": 2880,
+      "conv_spend": 658,
+      "fti": 0.0,
+      "reach": 46143,
+      "freq": 1.39,
+      "ctr": 0.85,
+      "cpa": 0,
+      "impressions": 72446,
+      "clicks": 616
+    },
+    "ROW": {
+      "total_spend": 2049,
+      "conv_spend": 79,
+      "fti": 0.0,
+      "reach": 1181,
+      "freq": 2.33,
+      "ctr": 0.68,
+      "cpa": 0,
+      "impressions": 2962,
+      "clicks": 20
+    }
+  },
+  "08 Mar 2026": {
+    "TH": {
+      "total_spend": 58188,
+      "conv_spend": 46536,
+      "fti": 0.0,
+      "reach": 192792,
+      "freq": 1.11,
+      "ctr": 1.74,
+      "cpa": 0,
+      "impressions": 956008,
+      "clicks": 16592
+    },
+    "SEA": {
+      "total_spend": 47303,
+      "conv_spend": 22717,
+      "fti": 0.0,
+      "reach": 205258,
+      "freq": 1.66,
+      "ctr": 1.22,
+      "cpa": 0,
+      "impressions": 828811,
+      "clicks": 10147
+    },
+    "MY": {
+      "total_spend": 12516,
+      "conv_spend": 0,
+      "fti": 0,
+      "reach": 79640,
+      "freq": 1.8,
+      "ctr": 0.29,
+      "cpa": 0,
+      "impressions": 143659,
+      "clicks": 411
+    },
+    "SG": {
+      "total_spend": 6359,
+      "conv_spend": 0,
+      "fti": 0,
+      "reach": 15199,
+      "freq": 2.38,
+      "ctr": 0.15,
+      "cpa": 0,
+      "impressions": 36249,
+      "clicks": 56
+    },
+    "PH": {
+      "total_spend": 5711,
+      "conv_spend": 0,
+      "fti": 0,
+      "reach": 110419,
+      "freq": 1.46,
+      "ctr": 1.03,
+      "cpa": 0,
+      "impressions": 160751,
+      "clicks": 1654
+    },
+    "ROW": {
+      "total_spend": 7845,
+      "conv_spend": 506,
+      "fti": 0.0,
+      "reach": 4210,
+      "freq": 2.57,
+      "ctr": 0.41,
+      "cpa": 0,
+      "impressions": 11843,
+      "clicks": 49
+    }
+  },
+  "15 Mar 2026": {
+    "TH": {
+      "total_spend": 42584,
+      "conv_spend": 33712,
+      "fti": 0.0,
+      "reach": 137535,
+      "freq": 1.17,
+      "ctr": 1.07,
+      "cpa": 0,
+      "impressions": 627104,
+      "clicks": 6734
+    },
+    "SEA": {
+      "total_spend": 36883,
+      "conv_spend": 20389,
+      "fti": 0.0,
+      "reach": 144183,
+      "freq": 1.67,
+      "ctr": 1.89,
+      "cpa": 0,
+      "impressions": 703755,
+      "clicks": 13308
+    },
+    "MY": {
+      "total_spend": 11146,
+      "conv_spend": 0,
+      "fti": 0,
+      "reach": 57721,
+      "freq": 2.0,
+      "ctr": 0.26,
+      "cpa": 0,
+      "impressions": 115452,
+      "clicks": 295
+    },
+    "SG": {
+      "total_spend": 1241,
+      "conv_spend": 0,
+      "fti": 0,
+      "reach": 3720,
+      "freq": 1.9,
+      "ctr": 0.14,
+      "cpa": 0,
+      "impressions": 7051,
+      "clicks": 10
+    },
+    "PH": {
+      "total_spend": 4107,
+      "conv_spend": 0,
+      "fti": 0,
+      "reach": 82742,
+      "freq": 1.43,
+      "ctr": 1.09,
+      "cpa": 0,
+      "impressions": 118642,
+      "clicks": 1289
+    },
+    "ROW": {
+      "total_spend": 8203,
+      "conv_spend": 183,
+      "fti": 0.0,
+      "reach": 4415,
+      "freq": 2.27,
+      "ctr": 0.54,
+      "cpa": 0,
+      "impressions": 10480,
+      "clicks": 57
+    }
+  }
+,
+  "28 Apr 2026": {
+    "TH": {"total_spend": 64180, "conv_spend": 61630, "fti": 213, "reach": 380000, "freq": 2.10, "ctr": 1.68, "cpa": 289, "impressions": 798000, "clicks": 13420, "cw": "CW18"},
+    "SEA": {"total_spend": 16950, "conv_spend": 16950, "fti": 76, "reach": 200000, "freq": 1.65, "ctr": 6.9, "cpa": 223, "impressions": 330000, "clicks": 22790, "cw": "CW18"},
+    "ROW": {"total_spend": 992, "conv_spend": 0, "fti": 0, "reach": 929, "freq": 1.33, "ctr": 3.0, "cpa": 0, "impressions": 1235, "clicks": 37, "cw": "CW18", "note": "UK paused"}
+  }
+};
+
+
+// ═══════════════════════════════════════════════════════════
+// MARKET DATA — per CW, plain-English for management
+// ═══════════════════════════════════════════════════════════
+const MARKET_BY_CW = {
+  CW14: {
+    // Real data: week ending 08 Feb 2026
+    TH:  { signal:'GOOD',        signalCls:'ms-scale',
+           headline:'Growing — 15 signups · ฿2,465 each',
+           fti:15, ftiLbl:'Signups this week', ftiC:'mnv-g',
+           cpa:'฿2,465', cpaLbl:'Cost per signup', cpaC:'mnv-g',
+           working:5, workingLbl:'Ads working', workingC:'mnv-g',
+           summary:'15 signups at ฿2,465 each. Total spend ฿46,908. Reached 164,837 people. Multiple ads contributing — UG-TS-001 and KOL-ED-001 both performing well.',
+           decision:'Increase budget +20% on top performers. Keep running.', decCls:'ms-scale' },
+    SEA: { signal:'WATCH',       signalCls:'ms-reset',
+           headline:'7 signups — but costs too high at ฿4,522 each',
+           fti:7, ftiLbl:'Signups this week', ftiC:'mnv-o',
+           cpa:'฿4,522', cpaLbl:'Cost per signup', cpaC:'mnv-r',
+           working:1, workingLbl:'Ads working', workingC:'mnv-o',
+           summary:'7 signups but at ฿4,522 each — 6× above the ฿739 plan. Spent ฿50,981 total, reached 160,394 people. One ad doing all the work with no backup.',
+           decision:'Hold budget. Start shooting replacement now — do not wait.', decCls:'ms-reset' },
+    ROW: { signal:'NOT STARTED', signalCls:'ms-reset',
+           headline:'Not yet running in this period',
+           fti:0, ftiLbl:'Signups this week', ftiC:'mnv-r',
+           cpa:'—', cpaLbl:'Cost per signup', cpaC:'mnv-o',
+           working:0, workingLbl:'Ads working', workingC:'mnv-r',
+           summary:'UK campaigns not yet active in this week.',
+           decision:'No action needed — UK launches in CW15.', decCls:'ms-reset' },
+  },
+  CW15: {
+    // Real data: week ending 22 Feb 2026
+    TH:  { signal:'BEST WEEK',   signalCls:'ms-scale',
+           headline:'Best week — 17 signups · ฿1,583 each',
+           fti:17, ftiLbl:'Signups this week', ftiC:'mnv-g',
+           cpa:'฿1,583', cpaLbl:'Cost per signup', cpaC:'mnv-g',
+           working:6, workingLbl:'Ads working', workingC:'mnv-g',
+           summary:'TH best week ever. 17 signups at ฿1,583 each — best CPA on record, 3.5× below the ฿550 target on conversion spend alone. Spent ฿37,466 total, reached 133,737 people.',
+           decision:'Scale aggressively. Add budget to UG-TS-001 and KOL-TS-001.', decCls:'ms-scale' },
+    SEA: { signal:'COLLAPSING',  signalCls:'ms-crit',
+           headline:'Down to 2 signups — ฿10,221 each',
+           fti:2, ftiLbl:'Signups this week', ftiC:'mnv-r',
+           cpa:'฿10,221', cpaLbl:'Cost per signup', cpaC:'mnv-r',
+           working:1, workingLbl:'Ads working', workingC:'mnv-r',
+           summary:'Dropped from 7 to 2 signups. Cost exploded to ฿10,221 each — 14× above the ฿739 plan. Spent ฿40,184 reaching 265,679 people but almost nobody converting. Audience burned out.',
+           decision:'Urgently produce replacement ad. Pause the saturated creative now.', decCls:'ms-crit' },
+    ROW: { signal:'NOT WORKING', signalCls:'ms-crit',
+           headline:'฿5,512 spent — 0 signups',
+           fti:0, ftiLbl:'Signups this week', ftiC:'mnv-r',
+           cpa:'—', cpaLbl:'Cost per signup', cpaC:'mnv-r',
+           working:0, workingLbl:'Ads working', workingC:'mnv-r',
+           summary:'UK running but 0 signups. Spent ฿5,512, reached 3,758 people. Message not connecting with UK Shopify businesses.',
+           decision:'Prepare a completely different ad — current approach is wrong.', decCls:'ms-crit' },
+  },
+  CW16: {
+    // Real data: week ending 08 Mar 2026
+    TH:  { signal:'0 SIGNUPS',   signalCls:'ms-crit',
+           headline:'฿58,188 spent — 0 signups recorded',
+           fti:0, ftiLbl:'Signups this week', ftiC:'mnv-r',
+           cpa:'—', cpaLbl:'Cost per signup', cpaC:'mnv-r',
+           working:2, workingLbl:'Ads working', workingC:'mnv-o',
+           summary:'AI Max expanded spend to irrelevant search queries — ฿58,188 spent, 0 FTI in this export. Reached 192,792 people but conversion tracking broke. Campaign restructure needed.',
+           decision:'AI Max paused. Restructure search campaigns. Hold Meta budget flat this week.', decCls:'ms-crit' },
+    SEA: { signal:'0 SIGNUPS',   signalCls:'ms-crit',
+           headline:'฿47,303 spent — 0 signups',
+           fti:0, ftiLbl:'Signups this week', ftiC:'mnv-r',
+           cpa:'—', cpaLbl:'Cost per signup', cpaC:'mnv-r',
+           working:0, workingLbl:'Ads working', workingC:'mnv-r',
+           summary:'Zero signups for 2nd consecutive week. Spent ฿47,303 reaching 205,258 people — nobody converting. Every active creative has a burned-out audience.',
+           decision:'Stop spending in SEA until new ad is ready. Shoot replacement this week.', decCls:'ms-crit' },
+    ROW: { signal:'0 SIGNUPS',   signalCls:'ms-crit',
+           headline:'฿7,845 spent — 0 signups',
+           fti:0, ftiLbl:'Signups this week', ftiC:'mnv-r',
+           cpa:'—', cpaLbl:'Cost per signup', cpaC:'mnv-r',
+           working:0, workingLbl:'Ads working', workingC:'mnv-r',
+           summary:'UK spent ฿7,845, reached 4,210 people — frequency 2.57 (same people seeing it 2.5 times). 0 conversions. Wrong message for UK market.',
+           decision:'Stop all UK ads now. Reshoot with UK Shopify business owner (Week 2).', decCls:'ms-crit' },
+  },
+  CW17: {
+    // Real data: week ending 15 Mar 2026 (latest in CSV)
+    TH:  { signal:'RECOVERING',  signalCls:'ms-reset',
+           headline:'฿42,584 spent — signups tracking gap',
+           fti:0, ftiLbl:'Signups this week', ftiC:'mnv-o',
+           cpa:'—', cpaLbl:'Cost per signup', cpaC:'mnv-o',
+           working:5, workingLbl:'Ads working', workingC:'mnv-g',
+           summary:'Spent ฿42,584, reached 137,535 people. FTI shows 0 in this export due to AI Max restructure tracking gap — Meta dashboard shows positive signal. Post-Songkran recovery expected CW18.',
+           decision:'Scale UG-TS-001 +50%. KOL-TS-001 +25%. Verify conversion tracking fix.', decCls:'ms-scale' },
+    SEA: { signal:'CRITICAL',    signalCls:'ms-crit',
+           headline:'฿36,883 spent — 0 signups · 3rd week in a row',
+           fti:0, ftiLbl:'Signups this week', ftiC:'mnv-r',
+           cpa:'—', cpaLbl:'Cost per signup', cpaC:'mnv-r',
+           working:0, workingLbl:'Ads working', workingC:'mnv-r',
+           summary:'3rd straight week of 0 signups in SEA. ฿36,883 wasted. Reached 144,183 people — frequency 1.67 on awareness side but conversion ads completely dead.',
+           decision:'Stop MY Awareness ad today. New ad must be shot and live within 7 days.', decCls:'ms-crit' },
+    ROW: { signal:'STARTING OVER', signalCls:'ms-reset',
+           headline:'฿8,203 spent — 0 signups total (5 weeks)',
+           fti:0, ftiLbl:'Signups this week', ftiC:'mnv-r',
+           cpa:'—', cpaLbl:'Cost per signup', cpaC:'mnv-r',
+           working:0, workingLbl:'Ads working', workingC:'mnv-r',
+           summary:'5 weeks running, ฿65k total spent, 0 UK signups ever. Reached 4,415 people this week at frequency 2.27. Wrong angle entirely — reshooting with UK Shopify store owner.',
+           decision:'Stop all UK ads now. New shoot with UK merchant by Week 2.', decCls:'ms-crit' },
+  },
+};
+
+const ACTION_BOX_CLASS = {SCALE:'ab-grn',KILL:'ab-red',REFRESH:'ab-ora',WATCH:'ab-yel',HOLD:'ab-yel'};
+
+// ═══════════════════════════════════════════════════════════
+// MARKET STATUS STRIP — updates when period changes
+// ═══════════════════════════════════════════════════════════
+// CW label → FB_REAL key mapping
+const CW_TO_DATE = {
+  'CW01':'04 Jan 2026','CW02':'11 Jan 2026','CW03':'18 Jan 2026','CW04':'25 Jan 2026',
+  'CW05':'01 Feb 2026','CW06':'08 Feb 2026','CW07':'15 Feb 2026','CW08':'22 Feb 2026',
+  'CW09':'01 Mar 2026','CW10':'08 Mar 2026','CW11':'15 Mar 2026',
+  'CW14':'22 Feb 2026','CW15':'01 Mar 2026','CW16':'08 Mar 2026','CW17':'15 Mar 2026'
+};
+// Region rollup: TH=TH, SEA=SEA (or MY+SG+PH sum), ROW=ROW
+function getRealFB(cw, regionKey) {
+  const dateKey = CW_TO_DATE[cw];
+  if(!dateKey || !FB_REAL[dateKey]) return null;
+  const week = FB_REAL[dateKey];
+  if(regionKey === 'TH')  return week['TH'] || null;
+  if(regionKey === 'SEA') {
+    // Use SEA rollup if available, else sum MY+SG+PH
+    if(week['SEA']) return week['SEA'];
+    const my = week['MY']||{}, sg = week['SG']||{}, ph = week['PH']||{};
+    return {
+      total_spend: (my.total_spend||0)+(sg.total_spend||0)+(ph.total_spend||0),
+      fti: (my.fti||0)+(sg.fti||0)+(ph.fti||0),
+      conv_spend: (my.conv_spend||0)+(sg.conv_spend||0)+(ph.conv_spend||0),
+      reach: (my.reach||0)+(sg.reach||0)+(ph.reach||0),
+      ctr: (((my.ctr||0)+(sg.ctr||0)+(ph.ctr||0))/3).toFixed(2),
+      freq: Math.max(my.freq||0, sg.freq||0, ph.freq||0),
+      cpa: (my.cpa||0)||(sg.cpa||0)||(ph.cpa||0) || 0
+    };
+  }
+  if(regionKey === 'ROW') return week['ROW'] || null;
+  return null;
+}
+
+function renderMarketStrip(cw){
+  const period = cw || activePeriod || 'CW17';
+  const data = MARKET_BY_CW[period] || MARKET_BY_CW['CW17'];
+  const el = document.getElementById('mktStrip');
+  const REGIONS = [
+    {key:'TH',  flag:'🇹🇭', label:'Thailand',             dotCls:'mnd-th',  cardCls:'mc-th'},
+    {key:'SEA', flag:'🌏', label:'SEA  (MY · SG · PH)',  dotCls:'mnd-sea', cardCls:'mc-sea'},
+    {key:'ROW', flag:'🌍', label:'ROW  (UK primary)',     dotCls:'mnd-row', cardCls:'mc-row'},
+  ];
+  el.innerHTML = REGIONS.map(r => {
+    const d = data[r.key];
+    const fb = getRealFB(period, r.key);
+
+    // Real metrics override static where available
+    const realSpend  = fb ? '฿'+fb.total_spend.toLocaleString() : '—';
+    const realFTI    = fb ? fb.fti.toString() : d.fti.toString();
+    const realCPA    = fb && fb.cpa > 0 ? '฿'+fb.cpa.toLocaleString() : (fb && fb.fti===0 ? 'No conversions' : '—');
+    const realReach  = fb && fb.reach > 0 ? (fb.reach >= 1000 ? (fb.reach/1000).toFixed(0)+'k' : fb.reach.toString()) : '—';
+    const realFreq   = fb && fb.freq > 0 ? fb.freq.toFixed(1)+'×' : '—';
+    const realCTR    = fb ? fb.ctr+'%' : '—';
+    const hasRealData = !!fb;
+
+    // Determine working ads count from ADS array
+    const workingCount = ADS.filter(a=>a.region===r.key && a.status==='LIVE' && ['SCALE','WATCH','HOLD'].includes(a.verdict)).length;
+    const ftiNum = fb ? fb.fti : d.fti;
+    const cpaNum = fb ? fb.cpa : 0;
+    const ftiColor = ftiNum >= 10 ? 'mnv-g' : ftiNum === 0 ? 'mnv-r' : 'mnv-o';
+    const cpaColor = cpaNum > 0 && cpaNum < 3000 ? 'mnv-g' : cpaNum > 6000 ? 'mnv-r' : 'mnv-o';
+    const workColor = workingCount >= 3 ? 'mnv-g' : workingCount === 0 ? 'mnv-r' : 'mnv-o';
+
+    const dataTag = hasRealData
+      ? `<span style="font-size:9px;font-family:'DM Mono',monospace;color:var(--th);opacity:.7;">● live</span>`
+      : ``;
+
+    return `<div class="mkt-card ${r.cardCls}">
+      <div class="mkt-top">
+        <div class="mkt-name"><span class="mkt-name-dot ${r.dotCls}"></span>${r.flag} ${r.label}</div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          ${dataTag}
+          <span class="mkt-status ${d.signalCls}">${d.signal}</span>
+        </div>
+      </div>
+      <div class="mkt-headline">${d.headline}</div>
+      <div class="mkt-numbers">
+        <div class="mkt-num"><div class="mn-lbl">Signups (FTI)</div><div class="mn-val ${ftiColor}">${realFTI}</div><div class="mn-sub">from Facebook ads</div></div>
+        <div class="mkt-num"><div class="mn-lbl">Cost per signup</div><div class="mn-val ${cpaColor}">${realCPA}</div><div class="mn-sub">plan: TH ฿550 / SEA ฿739</div></div>
+        <div class="mkt-num"><div class="mn-lbl">Ad spend</div><div class="mn-val mnv-t">${realSpend}</div><div class="mn-sub">Facebook only</div></div>
+      </div>
+      <div class="mkt-numbers" style="margin-top:6px;">
+        <div class="mkt-num"><div class="mn-lbl">People reached</div><div class="mn-val mnv-t">${realReach}</div></div>
+        <div class="mkt-num"><div class="mn-lbl">Avg views/person</div><div class="mn-val" style="color:${fb && fb.freq>=3?'var(--red)':fb && fb.freq>=2.5?'var(--orange)':'var(--text)'};">${realFreq}</div></div>
+        <div class="mkt-num"><div class="mn-lbl">Ads still working</div><div class="mn-val ${workColor}">${workingCount}</div></div>
+      </div>
+      <div class="mkt-summary">${d.summary}</div>
+      <div class="mkt-decision ${d.decCls}"><span class="dec-label">Decision →</span>${d.decision}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOP STATS
+// ═══════════════════════════════════════════════════════════
+function renderStats(){
+  const live    = ADS.filter(a=>a.status==='LIVE').length;
+  const scaling = ADS.filter(a=>a.verdict==='SCALE').length;
+  const atRisk  = ADS.filter(a=>['KILL','REFRESH','SATURATE'].includes(a.verdict)).length;
+  document.getElementById('stats-strip').innerHTML = `
+    <div class="stat"><div class="stat-lbl">Live ads</div><div class="stat-val c-txt">${live}</div><div class="stat-note">across TH / SEA / ROW</div></div>
+    <div class="stat"><div class="stat-lbl">Scaling</div><div class="stat-val c-th">${scaling}</div><div class="stat-note">verdict = SCALE</div></div>
+    <div class="stat"><div class="stat-lbl">At risk</div><div class="stat-val c-red">${atRisk}</div><div class="stat-note">KILL · REFRESH · SATURATE</div></div>
+    <div class="stat"><div class="stat-lbl">In production</div><div class="stat-val c-pur">6</div><div class="stat-note">CW17 sprint · see Section D</div></div>`;
+  const byRegion = r => ADS.filter(a=>a.region===r && a.status==='LIVE').length;
+  document.getElementById('nv-th').textContent  = `TH · ${byRegion('TH')}`;
+  document.getElementById('nv-sea').textContent = `SEA · ${byRegion('SEA')}`;
+  document.getElementById('nv-row').textContent = `ROW · ${byRegion('ROW')}`;
+}
+
+
+
+// ═══════════════════════════════════════════════════════════
+// CONTENT HEALTH STRIP
+// ═══════════════════════════════════════════════════════════
+function renderHealthStrip(){
+  const el = document.getElementById('healthStrip');
+  const HEALTH = [
+    {cls:'hsh-grn', label:'🟢 Working Well — Keep Going', count: ADS.filter(a=>a.verdict==='SCALE').length,
+     items:[
+       {strong:'TS (Testimonial) dominates TH', body:'3 of top 4 FTI drivers are TS format. KOL-TS + UG-TS both at ฿168 CPA. <span class="ftag ft-clone">CLONE</span>Pattern is real (N≥3).'},
+       {strong:'Real face = high hook', body:'KOL/UGC hook 33–38% vs AI 18–19%. Human presenter is the differentiating variable in TH.'},
+       {strong:'Freq 1.6–1.9 = room to scale', body:'All winners running healthy freq. Scale window is open — act now before it closes.'},
+     ]},
+    {cls:'hsh-yel', label:'🟡 Mixed Results — Watch Closely', count: ADS.filter(a=>['HOLD','WATCH'].includes(a.verdict)).length,
+     items:[
+       {strong:'SEA VB/ED: inconclusive', body:'2 FTI each, CPA 880–925 (above plan 739). Need 2 more clean weeks. Do not kill, do not scale.'},
+       {strong:'TH IH-VB-001: borderline', body:'Hook 22%, freq 2.4 creeping. VB angle proving weaker than TS in TH. May not survive next cycle.'},
+       {strong:'KOL-ED-001: watch freq', body:'132 FTI lifetime — best ever. But freq 2.1 and no in-house backup. Risk is high.'},
+     ]},
+    {cls:'hsh-red', label:'🔴 Problems — Stop or Replace', count: ADS.filter(a=>['KILL','REFRESH'].includes(a.verdict)).length,
+     items:[
+       {strong:'SEA-VB-002: freq 5.76', body:'<span class="ftag ft-fat">Burned out</span>Had 7 FTI lifetime. Dead from overexposure. Pause today.'},
+       {strong:'ROW VB: 0 FTI in 5 wks', body:'<span class="ftag ft-doa">Never worked</span>Wrong angle (VB) + wrong feature (Chat vs Shopify) for UK market.'},
+       {strong:'SG VB-003: hook 14%', body:'<span class="ftag ft-doa">Never worked</span>Never stopped scroll. Below kill threshold from day 1.'},
+       {strong:'Learning: VB loses to TS everywhere', body:'Stop briefing VB as primary angle. TS/ST consistently outperforms across all markets.'},
+     ]},
+  ];
+  el.innerHTML = HEALTH.map(h=>`
+    <div class="hs-card">
+      <div class="hs-head ${h.cls}">${h.label}<span class="hs-count">${h.count} ads</span></div>
+      <div class="hs-body">${h.items.map(i=>`<div class="hs-item"><strong>${i.strong}</strong>${i.body}</div>`).join('')}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// SECTION A — per-market ad list with EXPANDED PANEL
+// ═══════════════════════════════════════════════════════════
+function regionLabel(r){
+  if(r==='TH')  return {name:'TH',  dot:'rd-th',  note:'Thailand'};
+  if(r==='SEA') return {name:'SEA (MY + SG + PH)', dot:'rd-sea', note:'Malaysia · Singapore · Philippines'};
+  if(r==='ROW') return {name:'ROW (UK primary)', dot:'rd-row', note:'United Kingdom · US secondary'};
+  return {name:r, dot:'', note:''};
+}
+
+function buildExpandPanel(a){
+  const ftTag  = a.failure_type === 'FATIGUE' ? '<span class="failure-tag flt-fat">Burned out — worked before, audience saw it too many times</span>'
+               : a.failure_type === 'NEVER_WORKED'     ? '<span class="failure-tag flt-doa">Never worked — wrong message from day one</span>'
+               : '<span class="failure-tag flt-na">N/A — still active</span>';
+  const acCls  = ACTION_BOX_CLASS[a.action_type] || 'ab-yel';
+  const planCAC = a.region==='TH' ? '฿550' : a.region==='SEA' ? '฿739' : '฿1,800';
+  return `
+    ${assetPreviewHTML(a.code)}
+    <div class="expand-grid">
+      <div class="expand-col">
+        <div class="exp-col-title">Failure type &amp; diagnosis</div>
+        ${ftTag}
+        <div class="exp-text">${a.diagnosis}</div>
+      </div>
+      <div class="expand-col">
+        <div class="exp-col-title">Action — what to do now</div>
+        <div class="action-box ${acCls}">${a.action}</div>
+      </div>
+      <div class="expand-col">
+        <div class="exp-col-title">Replace with</div>
+        <div class="replace-box">
+          <div class="rb-text">${a.replace}</div>
+          ${a.verdict==='SCALE'?'<div class="rb-pred">Prediction: ≥15 FTI / wk · maintain freq &lt;2.5</div>':''}
+          ${a.verdict==='REFRESH'?'<div class="rb-pred">Prediction: replacement ≥15 FTI by CW20</div>':''}
+          ${a.verdict==='KILL'&&a.failure_type==='NEVER_WORKED'?'<div class="rb-pred">New brief needed — full angle reset</div>':''}
+        </div>
+      </div>
+    </div>
+    <div class="mrows" style="margin-top:10px;margin-bottom:0;">
+      <div class="mbox"><div class="mbox-l">FTI (LW)</div><div class="mbox-v" style="color:${a.fti>=10?'var(--green)':a.fti===0?'var(--red)':'var(--text)'}">${a.fti}</div><div class="mbox-s">PW ${a.fti_pw} · life ${a.fti_life}</div></div>
+      <div class="mbox"><div class="mbox-l">CPA</div><div class="mbox-v" style="color:${a.cpa>0&&a.cpa<300?'var(--green)':a.cpa>600?'var(--red)':'var(--text)'}">${a.cpa ? '฿'+a.cpa : '—'}</div><div class="mbox-s">Plan CAC ${planCAC}</div></div>
+      <div class="mbox"><div class="mbox-l">Hook rate</div><div class="mbox-v" style="color:${a.hook>=35?'var(--green)':a.hook<15?'var(--red)':'var(--text)'}">${a.hook}%</div><div class="mbox-s">Kill &lt;15% · Scale &gt;35%</div></div>
+      <div class="mbox"><div class="mbox-l">Frequency</div><div class="mbox-v" style="color:${a.freq>=3?'var(--red)':a.freq>=2.5?'var(--orange)':'var(--text)'}">${a.freq}</div><div class="mbox-s">${a.freq>=3?'⚠ fatigue zone':a.freq>=2.5?'watch zone':'ok'}</div></div>
+    </div>
+    <div class="axs-inline" style="margin-top:8px;">axes: <span>${a.region}</span> · <span>${a.country}</span> · <span>${a.lang}</span> · <span>${PROD_DECODE[a.prod]||a.prod}</span> · <span>${ANGLE_DECODE[a.angle]||a.angle}</span> · <span>${a.feat}</span> · <span>${a.funnel}</span></div>`;
+}
+
+function renderSectionA(){
+  const container = document.getElementById('sectionA');
+  let html = '';
+  ['TH','SEA','ROW'].forEach(reg => {
+    const ads = ADS.filter(a=>a.region===reg).slice().sort((a,b)=>{
+      const va = VERDICT_WEIGHT[a.verdict]||0, vb = VERDICT_WEIGHT[b.verdict]||0;
+      return vb!==va ? vb-va : b.fti-a.fti;
+    });
+    const rl = regionLabel(reg);
+    html += `<div class="region-hdr"><div class="rdot ${rl.dot}"></div>${rl.name}<span class="rcount">${ads.length} ads · ${rl.note}</span></div>`;
+    ['BOF','TOF'].forEach(fun => {
+      const funnelAds = ads.filter(a=>a.funnel===fun);
+      if(!funnelAds.length) return;
+      html += `<div class="funnel-group"><div class="funnel-lbl">── ${fun} (${fun==='BOF'?'Conversion':'Awareness'}) · ${funnelAds.length} ads</div><div class="alist">`;
+      funnelAds.forEach((a,i) => {
+        const id = `arow-${reg}-${fun}-${i}`;
+        const vc = VERDICT_CLASS[a.verdict]||'v-hold';
+        const srcTag = a.src==='C' ? '' : '';
+        const emoji = '';
+        const ftBadge = a.failure_type==='FATIGUE' ? '<span style="font-size:9px;color:var(--orange);margin-left:6px;font-family:\'DM Mono\',monospace;">fatigue</span>'
+                      : a.failure_type==='NEVER_WORKED' ? '<span style="font-size:9px;color:var(--red);margin-left:6px;font-family:\'DM Mono\',monospace;">never worked</span>' : '';
+        html += `
+          <div class="arow" id="${id}">
+            <div class="arow-top" onclick="toggleRow('${id}')">
+              <span class="chev">▶</span>
+              <span class="acode ${a.status==='PAUSED'?'muted':''}">${a.code}</span>
+              ${srcTag}${ftBadge}
+              <span class="vbadge ${vc}">${emoji}${a.verdict}</span>
+            </div>
+            <div class="arow-body">${buildExpandPanel(a)}</div>
+          </div>`;
+      });
+      html += `</div></div>`;
+    });
+  });
+  container.innerHTML = html;
+}
+
+function toggleRow(id){
+  document.getElementById(id).classList.toggle('expanded');
+}
+
+// ═══════════════════════════════════════════════════════════
+// SECTION B — segment scorecard (unchanged logic)
+// ═══════════════════════════════════════════════════════════
+function renderSectionB(){
+  const reg  = document.getElementById('fB-region').value;
+  const fun  = document.getElementById('fB-funnel').value;
+  const axis = document.getElementById('fB-axis').value;
+  let pool = ADS.filter(a=>a.status!=='PAUSED');
+  if(reg!=='ALL') pool = pool.filter(a=>a.region===reg);
+  if(fun!=='ALL') pool = pool.filter(a=>a.funnel===fun);
+  const metric = 'fti';
+  const groups = {};
+  pool.forEach(a=>{ const k=a[axis]||'?'; if(!groups[k]) groups[k]=[]; groups[k].push(a); });
+  const allAvg = pool.length ? pool.reduce((s,a)=>s+a[metric],0)/pool.length : 0;
+  const entries = Object.entries(groups).map(([k,g])=>{
+    const avg = +(g.reduce((s,a)=>s+a[metric],0)/g.length).toFixed(1);
+    const delta = allAvg>0 ? Math.round(((avg-allAvg)/allAvg)*100) : 0;
+    let tag='mid';
+    if(g.length<3) tag='directional';
+    else if(delta>=25) tag='winner';
+    else if(delta<=-25) tag='loser';
+    return {key:PROD_DECODE[k]||ANGLE_DECODE[k]||k, n:g.length, avg, delta, tag};
+  }).sort((a,b)=>b.avg-a.avg);
+  const decode = v => PROD_DECODE[v]||ANGLE_DECODE[v]||v;
+  let html = `<div class="sb-title">${AXIS_LABEL[axis]||axis} · metric: FTI (last week) · pool avg ${allAvg.toFixed(1)}</div>`;
+  entries.forEach(e=>{
+    if(e.tag==='winner')      html+=`<div class="sline"><span class="stag s-win">🟢 winner</span><span class="sval">${e.key}</span><span class="sdesc">N=${e.n} · avg FTI ${e.avg} · +${e.delta}% vs group</span></div>`;
+    else if(e.tag==='loser')  html+=`<div class="sline"><span class="stag s-los">🔴 loser</span><span class="sval">${e.key}</span><span class="sdesc">N=${e.n} · avg FTI ${e.avg} · ${e.delta}% vs group</span></div>`;
+    else if(e.tag==='directional') html+=`<div class="sline"><span class="stag s-dir">◐ N&lt;3</span><span class="sval">${e.key}</span><span class="sdesc">N=${e.n} · avg ${e.avg} · directional only</span></div>`;
+    else html+=`<div class="sline"><span class="stag s-unt">◯ mid</span><span class="sval">${e.key}</span><span class="sdesc">N=${e.n} · avg ${e.avg} · ${e.delta>0?'+':''}${e.delta}% vs group</span></div>`;
+  });
+  document.getElementById('scorebox').innerHTML = html;
+}
+['fB-region','fB-funnel','fB-axis'].forEach(id=>{
+  document.addEventListener('DOMContentLoaded',()=>document.getElementById(id).addEventListener('change',renderSectionB));
+});
+
+// ═══════════════════════════════════════════════════════════
+// SECTION C — sortable flat table
+// ═══════════════════════════════════════════════════════════
+let sortState = {col:'fti', asc:false};
+const activeFilters = {region:new Set(), funnel:new Set(), verdict:new Set()};
+
+function renderFilters(){
+  // Verdict filter pills — use plain-English display labels
+  const VERDICT_FILTERS = [
+    {val:'SCALE',   label:'🟢 Scale',            cls:'on-grn'},
+    {val:'WATCH',   label:'🟡 Watch Closely',     cls:'on'},
+    {val:'HOLD',    label:'⏸ Wait & Watch',       cls:'on'},
+    {val:'REFRESH', label:'🟠 Replace Creative',  cls:'on-red'},
+    {val:'KILL',    label:'🔴 Stop Now',           cls:'on-red'},
+    {val:'PAUSED',  label:'— Paused',             cls:'on'},
+  ];
+  const REGION_LABELS = {TH:'🇹🇭 Thailand', SEA:'🌏 SEA', ROW:'🌍 ROW'};
+  const FUNNEL_LABELS = {BOF:'Conversion (BOF)', TOF:'Awareness (TOF)'};
+
+  const regions = [...new Set(ADS.map(a=>a.region))];
+  const funnels = [...new Set(ADS.map(a=>a.funnel))];
+
+  let html = '<span class="flabel">Market:</span>';
+  regions.forEach(r=>
+    html+=`<span class="pill" data-filter="region" data-val="${r}">${REGION_LABELS[r]||r}</span>`
+  );
+  html+='<span style="width:1px;height:20px;background:var(--border);display:inline-block;margin:0 4px;vertical-align:middle;"></span>';
+  html+='<span class="flabel">Funnel:</span>';
+  funnels.forEach(f=>
+    html+=`<span class="pill" data-filter="funnel" data-val="${f}">${FUNNEL_LABELS[f]||f}</span>`
+  );
+  html+='<span style="width:1px;height:20px;background:var(--border);display:inline-block;margin:0 4px;vertical-align:middle;"></span>';
+  html+='<span class="flabel">Decision:</span>';
+  VERDICT_FILTERS.forEach(v=>
+    html+=`<span class="pill" data-filter="verdict" data-val="${v.val}" data-cls="${v.cls}">${v.label}</span>`
+  );
+  html+=`<span style="width:8px;"></span><span class="pill" id="clearF">clear all</span>`;
+  document.getElementById('tfilters').innerHTML = html;
+
+  document.querySelectorAll('#tfilters .pill[data-filter]').forEach(p=>{
+    p.addEventListener('click',()=>{
+      const f=p.dataset.filter, v=p.dataset.val, cls=p.dataset.cls||'on';
+      if(activeFilters[f].has(v)){ activeFilters[f].delete(v); p.classList.remove('on','on-red','on-grn'); }
+      else{ activeFilters[f].add(v); p.classList.add(cls); }
+      renderFlatTable();
+    });
+  });
+  document.getElementById('clearF').addEventListener('click',()=>{
+    Object.values(activeFilters).forEach(s=>s.clear());
+    document.querySelectorAll('#tfilters .pill').forEach(p=>p.classList.remove('on','on-red','on-grn'));
+    renderFlatTable();
+  });
+}
+
+function toggleFlatRow(id){
+  if(flatExpanded.has(id)) flatExpanded.delete(id);
+  else flatExpanded.add(id);
+  renderFlatTable();
+}
+const flatExpanded = new Set();
+
+function renderFlatTable(){
+  let rows = ADS.slice();
+  for(const [key,set] of Object.entries(activeFilters)) if(set.size>0) rows=rows.filter(r=>set.has(r[key]));
+  rows.sort((a,b)=>{
+    const va=a[sortState.col], vb=b[sortState.col];
+    if(typeof va==='number'&&typeof vb==='number') return sortState.asc?va-vb:vb-va;
+    return sortState.asc?String(va).localeCompare(String(vb)):String(vb).localeCompare(String(va));
+  });
+  document.querySelectorAll('#flatTable th').forEach(th=>{
+    th.classList.remove('sorted','asc');
+    if(th.dataset.col===sortState.col){ th.classList.add('sorted'); if(sortState.asc) th.classList.add('asc'); }
+  });
+
+  const AC = {SCALE:'ab-grn',KILL:'ab-red',REFRESH:'ab-ora',WATCH:'ab-yel',HOLD:'ab-yel',PAUSED:'ab-yel'};
+  let html='';
+  rows.forEach((a,idx)=>{
+    const vc=VERDICT_CLASS[a.verdict]||'v-hold';
+    const rowId=`flat-${idx}-${a.code.replace(/[^a-z0-9]/gi,'')}`;
+    const isOpen=flatExpanded.has(rowId);
+    const ftiC=a.fti>=10?'var(--green)':a.fti===0?'var(--red)':'var(--text)';
+    const freqC=a.freq>=3?'var(--red)':a.freq>=2.5?'var(--orange)':'var(--text)';
+    const hookC=a.hook>=35?'var(--green)':a.hook<15?'var(--red)':'var(--text)';
+    const cpaC=a.cpa>0&&a.cpa<300?'var(--green)':a.cpa>600?'var(--red)':'var(--text)';
+    const ftBadge=a.failure_type==='FATIGUE'
+      ?`<span style="font-size:9px;color:var(--orange);font-family:'DM Mono',monospace;margin-left:5px;">burned out</span>`
+      :a.failure_type==='NEVER_WORKED'
+      ?`<span style="font-size:9px;color:var(--red);font-family:'DM Mono',monospace;margin-left:5px;">never worked</span>`:``;
+    const regBg=a.region==='TH'?'var(--th-bg)':a.region==='SEA'?'var(--sea-bg)':'var(--row-bg)';
+    const regCl=a.region==='TH'?'var(--th)':a.region==='SEA'?'var(--sea)':'var(--row)';
+    const regBd=a.region==='TH'?'var(--th-bd)':a.region==='SEA'?'var(--sea-bd)':'var(--row-bd)';
+
+    html+=`<tr style="cursor:pointer;" onclick="toggleFlatRow('${rowId}')">
+      <td style="width:14px;color:var(--text3);font-size:10px;padding-left:10px;">${isOpen?'▼':'▶'}</td>
+      <td class="mono">${a.code}${a.src==='P'?` <span style="color:var(--yellow);opacity:.7;font-size:10px;" `:` <span style="color:var(--th);opacity:.8;font-size:10px;" `}</td>
+      <td><span style="font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px;background:${regBg};color:${regCl};border:1px solid ${regBd};">${a.region}</span></td>
+      <td>${a.country}</td><td>${a.prod}</td><td>${ANGLE_DECODE[a.angle]||a.angle}</td><td>${a.funnel}</td>
+      <td class="mono" style="color:${ftiC};font-weight:${a.fti>=10?'600':'400'};">${a.fti} <span style="color:var(--text3);font-size:10px;">/ ${a.fti_pw}</span></td>
+      <td class="mono" style="color:${cpaC};">${a.cpa?'฿'+a.cpa:'—'}</td>
+      <td class="mono" style="color:${hookC};">${a.hook}%</td>
+      <td class="mono" style="color:${freqC};">${a.freq}${a.freq>=3?' ⚠':''}</td>
+      <td><span class="vbadge ${vc}" style="font-size:9px;padding:2px 6px;">${VERDICT_DISPLAY[a.verdict]||a.verdict}</span>${ftBadge}</td>
+    </tr>`;
+
+    if(isOpen){
+      const ftTag=a.failure_type==='FATIGUE'
+        ?`<span class="failure-tag flt-fat">Burned out — worked before, audience saw it too many times</span>`
+        :a.failure_type==='NEVER_WORKED'
+        ?`<span class="failure-tag flt-doa">Never worked — wrong message from day one</span>`
+        :`<span class="failure-tag flt-na">Active — no failure</span>`;
+      const acCls=AC[a.action_type||a.verdict]||'ab-yel';
+      const planCAC=a.region==='TH'?'฿550':a.region==='SEA'?'฿739':'฿1,800';
+      html+=`<tr><td colspan="12" style="padding:0;background:var(--bg2);border-bottom:2px solid var(--border2);">
+        <div style="padding:14px 18px 16px;">
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:7px 12px;">
+              <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px;">FTI (LW)</div>
+              <div style="font-family:'DM Mono',monospace;font-size:15px;font-weight:600;color:${ftiC};">${a.fti}</div>
+              <div style="font-size:10px;color:var(--text3);">PW ${a.fti_pw} · life ${a.fti_life}</div>
+            </div>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:7px 12px;">
+              <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px;">CPA</div>
+              <div style="font-family:'DM Mono',monospace;font-size:15px;font-weight:600;color:${cpaC};">${a.cpa?'฿'+a.cpa:'—'}</div>
+              <div style="font-size:10px;color:var(--text3);">Plan CAC ${planCAC}</div>
+            </div>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:7px 12px;">
+              <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px;">Hook rate</div>
+              <div style="font-family:'DM Mono',monospace;font-size:15px;font-weight:600;color:${hookC};">${a.hook}%</div>
+              <div style="font-size:10px;color:var(--text3);">Kill &lt;15% · Scale &gt;35%</div>
+            </div>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:7px 12px;">
+              <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px;">Frequency</div>
+              <div style="font-family:'DM Mono',monospace;font-size:15px;font-weight:600;color:${freqC};">${a.freq}${a.freq>=3?' ⚠':''}</div>
+              <div style="font-size:10px;color:var(--text3);">${a.freq>=3?'fatigue zone':a.freq>=2.5?'watch zone':'ok'}</div>
+            </div>
+          </div>
+          ${assetPreviewHTML(a.code)}<div class="expand-grid">
+            <div class="expand-col">
+              <div class="exp-col-title">Failure type</div>
+              ${ftTag}
+              <div class="exp-text" style="margin-top:7px;">${a.diagnosis||a.note}</div>
+            </div>
+            <div class="expand-col">
+              <div class="exp-col-title">Action — what to do now</div>
+              <div class="action-box ${acCls}">${a.action||'—'}</div>
+            </div>
+            <div class="expand-col">
+              <div class="exp-col-title">Replace with</div>
+              <div class="replace-box">
+                <div class="rb-text">${a.replace||'N/A'}</div>
+                ${a.verdict==='SCALE'?'<div class="rb-pred">Prediction: ≥15 FTI / wk · freq &lt;2.5</div>':''}
+                ${a.verdict==='REFRESH'?'<div class="rb-pred">Prediction: replacement ≥15 FTI by CW20</div>':''}
+                ${(a.verdict==='KILL'&&a.failure_type==='NEVER_WORKED')?'<div class="rb-pred">New brief needed — full angle reset</div>':''}
+              </div>
+            </div>
+          </div>
+        </div>
+      </td></tr>`;
+    }
+  });
+  document.getElementById('flatBody').innerHTML = html;
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('#flatTable th').forEach(th=>{
+    th.addEventListener('click',()=>{
+      const col=th.dataset.col;
+      if(sortState.col===col) sortState.asc=!sortState.asc;
+      else { sortState.col=col; sortState.asc=false; }
+      renderFlatTable();
+    });
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// PERIOD SELECTOR
+// ═══════════════════════════════════════════════════════════
+const CW_META = {
+  CW14: { label:'Feb 2 – 8, 2026',         note:'TH 15 signups · SEA 7 signups',         highlight:'TH ฿2,465/signup · SEA ฿4,522/signup' },
+  CW15: { label:'Feb 16 – 22, 2026',      note:'TH best week · SEA collapsing fast',    highlight:'TH 17 signups ฿1,583 · SEA 2 signups ฿10,221' },
+  CW16: { label:'Mar 2 – 8, 2026',        note:'AI Max collapse — 0 signups all markets', highlight:'TH ฿58k · SEA ฿47k · ROW ฿7.8k — all 0 signups' },
+  CW17: { label:'Mar 9 – 15, 2026',       note:'Latest pre-CW18 sample',                highlight:'TH recovering · SEA 3rd zero week · ROW 0 signups' },
+  CW18: { label:'Apr 28 – May 4, 2026',   note:'PH reactivated · TH workhorse healthy', highlight:'฿78.6K spend · 289 FTI · ฿272 blended CPA · 2.7× under plan' },
+};
+
+let activePeriod = 'CW18';
+let customFrom = 'CW18', customTo = 'CW18';
+
+function setPeriod(cw, btn) {
+  activePeriod = cw;
+  customFrom = cw; customTo = cw;
+  document.getElementById('periodFrom').value = cw;
+  document.getElementById('periodTo').value = cw;
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updatePeriodDisplay();
+  renderMarketStrip(cw);
+  applyPeriodFilter();
+}
+
+function setCustomPeriod() {
+  customFrom = document.getElementById('periodFrom').value;
+  customTo   = document.getElementById('periodTo').value;
+  // Clamp: from <= to
+  const order = ['CW14','CW15','CW16','CW17','CW18'];
+  if(order.indexOf(customFrom) > order.indexOf(customTo)) {
+    customTo = customFrom;
+    document.getElementById('periodTo').value = customTo;
+  }
+  // Deactivate quick buttons
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  // If single CW, activate matching quick btn
+  if(customFrom === customTo) {
+    const matching = document.querySelector(`.period-btn[onclick*="${customFrom}"]`);
+    if(matching) matching.classList.add('active');
+    activePeriod = customFrom;
+  } else {
+    activePeriod = null;
+  }
+  updatePeriodDisplay();
+  applyPeriodFilter();
+}
+
+function updatePeriodDisplay() {
+  const el = document.getElementById('periodDisplay');
+  const navEl = document.querySelector('.nav-meta');
+  if(customFrom === customTo) {
+    const m = CW_META[customFrom] || {};
+    el.textContent = `${m.label || customFrom} · ${customFrom}`;
+    if(navEl) navEl.textContent = `Meta-Asset · ${customFrom} 2026`;
+  } else {
+    el.textContent = `${customFrom} → ${customTo} · multi-week`;
+    if(navEl) navEl.textContent = `Meta-Asset · ${customFrom}–${customTo} 2026`;
+  }
+}
+
+function applyPeriodFilter() {
+  const order = ['CW14','CW15','CW16','CW17','CW18'];
+  const fi = order.indexOf(customFrom);
+  const ti = order.indexOf(customTo);
+
+  // Show a notice banner about the period
+  let notice = document.getElementById('periodNotice');
+  if(!notice) {
+    notice = document.createElement('div');
+    notice.id = 'periodNotice';
+    notice.style.cssText = 'background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;font-size:12px;color:var(--text2);';
+    const statsEl = document.getElementById('stats-strip');
+    statsEl.parentNode.insertBefore(notice, statsEl);
+  }
+
+  const cwRange = order.slice(fi, ti+1);
+  const inRange = a => cwRange.includes(a.cw);
+  const periodAds = ADS.filter(inRange);
+
+  if(customFrom === customTo) {
+    const m = CW_META[customFrom] || {};
+    notice.innerHTML = `
+      <span style="font-family:'DM Mono',monospace;font-size:10px;background:var(--sea-bg);color:var(--sea);border:1px solid var(--sea-bd);padding:2px 8px;border-radius:3px;flex-shrink:0;">${customFrom}</span>
+      <span><strong style="color:var(--text);">${m.label}</strong> · ${m.note}</span>
+      <span style="margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);">${m.highlight}</span>`;
+  } else {
+    notice.innerHTML = `
+      <span style="font-family:'DM Mono',monospace;font-size:10px;background:var(--sea-bg);color:var(--sea);border:1px solid var(--sea-bd);padding:2px 8px;border-radius:3px;flex-shrink:0;">${customFrom} → ${customTo}</span>
+      <span><strong style="color:var(--text);">Multi-week view</strong> · ${cwRange.length} weeks · ${periodAds.length} ad records</span>
+      <span style="margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);">Showing combined data — filter still applies</span>`;
+  }
+
+  // Re-render sections that use cw data
+  renderMarketStrip(customFrom === customTo ? customFrom : 'CW18');
+  renderSectionA_period(cwRange);
+  renderFlatTable();
+}
+
+// Period-aware Section A wrapper
+function renderSectionA_period(cwRange) {
+  // For now, all our ADS have cw:'CW17' so we always show all.
+  // When real multi-CW data is wired: filter ADS by cwRange here.
+  renderSectionA();
+}
+
+
+// ═══════════════════════════════════════════════════════════
+function showSub(id,btn){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.subtab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sub-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  renderStats();
+  renderMarketStrip();
+  renderHealthStrip();
+  renderSectionA();
+  renderSectionB();
+  renderFilters();
+  renderFlatTable();
+});
+</script>
+</body>
+</html>
